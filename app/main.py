@@ -7,7 +7,7 @@ app = FastAPI(
     title="Service Data Download",
     description="Service for data download usage",
     docs_url="/v1/api-docs",
-    version=ConfigClass.version
+    version = ConfigClass.version
 )
 
 app.add_middleware(
@@ -21,3 +21,5 @@ app.add_middleware(
 # API registry
 ## v1
 api_registry(app)
+
+
