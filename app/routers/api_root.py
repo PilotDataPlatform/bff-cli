@@ -9,4 +9,4 @@ async def root():
     '''
     For testing if service's up
     '''
-    return {"message": "Service-Download On, Version: " + ConfigClass.version}
+    return {"message": "BFF-CLI On, Version: " + ConfigClass.version}

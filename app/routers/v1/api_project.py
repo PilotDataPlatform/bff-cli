@@ -4,49 +4,44 @@ from ...models.models_data_download import EDataDownloadStatus, PreDataDowanload
 from ...models.base_models import APIResponse, EAPIResponseCode
 from ...models.project_models import ProjectListResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from ...resources.error_handler import catch_internal, ECustomizedError, customized_error_template
 from ...config import ConfigClass
-import os
-import time
-import requests
+from ...auth import jwt_required
 import jwt
 import requests
 from ...resources.helpers import get_user_role
-
+import json
 
 router = APIRouter()
-
-
-@cbv(router)
-class FiledataMeta:
-    def __init__(self):
-        self._logger = SrvLoggerFactory('api_file_meta').get_logger()
-
+_API_TAG = 'v1/project'
+_API_NAMESPACE = "api_project_list"
 
 @cbv(router)
 class APIProject:
     '''
     API Data Download Class
     '''
+    current_identity: dict = Depends(jwt_required)
 
     def __init__(self):
-        self._logger = SrvLoggerFactory('api_file_meta').get_logger()
+        self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.get("/project", response_model=ProjectListResponse,
+    @router.get("/project", tags=[_API_TAG],
+                response_model=ProjectListResponse,
                 summary="Get project list that user have access to")
-    async def list_project(self, request: Request):
+    @catch_internal(_API_NAMESPACE)
+    async def list_project(self):
         '''
         Get the project list that user have access to
         '''
         api_response = ProjectListResponse()
-        access_token = request.headers.get('authorization').split(' ')[1]
-        decoded = jwt.decode(access_token, verify=False)
-        username = decoded.get('preferred_username')
-        exp = decoded.get('exp')
-        if time.time() - exp > 0:
-            api_response.error_msg = "token expired"
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
-        user_role = get_user_role(username, api_response)
+        jwt_status = self.current_identity
+        try:
+            username = jwt_status['username']
+            user_role = jwt_status['role']
+        except (AttributeError, TypeError):
+            return jwt_status
+
         projects_list = []
         if user_role == "admin":
             url = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/query"

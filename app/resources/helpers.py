@@ -8,14 +8,16 @@ from ..commons.data_providers.redis import SrvRedisSingleton
 import requests
 from ..models.base_models import APIResponse, EAPIResponseCode
 
-def get_user_role(username, api_response):
+
+def get_user_role(username):
+    api_response = APIResponse()
     url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
     res = requests.post(
         url=url,
         json={"name": username}
     )
     users = json.loads(res.text)
-    if (len(users) == 0):
+    if len(users) == 0:
         api_response.error_msg = "token expired"
         api_response.code = EAPIResponseCode.forbidden
         return api_response.json_response()
