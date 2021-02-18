@@ -10,13 +10,17 @@ import time
 import requests
 import jwt
 import requests
+from ...resources.helpers import get_user_role
+
 
 router = APIRouter()
+
 
 @cbv(router)
 class FiledataMeta:
     def __init__(self):
         self._logger = SrvLoggerFactory('api_file_meta').get_logger()
+
 
 @cbv(router)
 class APIProject:
@@ -38,16 +42,37 @@ class APIProject:
         decoded = jwt.decode(access_token, verify=False)
         username = decoded.get('preferred_username')
         exp = decoded.get('exp')
-        #if time.time() - exp > 0:
-        #    return {'result': '', 'error_msg':'token expired', 'error_code': 401}
-        url = ConfigClass.NEO4J_SERVICE + "relations/query"
-        data = {'is_all': 'true'}
-
-        res = requests.post(
-            url=url,
-            json=data,
-        )
-        api_response.result = res.json()
+        if time.time() - exp > 0:
+            api_response.error_msg = "token expired"
+            api_response.code = EAPIResponseCode.forbidden
+            return api_response.json_response()
+        user_role = get_user_role(username, api_response)
+        projects_list = []
+        if user_role == "admin":
+            url = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/query"
+            data = {'is_all': 'true'}
+            res = requests.post(
+                url=url,
+                json=data,
+            )
+            project = res.json()
+        else:
+            url = ConfigClass.NEO4J_SERVICE + "relations/query"
+            data = {'start_params': {'name': username}}
+            res = requests.post(
+                url=url,
+                json=data,
+            )
+            res = res.json()
+            project = []
+            for i in res:
+                project.append(i['end_node'])
+        for p in project:
+            if p['labels'] == ['Dataset']:
+                res_projects = {'name': p.get('name'),
+                                'code': p.get('code')}
+                projects_list.append(res_projects)
+        api_response.result = projects_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
 

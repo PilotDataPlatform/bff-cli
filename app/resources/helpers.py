@@ -5,8 +5,25 @@ import json
 import enum
 from ..config import ConfigClass
 from ..commons.data_providers.redis import SrvRedisSingleton
+import requests
+from ..models.base_models import APIResponse, EAPIResponseCode
+
+def get_user_role(username, api_response):
+    url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
+    res = requests.post(
+        url=url,
+        json={"name": username}
+    )
+    users = json.loads(res.text)
+    if (len(users) == 0):
+        api_response.error_msg = "token expired"
+        api_response.code = EAPIResponseCode.forbidden
+        return api_response.json_response()
+    user_role = users[0]['role']
+    return user_role
 
 
+#######################################################
 def generate_zipped_file_path(project_code):
     '''
     generate zipped file path
