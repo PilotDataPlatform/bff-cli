@@ -1,0 +1,131 @@
+[2021-02-17 12:17:21 -0500] [332831] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5077']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /home/jzhang/Desktop/Indoc/service_download
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: app.main:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7f613c5090e0>
+  on_reload: <function OnReload.on_reload at 0x7f613c509200>
+  when_ready: <function WhenReady.when_ready at 0x7f613c509320>
+  pre_fork: <function Prefork.pre_fork at 0x7f613c509440>
+  post_fork: <function Postfork.post_fork at 0x7f613c509560>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f613c509680>
+  worker_int: <function WorkerInt.worker_int at 0x7f613c5097a0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f613c5098c0>
+  pre_exec: <function PreExec.pre_exec at 0x7f613c5099e0>
+  pre_request: <function PreRequest.pre_request at 0x7f613c509b00>
+  post_request: <function PostRequest.post_request at 0x7f613c509b90>
+  child_exit: <function ChildExit.child_exit at 0x7f613c509cb0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f613c509dd0>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f613c509ef0>
+  on_exit: <function OnExit.on_exit at 0x7f613c510050>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-02-17 12:17:21 -0500] [332831] [INFO] Starting gunicorn 20.0.4
+[2021-02-17 12:17:21 -0500] [332831] [DEBUG] Arbiter booted
+[2021-02-17 12:17:21 -0500] [332831] [INFO] Listening at: http://0.0.0.0:5077 (332831)
+[2021-02-17 12:17:21 -0500] [332831] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-02-17 12:17:21 -0500] [332834] [INFO] Booting worker with pid: 332834
+[2021-02-17 12:17:21 -0500] [332835] [INFO] Booting worker with pid: 332835
+[2021-02-17 12:17:21 -0500] [332834] [INFO] Started server process [332834]
+[2021-02-17 12:17:21 -0500] [332834] [INFO] Waiting for application startup.
+[2021-02-17 12:17:21 -0500] [332834] [INFO] Application startup complete.
+[2021-02-17 12:17:21 -0500] [332836] [INFO] Booting worker with pid: 332836
+[2021-02-17 12:17:21 -0500] [332835] [INFO] Started server process [332835]
+[2021-02-17 12:17:21 -0500] [332835] [INFO] Waiting for application startup.
+[2021-02-17 12:17:21 -0500] [332835] [INFO] Application startup complete.
+[2021-02-17 12:17:21 -0500] [332837] [INFO] Booting worker with pid: 332837
+[2021-02-17 12:17:21 -0500] [332831] [DEBUG] 4 workers
+[2021-02-17 12:17:21 -0500] [332836] [INFO] Started server process [332836]
+[2021-02-17 12:17:21 -0500] [332836] [INFO] Waiting for application startup.
+[2021-02-17 12:17:21 -0500] [332836] [INFO] Application startup complete.
+[2021-02-17 12:17:21 -0500] [332837] [INFO] Started server process [332837]
+[2021-02-17 12:17:21 -0500] [332837] [INFO] Waiting for application startup.
+[2021-02-17 12:17:21 -0500] [332837] [INFO] Application startup complete.
+[2021-02-17 12:18:24 -0500] [332831] [INFO] Handling signal: int
+[2021-02-17 12:18:24 -0500] [332837] [INFO] Shutting down
+[2021-02-17 12:18:24 -0500] [332837] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-17 12:18:24 -0500] [332834] [INFO] Shutting down
+[2021-02-17 12:18:24 -0500] [332834] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-17 12:18:24 -0500] [332836] [INFO] Shutting down
+[2021-02-17 12:18:24 -0500] [332836] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-17 12:18:24 -0500] [332835] [INFO] Shutting down
+[2021-02-17 12:18:24 -0500] [332835] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-17 12:18:24 -0500] [332837] [INFO] Waiting for application shutdown.
+[2021-02-17 12:18:24 -0500] [332837] [INFO] Application shutdown complete.
+[2021-02-17 12:18:24 -0500] [332837] [INFO] Finished server process [332837]
+[2021-02-17 12:18:24 -0500] [332837] [INFO] Worker exiting (pid: 332837)
+[2021-02-17 12:18:24 -0500] [332834] [INFO] Waiting for application shutdown.
+[2021-02-17 12:18:24 -0500] [332834] [INFO] Application shutdown complete.
+[2021-02-17 12:18:24 -0500] [332834] [INFO] Finished server process [332834]
+[2021-02-17 12:18:24 -0500] [332834] [INFO] Worker exiting (pid: 332834)
+[2021-02-17 12:18:24 -0500] [332836] [INFO] Waiting for application shutdown.
+[2021-02-17 12:18:24 -0500] [332836] [INFO] Application shutdown complete.
+[2021-02-17 12:18:24 -0500] [332836] [INFO] Finished server process [332836]
+[2021-02-17 12:18:24 -0500] [332836] [INFO] Worker exiting (pid: 332836)
+[2021-02-17 12:18:24 -0500] [332835] [INFO] Waiting for application shutdown.
+[2021-02-17 12:18:24 -0500] [332835] [INFO] Application shutdown complete.
+[2021-02-17 12:18:24 -0500] [332835] [INFO] Finished server process [332835]
+[2021-02-17 12:18:24 -0500] [332835] [INFO] Worker exiting (pid: 332835)
+[2021-02-17 12:18:24 -0500] [332831] [INFO] Shutting down: Master
