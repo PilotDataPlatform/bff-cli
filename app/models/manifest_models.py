@@ -2,19 +2,19 @@ from enum import Enum
 from pydantic import BaseModel, Field
 from .base_models import APIResponse
 
-### ProjectList ###
+### Manifest ###
 
 
-class ProjectListParams(BaseModel):
+class ManifestListParams(BaseModel):
     '''
-    Project list params model
+    Manifest list params model
     '''
     pass
 
 
-class ProjectListResponse(APIResponse):
+class ManifestListResponse(APIResponse):
     '''
-    Project list response class
+    Manifest list response class
     '''
     result: dict = Field({}, example={
             "code": 200,
