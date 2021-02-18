@@ -44,8 +44,9 @@ class APIManifestList:
         except (AttributeError, TypeError):
             return jwt_status
         manifests = db.query(DataManifestModel.name, DataManifestModel.id).filter_by(project_code=project_code).all()
-        results = []
+        manifest_list = {}
         for manifest in manifests:
+            attr_list = []
             attributes = db.query(DataAttributeModel.name,
                                   DataAttributeModel.type,
                                   DataAttributeModel.optional,
@@ -57,7 +58,8 @@ class APIManifestList:
                           "type": attr[1],
                           "optional": attr[2],
                           "value": attr[3]}
-                results.append(result)
-        api_response.result = results
+                attr_list.append(result)
+            manifest_list[manifest[0]] = attr_list
+        api_response.result = manifest_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
