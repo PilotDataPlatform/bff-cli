@@ -39,3 +39,4 @@ class APIManifestList:
         api_response.result = manifest_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
+

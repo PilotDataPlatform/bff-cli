@@ -9,7 +9,7 @@ class ProjectListParams(BaseModel):
     '''
     Project list params model
     '''
-    pass
+    project_code: str
 
 
 class ProjectListResponse(APIResponse):
