@@ -21,13 +21,12 @@ class APIManifest:
 
     @router.get("/manifest", tags=[_API_TAG],
                 response_model=ManifestListResponse,
-                summary="Get manifest list by project code")
+                summary="Get manifest list by project code (project_code required)")
     @catch_internal(_API_NAMESPACE)
-    async def list_manifest(self, request_params: ManifestListParams,
+    async def list_manifest(self, project_code: str,
                             db: Session = Depends(get_db),
                             current_identity: dict = Depends(jwt_required)):
         api_response = ManifestListResponse()
-        project_code = request_params.project_code
         try:
             _ = current_identity['username']
         except (AttributeError, TypeError):

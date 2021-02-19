@@ -5,13 +5,6 @@ from .base_models import APIResponse
 ### Manifest ###
 
 
-class ManifestListParams(BaseModel):
-    '''
-    Manifest list params model
-    '''
-    project_code: str
-
-
 class ManifestListResponse(APIResponse):
     '''
     Manifest list response class
