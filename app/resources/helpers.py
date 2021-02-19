@@ -1,10 +1,6 @@
-import os
-import zipfile
-import time
 import json
-import enum
 from ..config import ConfigClass
-from ..commons.data_providers.redis import SrvRedisSingleton
+from ..resources. error_handler import customized_error_template, ECustomizedError
 import requests
 from ..models.base_models import APIResponse, EAPIResponseCode
 from ..commons.data_providers.models import Base, DataManifestModel, DataAttributeModel
@@ -68,7 +64,7 @@ def get_user_role(username):
     )
     users = json.loads(res.text)
     if len(users) == 0:
-        api_response.error_msg = "token expired"
+        api_response.error_msg = customized_error_template(ECustomizedError.TOKEN_EXPIRED)
         api_response.code = EAPIResponseCode.forbidden
         return api_response.json_response()
     user_role = users[0]['role']
@@ -122,7 +118,7 @@ def check_attributes(attributes):
     name_requirements = re.compile("^[a-zA-z0-9]{1,32}$")
     for key, value in attributes.items():
         if not re.search(name_requirements, key):
-            return False, "regex validation error"
+            return False, customized_error_template(ECustomizedError.REGEX_VALIDATION_ERROR)
     return True, ""
 
 
@@ -130,23 +126,23 @@ def has_valid_attributes(manifest, attributes, db_session):
     exist_attributes = get_attributes_in_manifest(manifest, db_session)
     for attr in exist_attributes:
         if not attr.get('optional') and not attr.get('name') in attributes:
-            return False, "Missing required attribute"
+            return False, customized_error_template(ECustomizedError.MISSING_REQUIRED_ATTRIBUTES)
         if attr.get('type') == "multiple_choice":
             value = attributes.get(attr.get('name'))
             if value:
                 if not value in attr.get('value').split(","):
-                    return False, "Invalid choice field"
+                    return False, customized_error_template(ECustomizedError.INVALID_CHOICE)
             else:
                 if not attr.get('optional'):
-                    return False, "Field required"
+                    return False, customized_error_template(ECustomizedError.FIELD_REQUIRED)
         if attr.get('type') == "text":
             value = attributes.get(attr.get('name'))
             if value:
                 if len(value) > 100:
-                    return False, "text too long"
+                    return False, customized_error_template(ECustomizedError.TEXT_TOO_LONG)
             else:
                 if not attr.get('optional'):
-                    return False, "Field required"
+                    return False, customized_error_template(ECustomizedError.FIELD_REQUIRED)
     return True, ""
 
 

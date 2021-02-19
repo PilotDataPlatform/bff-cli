@@ -29,12 +29,15 @@ class ECustomizedError(enum.Enum):
     Enum of customized errors
     '''
     FILE_NOT_FOUND = "FILE_NOT_FOUND"
-    INVALID_FILE_AMOUNT = "INVALID_FILE_AMOUNT"
-    JOB_NOT_FOUND = "JOB_NOT_FOUND"
-    FORGED_TOKEN = "FORGED_TOKEN"
+    MANIFEST_NOT_FOUND = "MANIFEST_NOT_FOUND"
+    INVALID_ATTRIBUTE = "INVALID_ATTRIBUTE"
     TOKEN_EXPIRED = "TOKEN_EXPIRED"
-    INVALID_TOKEN = "INVALID_TOKEN"
-    INTERNAL = "INTERNAL"
+    REGEX_VALIDATION_ERROR = "REGEX_VALIDATION_ERROR"
+    MISSING_REQUIRED_ATTRIBUTES = "MISSING_REQUIRED_ATTRIBUTES"
+    INVALID_CHOICE = "INVALID_CHOICE"
+    FIELD_REQUIRED = "FIELD_REQUIRED"
+    TEXT_TOO_LONG = "TEXT_TOO_LONG"
+    INVALID_GENERATE_ID = "INVALID_GENERATE_ID"
 
 
 def customized_error_template(customized_error: ECustomizedError):
@@ -42,14 +45,16 @@ def customized_error_template(customized_error: ECustomizedError):
     get error template
     '''
     return {
-        "FILE_NOT_FOUND": "[File not found] %s.",
-        "INVALID_FILE_AMOUNT": "[Invalid file amount] must greater than 0",
-        "JOB_NOT_FOUND": "[Invalid Job ID] Not Found",
-        "FORGED_TOKEN": "[Invalid Token] System detected forged token, \
-                    a report has been submitted.",
-        "TOKEN_EXPIRED": "[Invalid Token] Already expired.",
-        "INVALID_TOKEN": "[Invalid Token] %s",
-        "INTERNAL": "[Internal] %s"
+        "FILE_NOT_FOUND": "File Not Exist",
+        "MANIFEST_NOT_FOUND": "Manifest Not Exist",
+        "INVALID_ATTRIBUTE": "Invalid Attribute",
+        "TOKEN_EXPIRED": "Token Expired",
+        "REGEX_VALIDATION_ERROR": "Regex Validation Error",
+        "MISSING_REQUIRED_ATTRIBUTES": "Missing Required Attribute",
+        "INVALID_CHOICE": "Invalid Choice Field",
+        "FIELD_REQUIRED": "Field Required",
+        "TEXT_TOO_LONG": "Text Too Long",
+        "INVALID_GENERATE_ID": "Invalid Generate ID"
     }.get(
         customized_error.name, "Unknown Error"
     )

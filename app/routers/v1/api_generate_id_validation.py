@@ -4,6 +4,7 @@ from ...models.base_models import EAPIResponseCode
 from ...models.validate_generate_id_models import ValidateGenerateIDPOST, ValidateGenerateIDResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
+from ...resources. error_handler import customized_error_template, ECustomizedError
 import re
 
 router = APIRouter()
@@ -29,7 +30,7 @@ class APIManifestList:
             result = "Valid"
             res_code = EAPIResponseCode.success
         else:
-            result = "Invalid"
+            result = customized_error_template(ECustomizedError.INVALID_GENERATE_ID)
             res_code = EAPIResponseCode.bad_request
         api_response.result = result
         api_response.code = res_code

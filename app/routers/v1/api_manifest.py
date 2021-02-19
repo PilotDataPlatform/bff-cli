@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
-from ...models.base_models import EAPIResponseCode
 from ...models.manifest_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...auth import jwt_required
 from ...resources.helpers import *
 from sqlalchemy.orm import Session
+from ...resources. error_handler import customized_error_template, ECustomizedError
 
 router = APIRouter()
 
@@ -67,7 +67,7 @@ class APIManifest:
         manifest_id = manifest_info.get('id')
         response = attach_manifest_to_file(file_path, manifest_id, attributes)
         if not response:
-            result = "File not found"
+            result = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
             res_code = EAPIResponseCode.bad_request
         else:
             result = response
@@ -93,7 +93,7 @@ class APIManifest:
         # Check manifest_name exist in the project
         manifest_info = get_manifest_from_project(project_code, db, manifest_name)
         if not manifest_info:
-            api_response.result = 'Manifest not found'
+            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         # Check attributes are exist in manifest
@@ -104,7 +104,7 @@ class APIManifest:
         for key, value in attributes.items():
             if key not in valid_attributes:
                 api_response.code = EAPIResponseCode.bad_request
-                api_response.result = "Invalid attribute"
+                api_response.result = customized_error_template(ECustomizedError.INVALID_ATTRIBUTE)
         # Check input attributes are valid characters
         valid, error_msg = check_attributes(attributes)
         if not valid:
