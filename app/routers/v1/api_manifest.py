@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.base_models import EAPIResponseCode
-from ...models.manifest_models import ManifestListParams, ManifestListResponse, ManifestAttachPost
+from ...models.manifest_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...auth import jwt_required
@@ -29,7 +29,7 @@ class APIManifest:
         api_response = ManifestListResponse()
         project_code = request_params.project_code
         try:
-            username = current_identity['username']
+            _ = current_identity['username']
         except (AttributeError, TypeError):
             return current_identity
         manifests = get_manifest_from_project(project_code, db)
@@ -44,8 +44,8 @@ class APIManifest:
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
 
-    @router.post("/manifest/attach", tags=[_API_TAG+'/attach'],
-                 response_model=ManifestListResponse,
+    @router.post("/manifest/attach", tags=[_API_TAG],
+                 response_model=ManifestAttachResponse,
                  summary="Attach manifest to file")
     @catch_internal(_API_NAMESPACE)
     async def attach_manifest(self, request_payload: ManifestAttachPost,
@@ -76,3 +76,46 @@ class APIManifest:
         api_response.code = res_code
         return api_response.json_response()
 
+    @router.post("/manifest/validate", tags=[_API_TAG],
+                 response_model=ManifestValidateResponse,
+                 summary="Validate manifest for project")
+    @catch_internal(_API_NAMESPACE)
+    async def validate_manifest(self, request_payload: ManifestValidatePost,
+                                db: Session = Depends(get_db)):
+        """Validate the manifest based on the project"""
+        api_response = ManifestListResponse()
+        manifests = request_payload.manifest_json
+        manifest_name = manifests["manifest_name"]
+        project_code = manifests['project_code']
+        attributes = manifests.get("attributes", {})
+        result = 'Valid'
+        res_code = EAPIResponseCode.success
+        # Check manifest_name exist in the project
+        manifest_info = get_manifest_from_project(project_code, db, manifest_name)
+        if not manifest_info:
+            api_response.result = 'Manifest not found'
+            api_response.code = EAPIResponseCode.not_found
+            return api_response.json_response()
+        # Check attributes are exist in manifest
+        exist_attributes = get_attributes_in_manifest(manifest_info, db)
+        valid_attributes = []
+        for attr in exist_attributes:
+            valid_attributes.append(attr.get('name'))
+        for key, value in attributes.items():
+            if key not in valid_attributes:
+                api_response.code = EAPIResponseCode.bad_request
+                api_response.result = "Invalid attribute"
+        # Check input attributes are valid characters
+        valid, error_msg = check_attributes(attributes)
+        if not valid:
+            res_code = EAPIResponseCode.bad_request
+            result = error_msg
+        # Check reserved attributes exist, attributes has correct choice and length
+        valid, error_msg = has_valid_attributes(manifest_info, attributes, db)
+        if not valid:
+            api_response.result = error_msg
+            api_response.code = EAPIResponseCode.bad_request
+            return api_response.json_response()
+        api_response.code = res_code
+        api_response.result = result
+        return api_response.json_response()

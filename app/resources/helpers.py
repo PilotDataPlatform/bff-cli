@@ -9,7 +9,7 @@ import requests
 from ..models.base_models import APIResponse, EAPIResponseCode
 from ..commons.data_providers.models import Base, DataManifestModel, DataAttributeModel
 from ..commons.data_providers.database import SessionLocal, engine
-
+import re
 # Base.metadata.create_all(bind=engine)
 
 
@@ -26,8 +26,11 @@ def get_manifest_from_project(project_code, db_session, manifest_name=None):
         m = db_session.query(DataManifestModel.name, DataManifestModel.id)\
             .filter_by(project_code=project_code, name=manifest_name)\
             .first()
-        manifest = {'name': m[0], 'id': m[1]}
-        return manifest
+        if not m:
+            return None
+        else:
+            manifest = {'name': m[0], 'id': m[1]}
+            return manifest
     else:
         manifests = db_session.query(DataManifestModel.name, DataManifestModel.id)\
             .filter_by(project_code=project_code)\
@@ -112,3 +115,39 @@ def attach_manifest_to_file(file_path, manifest_id, attributes):
     if not response.json():
         return None
     return response.json()
+
+
+def check_attributes(attributes):
+    # Apply name restrictions
+    name_requirements = re.compile("^[a-zA-z0-9]{1,32}$")
+    for key, value in attributes.items():
+        if not re.search(name_requirements, key):
+            return False, "regex validation error"
+    return True, ""
+
+
+def has_valid_attributes(manifest, attributes, db_session):
+    exist_attributes = get_attributes_in_manifest(manifest, db_session)
+    for attr in exist_attributes:
+        if not attr.get('optional') and not attr.get('name') in attributes:
+            return False, "Missing required attribute"
+        if attr.get('type') == "multiple_choice":
+            value = attributes.get(attr.get('name'))
+            if value:
+                if not value in attr.get('value').split(","):
+                    return False, "Invalid choice field"
+            else:
+                if not attr.get('optional'):
+                    return False, "Field required"
+        if attr.get('type') == "text":
+            value = attributes.get(attr.get('name'))
+            if value:
+                if len(value) > 100:
+                    return False, "text too long"
+            else:
+                if not attr.get('optional'):
+                    return False, "Field required"
+    return True, ""
+
+
+

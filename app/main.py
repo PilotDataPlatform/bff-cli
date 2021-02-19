@@ -4,10 +4,10 @@ from .config import ConfigClass
 from .api_registry import api_registry
 
 app = FastAPI(
-    title="Service Data Download",
-    description="Service for data download usage",
-    docs_url="/vrecli/v1/api-docs",
-    version = ConfigClass.version
+    title="BFF VRECLI",
+    description="BFF For VRECLI",
+    docs_url="/v1/api-docs",
+    version=ConfigClass.version
 )
 
 app.add_middleware(
@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # API registry
-## v1
+# v1
 api_registry(app)
 
 

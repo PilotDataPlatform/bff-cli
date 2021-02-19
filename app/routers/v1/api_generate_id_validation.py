@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from fastapi_utils.cbv import cbv
 from ...models.base_models import EAPIResponseCode
 from ...models.validate_generate_id_models import ValidateGenerateIDPOST, ValidateGenerateIDResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
-from ...auth import jwt_required
 import re
 
 router = APIRouter()
@@ -12,7 +11,7 @@ router = APIRouter()
 
 @cbv(router)
 class APIManifestList:
-    _API_TAG = 'vrecli/v1/validgid'
+    _API_TAG = 'v1/validgid'
     _API_NAMESPACE = "api_generate_validate"
 
     def __init__(self):
