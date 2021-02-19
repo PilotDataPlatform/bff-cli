@@ -3,10 +3,9 @@ from ...models.base_models import EAPIResponseCode
 from ...models.project_models import ProjectListResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
-from ...config import ConfigClass
 from ...auth import jwt_required
 from fastapi_utils.cbv import cbv
-import requests
+from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
 
 
 router = APIRouter()
@@ -17,8 +16,6 @@ _API_NAMESPACE = "api_project_list"
 @cbv(router)
 class APIProject:
 
-    current_identity: dict = Depends(jwt_required)
-
     def __init__(self):
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
@@ -26,33 +23,22 @@ class APIProject:
                 response_model=ProjectListResponse,
                 summary="Get project list that user have access to")
     @catch_internal(_API_NAMESPACE)
-    async def list_project(self):
+    async def list_project(self, current_identity: dict = Depends(jwt_required)):
         '''
         Get the project list that user have access to
         '''
         api_response = ProjectListResponse()
-        jwt_status = self.current_identity
         try:
-            username = jwt_status['username']
-            user_role = jwt_status['role']
+            username = current_identity['username']
+            user_role = current_identity['role']
         except (AttributeError, TypeError):
-            return jwt_status
-
+            return current_identity
         projects_list = []
         if user_role == "admin":
-            url = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/query"
-            data = {'is_all': 'true'}
-            res = requests.post(url=url, json=data)
-            project = res.json()
+            project_candidate = query__node_has_relation_with_admin()
         else:
-            url = ConfigClass.NEO4J_SERVICE + "relations/query"
-            data = {'start_params': {'name': username}}
-            res = requests.post(url=url, json=data)
-            res = res.json()
-            project = []
-            for i in res:
-                project.append(i['end_node'])
-        for p in project:
+            project_candidate = query_node_has_relation_for_user(username)
+        for p in project_candidate:
             if p['labels'] == ['Dataset']:
                 res_projects = {'name': p.get('name'),
                                 'code': p.get('code')}
@@ -60,4 +46,3 @@ class APIProject:
         api_response.result = projects_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
-

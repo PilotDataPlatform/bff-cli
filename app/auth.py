@@ -30,7 +30,7 @@ async def jwt_required(request: Request):
         url=url,
         json={"name": username}
     )
-    if(res.status_code != 200):
+    if res.status_code != 200:
         api_response.code = EAPIResponseCode.forbidden
         api_response.error_msg = "Neo4j service: " + json.loads(res.text)
         return api_response.json_response()
@@ -46,5 +46,3 @@ async def jwt_required(request: Request):
         api_response.error_msg = "User not found"
         return api_response.json_response()
     return {"code": 200, "user_id": user_id, "username": username, "role": role}
-
-

@@ -7,6 +7,44 @@ from ..config import ConfigClass
 from ..commons.data_providers.redis import SrvRedisSingleton
 import requests
 from ..models.base_models import APIResponse, EAPIResponseCode
+from ..commons.data_providers.models import Base, DataManifestModel, DataAttributeModel
+from ..commons.data_providers.database import SessionLocal, engine
+
+# Base.metadata.create_all(bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def get_manifest_from_project(project_code, db_session):
+    manifests = db_session.query(DataManifestModel.name, DataManifestModel.id).filter_by(project_code=project_code).all()
+    manifest_in_project = []
+    for m in manifests:
+        manifest = {'name': m[0], 'id': m[1]}
+        manifest_in_project.append(manifest)
+    return manifest_in_project
+
+
+def get_attributes_in_manifest(manifest, db_session):
+    attr_list = []
+    attributes = db_session.query(DataAttributeModel.name,
+                                  DataAttributeModel.type,
+                                  DataAttributeModel.optional,
+                                  DataAttributeModel.value). \
+        filter_by(manifest_id=manifest.get('id')). \
+        order_by(DataAttributeModel.id.asc()).all()
+    for attr in attributes:
+        result = {"name": attr[0],
+                  "type": attr[1],
+                  "optional": attr[2],
+                  "value": attr[3]}
+        attr_list.append(result)
+    return attr_list
 
 
 def get_user_role(username):
@@ -25,88 +63,20 @@ def get_user_role(username):
     return user_role
 
 
-#######################################################
-def generate_zipped_file_path(project_code):
-    '''
-    generate zipped file path
-    '''
-    target_path = os.path.join(
-        ConfigClass.NFS_ROOT_PATH, project_code, 'workdir')  # data/vre-storage/project_code/workdir
-    zip_filename = project_code + '_zipped' + \
-        '_' + str(int(time.time())) + '.zip'
-    zipped_file_path = os.path.join(target_path, zip_filename)
-    return zipped_file_path
+def query__node_has_relation_with_admin():
+    url = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/query"
+    data = {'is_all': 'true'}
+    res = requests.post(url=url, json=data)
+    project = res.json()
+    return project
 
 
-def zip_multi_files(zipped_file_path, target_files):
-    '''
-    zip multiple files
-    '''
-    target_path = os.path.dirname(zipped_file_path)
-    if not os.path.isdir(target_path):
-        try:
-            os.makedirs(target_path)
-        except FileExistsError as file_e:
-            # ignore existed folder
-            pass
-    try:
-        with zipfile.ZipFile(zipped_file_path, 'w', zipfile.ZIP_STORED) as zf:
-            for f in target_files:
-                full_path = f["full_path"]
-                if not os.path.exists(full_path):
-                    return False, 'File not found: %s' % full_path
-                with open(full_path, 'rb') as fp:
-                    zf.writestr(full_path, fp.read())
-    except Exception as e:
-        return False, str(e)
-
-    return True, zipped_file_path
-
-
-def namespace_to_path(my_disk_namespace: str):
-    '''
-    disk namespace to path
-    '''
-    return {
-        "greenroom": ConfigClass.NFS_ROOT_PATH,
-        "vrecore": ConfigClass.VRE_ROOT_PATH
-    }.get(my_disk_namespace, None)
-
-
-def set_status(session_id, job_id, source, action, target_status,
-               project_code, operator, payload=None, progress=0):
-    '''
-    set session job status
-    '''
-    srv_redis = SrvRedisSingleton()
-    my_key = "dataaction:{}:{}:{}:{}:{}:{}".format(
-        session_id, job_id, action, project_code, operator, source)
-    record = {
-        "session_id": session_id,
-        "job_id": job_id,
-        "source": source,
-        "action": action,
-        "status": target_status,
-        "project_code": project_code,
-        "operator": operator,
-        "progress": progress,
-        "payload": payload,
-        'update_timestamp': str(round(time.time()))
-    }
-    my_value = json.dumps(record)
-    srv_redis.set_by_key(my_key, my_value)
-    return record
-
-
-def get_status(session_id, job_id, project_code, action, operator=None):
-    '''
-    get session job status from datastore
-    '''
-    srv_redis = SrvRedisSingleton()
-    my_key = "dataaction:{}:{}:{}:{}".format(
-        session_id, job_id, action, project_code)
-    if operator:
-        my_key = "dataaction:{}:{}:{}:{}:{}".format(
-            session_id, job_id, action, project_code, operator)
-    res_binary = srv_redis.mget_by_prefix(my_key)
-    return [json.loads(record.decode('utf-8')) for record in res_binary] if res_binary else []
+def query_node_has_relation_for_user(username):
+    url = ConfigClass.NEO4J_SERVICE + "relations/query"
+    data = {'start_params': {'name': username}}
+    res = requests.post(url=url, json=data)
+    res = res.json()
+    project = []
+    for i in res:
+        project.append(i['end_node'])
+    return project
