@@ -27,10 +27,11 @@ class APIManifestList:
         generate_id = requst_payload.generate_id
         is_valid = re.match("^([A-Z]{3})-([0-9]{4})$", generate_id)
         if is_valid:
-            api_response.result = "Valid"
-            api_response.code = EAPIResponseCode.success
-            return api_response.json_response()
+            result = "Valid"
+            res_code = EAPIResponseCode.success
         else:
-            api_response.result = "Invalid"
-            api_response.code = EAPIResponseCode.bad_request
-            return api_response.json_response()
+            result = "Invalid"
+            res_code = EAPIResponseCode.bad_request
+        api_response.result = result
+        api_response.code = res_code
+        return api_response.json_response()

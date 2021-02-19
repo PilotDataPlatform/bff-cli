@@ -21,13 +21,22 @@ def get_db():
         db.close()
 
 
-def get_manifest_from_project(project_code, db_session):
-    manifests = db_session.query(DataManifestModel.name, DataManifestModel.id).filter_by(project_code=project_code).all()
-    manifest_in_project = []
-    for m in manifests:
+def get_manifest_from_project(project_code, db_session, manifest_name=None):
+    if manifest_name:
+        m = db_session.query(DataManifestModel.name, DataManifestModel.id)\
+            .filter_by(project_code=project_code, name=manifest_name)\
+            .first()
         manifest = {'name': m[0], 'id': m[1]}
-        manifest_in_project.append(manifest)
-    return manifest_in_project
+        return manifest
+    else:
+        manifests = db_session.query(DataManifestModel.name, DataManifestModel.id)\
+            .filter_by(project_code=project_code)\
+            .all()
+        manifest_in_project = []
+        for m in manifests:
+            manifest = {'name': m[0], 'id': m[1]}
+            manifest_in_project.append(manifest)
+        return manifest_in_project
 
 
 def get_attributes_in_manifest(manifest, db_session):
@@ -80,3 +89,26 @@ def query_node_has_relation_for_user(username):
     for i in res:
         project.append(i['end_node'])
     return project
+
+
+def get_file_node(full_path):
+    post_data = {"full_path": full_path}
+    response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/File/query", json=post_data)
+    if not response.json():
+        return None
+    return response.json()[0]
+
+
+def attach_manifest_to_file(file_path, manifest_id, attributes):
+    file_node = get_file_node(file_path)
+    if not file_node:
+        return None
+    file_id = file_node["id"]
+    post_data = {"manifest_id": manifest_id}
+    if attributes:
+        for key, value in attributes.items():
+            post_data["attr_" + key] = value
+    response = requests.put(ConfigClass.NEO4J_SERVICE + f"nodes/File/node/{file_id}", json=post_data)
+    if not response.json():
+        return None
+    return response.json()
