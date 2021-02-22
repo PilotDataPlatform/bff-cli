@@ -1,9 +1,9 @@
 import json
+import requests
 from ..config import ConfigClass
 from ..resources. error_handler import customized_error_template, ECustomizedError
-import requests
 from ..models.base_models import APIResponse, EAPIResponseCode
-from ..commons.data_providers.models import DataManifestModel, DataAttributeModel
+from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
 from ..commons.data_providers.database import SessionLocal
 
 
@@ -93,6 +93,31 @@ def query_node_has_relation_for_user(username):
     for i in res:
         project.append(i['end_node'])
     return project
+
+
+def query_file_in_project(dataset_id, filename):
+    url = ConfigClass.FILEINFO_HOST + "v1/files/%s/query" % str(dataset_id)
+    if filename:
+        data = {"query": {
+            "name": filename,
+            "labels": ["File"]}}
+    else:
+        data = {"query": {"labels": ["File"]}}
+    res = requests.post(url=url, json=data)
+    res = res.json()
+    return res
+
+
+def get_file_path(project_code, file_name):
+    post_data = {"code": project_code}
+    response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/Dataset/query", json=post_data)
+    if not response.json():
+        return None
+    project_info = response.json()[0]
+    project_id = project_info.get('id')
+    res = query_file_in_project(project_id, file_name)
+    file_path = res.get('result')[0].get('path')
+    return file_path
 
 
 def get_file_node(full_path):

@@ -1,21 +1,11 @@
-from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import Field
 from .base_models import APIResponse
-
-### ProjectList ###
-
-
-class ProjectListParams(BaseModel):
-    '''
-    Project list params model
-    '''
-    project_code: str
 
 
 class ProjectListResponse(APIResponse):
-    '''
+    """
     Project list response class
-    '''
+    """
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",

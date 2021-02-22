@@ -77,33 +77,27 @@ class APIManifest:
         api_response.code = res_code
         return api_response.json_response()
 
-    @router.post("/manifest/validate", tags=[_API_TAG],
-                 response_model=ManifestValidateResponse,
-                 summary="Validate manifest for project")
+    @router.get("/manifest/export", tags=[_API_TAG],
+                response_model=ManifestExportResponse,
+                summary="Export manifest from project")
     @catch_internal(_API_NAMESPACE)
-    async def validate_manifest(self, request_payload: ManifestValidatePost,
-                                db: Session = Depends(get_db)):
-        """Validate the manifest based on the project"""
+    async def export_manifest(self, project_code, manifest_name,
+                              db: Session = Depends(get_db)):
+        """Export manifest from the project"""
         api_response = ManifestListResponse()
-        manifests = request_payload.manifest_json
-        manifest_name = manifests["manifest_name"]
-        project_code = manifests['project_code']
-        attributes = manifests.get("attributes", {})
-        validation_event = {"project_code": project_code,
-                            "manifest_name": manifest_name,
-                            "attributes": attributes,
-                            "session": db}
-        manifest_info = get_manifest_name_from_project_in_db(validation_event)
-        if not manifest_info:
-            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
+        manifest_event = {"project_code": project_code,
+                          "manifest_name": manifest_name,
+                          'session': db}
+        manifest = get_manifest_name_from_project_in_db(manifest_event)
+        if not manifest:
             api_response.code = EAPIResponseCode.not_found
+            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
             return api_response.json_response()
-        validation_event["manifest"] = manifest_info
-        attribute_validation_error_msg = has_valid_attributes(validation_event)
-        if attribute_validation_error_msg:
-            api_response.result = attribute_validation_error_msg
-            api_response.code = EAPIResponseCode.bad_request
-            return api_response.json_response()
+        manifest_event['manifest'] = manifest
+        attributes = get_attributes_in_manifest_in_db(manifest_event)
+        result = {'name': manifest_name,
+                  'project_code': project_code,
+                  'attributes': attributes}
         api_response.code = EAPIResponseCode.success
-        api_response.result = 'Valid'
+        api_response.result = result
         return api_response.json_response()

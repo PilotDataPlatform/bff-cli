@@ -9,7 +9,7 @@ from ...resources.helpers import query_node_has_relation_for_user, query__node_h
 
 
 router = APIRouter()
-_API_TAG = 'v1/project'
+_API_TAG = 'v1/projects'
 _API_NAMESPACE = "api_project_list"
 
 
@@ -19,7 +19,7 @@ class APIProject:
     def __init__(self):
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.get("/project", tags=[_API_TAG],
+    @router.get("/projects", tags=[_API_TAG],
                 response_model=ProjectListResponse,
                 summary="Get project list that user have access to")
     @catch_internal(_API_NAMESPACE)

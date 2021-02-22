@@ -1,14 +1,11 @@
-from enum import Enum
 from pydantic import BaseModel, Field
 from .base_models import APIResponse
 
-### Manifest ###
-
 
 class ManifestListResponse(APIResponse):
-    '''
+    """
     Manifest list response class
-    '''
+    """
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
@@ -107,29 +104,42 @@ class ManifestAttachResponse(APIResponse):
     )
 
 
-class ManifestValidatePost(BaseModel):
-    """
-    Validate Manifest post model
-    """
-    manifest_json: dict = Field({}, example={
-                "manifest_name": "Manifest1",
-                "project_code": "0216",
-                "attributes": {"attr1": "a1", "attr2": "test cli upload"},
-                "file_path": "/data/vre-storage/0216/raw/testf1"
-            }
-    )
+class ManifestExportParam(BaseModel):
+    project_code: str
+    manifest_name: str
 
 
-class ManifestValidateResponse(APIResponse):
+class ManifestExportResponse(APIResponse):
     """
     Validate Manifest Response class
     """
     result: dict = Field({}, example={
-                    "code": 200,
-                    "error_msg": "",
-                    "page": 0,
-                    "total": 1,
-                    "num_of_pages": 1,
-                    "result": "Valid"
+                "code": 200,
+                "error_msg": "",
+                "page": 0,
+                "total": 1,
+                "num_of_pages": 1,
+                "result": {
+                    "name": "Manifest1",
+                    "project_code": "0216",
+                    "attributes": [
+                        {
+                            "name": "attr1",
+                            "type": "multiple_choice",
+                            "optional": "false",
+                            "value": "a1,a2"
+                        },
+                        {
+                            "name": "attr2",
+                            "type": "text",
+                            "optional": "true",
+                            "value": "null"
+                        }
+                    ]
                 }
-            )
+            }
+        )
+
+
+
+

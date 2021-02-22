@@ -6,7 +6,7 @@ from .api_registry import api_registry
 app = FastAPI(
     title="BFF VRECLI",
     description="BFF For VRECLI",
-    docs_url="/v1/api-docs",
+    docs_url="/v1/api-doc",
     version=ConfigClass.version
 )
 
