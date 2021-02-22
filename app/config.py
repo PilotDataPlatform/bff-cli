@@ -1,5 +1,6 @@
 import os
 
+
 class ConfigClass(object):
     env = os.environ.get('env')
 
