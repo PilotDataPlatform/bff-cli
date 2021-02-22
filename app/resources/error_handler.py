@@ -32,7 +32,6 @@ class ECustomizedError(enum.Enum):
     MANIFEST_NOT_FOUND = "MANIFEST_NOT_FOUND"
     INVALID_ATTRIBUTE = "INVALID_ATTRIBUTE"
     TOKEN_EXPIRED = "TOKEN_EXPIRED"
-    REGEX_VALIDATION_ERROR = "REGEX_VALIDATION_ERROR"
     MISSING_REQUIRED_ATTRIBUTES = "MISSING_REQUIRED_ATTRIBUTES"
     INVALID_CHOICE = "INVALID_CHOICE"
     FIELD_REQUIRED = "FIELD_REQUIRED"
@@ -47,13 +46,12 @@ def customized_error_template(customized_error: ECustomizedError):
     return {
         "FILE_NOT_FOUND": "File Not Exist",
         "MANIFEST_NOT_FOUND": "Manifest Not Exist",
-        "INVALID_ATTRIBUTE": "Invalid Attribute",
+        "INVALID_ATTRIBUTE": "Invalid Attribute %s",
         "TOKEN_EXPIRED": "Token Expired",
-        "REGEX_VALIDATION_ERROR": "Regex Validation Error",
-        "MISSING_REQUIRED_ATTRIBUTES": "Missing Required Attribute",
-        "INVALID_CHOICE": "Invalid Choice Field",
-        "FIELD_REQUIRED": "Field Required",
-        "TEXT_TOO_LONG": "Text Too Long",
+        "MISSING_REQUIRED_ATTRIBUTES": "Missing Required Attribute %s",
+        "INVALID_CHOICE": "Invalid Choice Field %s",
+        "FIELD_REQUIRED": "Field Required %s",
+        "TEXT_TOO_LONG": "Text Too Long %s",
         "INVALID_GENERATE_ID": "Invalid Generate ID"
     }.get(
         customized_error.name, "Unknown Error"

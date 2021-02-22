@@ -28,13 +28,15 @@ class APIManifest:
                             current_identity: dict = Depends(jwt_required)):
         api_response = ManifestListResponse()
         try:
-            _ = current_identity['username']
+            _username = current_identity['username']
         except (AttributeError, TypeError):
             return current_identity
-        manifests = get_manifest_from_project(project_code, db)
+        mani_project_event = {"project_code": project_code, 'session': db}
+        manifests = get_manifest_name_from_project_in_db(mani_project_event)
         manifest_list = []
         for manifest in manifests:
-            attr = get_attributes_in_manifest(manifest, db)
+            mani_project_event['manifest'] = manifest
+            attr = get_attributes_in_manifest_in_db(manifest)
             single_manifest = {'manifest_name': manifest['name'],
                                'id': manifest['id'],
                                'attributes': attr}
@@ -53,7 +55,7 @@ class APIManifest:
         """CLI will call manifest validation API before attach manifest to file in uploading process"""
         api_response = ManifestListResponse()
         try:
-            _ = current_identity['username']
+            _username = current_identity['username']
         except (AttributeError, TypeError):
             return current_identity
         manifests = request_payload.manifest_json
@@ -61,8 +63,8 @@ class APIManifest:
         file_path = manifests["file_path"]
         project_code = manifests['project_code']
         attributes = manifests.get("attributes", {})
-
-        manifest_info = get_manifest_from_project(project_code, db, manifest_name)
+        mani_project_event = {"project_code": project_code, "manifest_name": manifest_name, "session": db}
+        manifest_info = get_manifest_name_from_project_in_db(mani_project_event)
         manifest_id = manifest_info.get('id')
         response = attach_manifest_to_file(file_path, manifest_id, attributes)
         if not response:
@@ -87,34 +89,21 @@ class APIManifest:
         manifest_name = manifests["manifest_name"]
         project_code = manifests['project_code']
         attributes = manifests.get("attributes", {})
-        result = 'Valid'
-        res_code = EAPIResponseCode.success
-        # Check manifest_name exist in the project
-        manifest_info = get_manifest_from_project(project_code, db, manifest_name)
+        validation_event = {"project_code": project_code,
+                            "manifest_name": manifest_name,
+                            "attributes": attributes,
+                            "session": db}
+        manifest_info = get_manifest_name_from_project_in_db(validation_event)
         if not manifest_info:
             api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
-        # Check attributes are exist in manifest
-        exist_attributes = get_attributes_in_manifest(manifest_info, db)
-        valid_attributes = []
-        for attr in exist_attributes:
-            valid_attributes.append(attr.get('name'))
-        for key, value in attributes.items():
-            if key not in valid_attributes:
-                api_response.code = EAPIResponseCode.bad_request
-                api_response.result = customized_error_template(ECustomizedError.INVALID_ATTRIBUTE)
-        # Check input attributes are valid characters
-        valid, error_msg = check_attributes(attributes)
-        if not valid:
-            res_code = EAPIResponseCode.bad_request
-            result = error_msg
-        # Check reserved attributes exist, attributes has correct choice and length
-        valid, error_msg = has_valid_attributes(manifest_info, attributes, db)
-        if not valid:
-            api_response.result = error_msg
+        validation_event["manifest"] = manifest_info
+        attribute_validation_error_msg = has_valid_attributes(validation_event)
+        if attribute_validation_error_msg:
+            api_response.result = attribute_validation_error_msg
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
-        api_response.code = res_code
-        api_response.result = result
+        api_response.code = EAPIResponseCode.success
+        api_response.result = 'Valid'
         return api_response.json_response()
