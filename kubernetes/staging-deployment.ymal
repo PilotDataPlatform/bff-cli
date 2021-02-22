@@ -1,15 +1,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bff_vrecli
+  name: bff-vrecli
   namespace: utility
   labels:
-    app: bff_vrecli
+    app: bff-vrecli
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: bff_vrecli
+      app: bff-vrecli
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,11 +18,11 @@ spec:
   template:
     metadata:
       labels:
-        app: bff_vrecli
+        app: bff-vrecli
     spec:
       containers:
-        - name: bff_vrecli
-          image: 10.3.7.241:5000/bff_vrecli:<VERSION>
+        - name: bff-vrecli
+          image: 10.3.7.241:5000/bff-vrecli:<VERSION>
           ports:
             - containerPort: 5077
           env:
@@ -34,15 +34,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: bff_vrecli
+  name: bff-vrecli
   namespace: utility
   labels:
-    app: bff_vrecli
+    app: bff-vrecli
 spec:
   ports:
   - name: http
     port: 5077
     targetPort: 5077
   selector:
-    app: bff_vrecli
+    app: bff-vrecli
   type: ClusterIP
