@@ -129,3 +129,1274 @@
 [2021-02-17 12:18:24 -0500] [332835] [INFO] Finished server process [332835]
 [2021-02-17 12:18:24 -0500] [332835] [INFO] Worker exiting (pid: 332835)
 [2021-02-17 12:18:24 -0500] [332831] [INFO] Shutting down: Master
+[2021-02-22 18:07:54 -0500] [20808] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5077']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/Jiayu/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 501
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7feefda173b0>
+  on_reload: <function OnReload.on_reload at 0x7feefda174d0>
+  when_ready: <function WhenReady.when_ready at 0x7feefda175f0>
+  pre_fork: <function Prefork.pre_fork at 0x7feefda17710>
+  post_fork: <function Postfork.post_fork at 0x7feefda17830>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7feefda17950>
+  worker_int: <function WorkerInt.worker_int at 0x7feefda17a70>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7feefda17b90>
+  pre_exec: <function PreExec.pre_exec at 0x7feefda17cb0>
+  pre_request: <function PreRequest.pre_request at 0x7feefda17dd0>
+  post_request: <function PostRequest.post_request at 0x7feefda17e60>
+  child_exit: <function ChildExit.child_exit at 0x7feefda17f80>
+  worker_exit: <function WorkerExit.worker_exit at 0x7feefda300e0>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7feefda30200>
+  on_exit: <function OnExit.on_exit at 0x7feefda30320>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-02-22 18:07:54 -0500] [20808] [INFO] Starting gunicorn 20.0.4
+[2021-02-22 18:07:54 -0500] [20808] [DEBUG] Arbiter booted
+[2021-02-22 18:07:54 -0500] [20808] [INFO] Listening at: http://0.0.0.0:5077 (20808)
+[2021-02-22 18:07:54 -0500] [20808] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-02-22 18:07:54 -0500] [20811] [INFO] Booting worker with pid: 20811
+[2021-02-22 18:07:54 -0500] [20812] [INFO] Booting worker with pid: 20812
+[2021-02-22 18:07:54 -0500] [20815] [INFO] Booting worker with pid: 20815
+[2021-02-22 18:07:55 -0500] [20816] [INFO] Booting worker with pid: 20816
+[2021-02-22 18:07:55 -0500] [20808] [DEBUG] 4 workers
+[2021-02-22 18:07:57 -0500] [20812] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:07:57 -0500] [20811] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:07:57 -0500] [20816] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:07:57 -0500] [20815] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:07:57 -0500] [20816] [INFO] Worker exiting (pid: 20816)
+[2021-02-22 18:07:57 -0500] [20815] [INFO] Worker exiting (pid: 20815)
+[2021-02-22 18:07:57 -0500] [20812] [INFO] Worker exiting (pid: 20812)
+[2021-02-22 18:07:57 -0500] [20811] [INFO] Worker exiting (pid: 20811)
+[2021-02-22 18:08:03 -0500] [20819] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5077']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/Jiayu/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 501
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7fbd432173b0>
+  on_reload: <function OnReload.on_reload at 0x7fbd432174d0>
+  when_ready: <function WhenReady.when_ready at 0x7fbd432175f0>
+  pre_fork: <function Prefork.pre_fork at 0x7fbd43217710>
+  post_fork: <function Postfork.post_fork at 0x7fbd43217830>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fbd43217950>
+  worker_int: <function WorkerInt.worker_int at 0x7fbd43217a70>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7fbd43217b90>
+  pre_exec: <function PreExec.pre_exec at 0x7fbd43217cb0>
+  pre_request: <function PreRequest.pre_request at 0x7fbd43217dd0>
+  post_request: <function PostRequest.post_request at 0x7fbd43217e60>
+  child_exit: <function ChildExit.child_exit at 0x7fbd43217f80>
+  worker_exit: <function WorkerExit.worker_exit at 0x7fbd432300e0>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fbd43230200>
+  on_exit: <function OnExit.on_exit at 0x7fbd43230320>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-02-22 18:08:03 -0500] [20819] [INFO] Starting gunicorn 20.0.4
+[2021-02-22 18:08:03 -0500] [20819] [DEBUG] Arbiter booted
+[2021-02-22 18:08:03 -0500] [20819] [INFO] Listening at: http://0.0.0.0:5077 (20819)
+[2021-02-22 18:08:03 -0500] [20819] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-02-22 18:08:03 -0500] [20822] [INFO] Booting worker with pid: 20822
+[2021-02-22 18:08:03 -0500] [20823] [INFO] Booting worker with pid: 20823
+[2021-02-22 18:08:03 -0500] [20824] [INFO] Booting worker with pid: 20824
+[2021-02-22 18:08:04 -0500] [20825] [INFO] Booting worker with pid: 20825
+[2021-02-22 18:08:04 -0500] [20819] [DEBUG] 4 workers
+[2021-02-22 18:08:04 -0500] [20822] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:08:04 -0500] [20822] [INFO] Worker exiting (pid: 20822)
+[2021-02-22 18:08:04 -0500] [20823] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:08:04 -0500] [20823] [INFO] Worker exiting (pid: 20823)
+[2021-02-22 18:08:04 -0500] [20824] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:08:04 -0500] [20824] [INFO] Worker exiting (pid: 20824)
+[2021-02-22 18:08:04 -0500] [20825] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:08:04 -0500] [20825] [INFO] Worker exiting (pid: 20825)
+[2021-02-22 18:12:19 -0500] [21436] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5077']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/Jiayu/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 501
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7f80ca2173b0>
+  on_reload: <function OnReload.on_reload at 0x7f80ca2174d0>
+  when_ready: <function WhenReady.when_ready at 0x7f80ca2175f0>
+  pre_fork: <function Prefork.pre_fork at 0x7f80ca217710>
+  post_fork: <function Postfork.post_fork at 0x7f80ca217830>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f80ca217950>
+  worker_int: <function WorkerInt.worker_int at 0x7f80ca217a70>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f80ca217b90>
+  pre_exec: <function PreExec.pre_exec at 0x7f80ca217cb0>
+  pre_request: <function PreRequest.pre_request at 0x7f80ca217dd0>
+  post_request: <function PostRequest.post_request at 0x7f80ca217e60>
+  child_exit: <function ChildExit.child_exit at 0x7f80ca217f80>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f80ca2300e0>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f80ca230200>
+  on_exit: <function OnExit.on_exit at 0x7f80ca230320>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-02-22 18:12:19 -0500] [21436] [INFO] Starting gunicorn 20.0.4
+[2021-02-22 18:12:19 -0500] [21436] [DEBUG] Arbiter booted
+[2021-02-22 18:12:19 -0500] [21436] [INFO] Listening at: http://0.0.0.0:5077 (21436)
+[2021-02-22 18:12:19 -0500] [21436] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-02-22 18:12:19 -0500] [21439] [INFO] Booting worker with pid: 21439
+[2021-02-22 18:12:19 -0500] [21440] [INFO] Booting worker with pid: 21440
+[2021-02-22 18:12:19 -0500] [21441] [INFO] Booting worker with pid: 21441
+[2021-02-22 18:12:19 -0500] [21442] [INFO] Booting worker with pid: 21442
+[2021-02-22 18:12:19 -0500] [21436] [DEBUG] 4 workers
+[2021-02-22 18:12:19 -0500] [21439] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:12:19 -0500] [21439] [INFO] Worker exiting (pid: 21439)
+[2021-02-22 18:12:19 -0500] [21440] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:12:19 -0500] [21440] [INFO] Worker exiting (pid: 21440)
+[2021-02-22 18:12:19 -0500] [21441] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:12:19 -0500] [21441] [INFO] Worker exiting (pid: 21441)
+[2021-02-22 18:12:20 -0500] [21442] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:12:20 -0500] [21442] [INFO] Worker exiting (pid: 21442)
+[2021-02-22 18:17:10 -0500] [21677] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5077']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/Jiayu/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 501
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7ff45d1164d0>
+  on_reload: <function OnReload.on_reload at 0x7ff45d1165f0>
+  when_ready: <function WhenReady.when_ready at 0x7ff45d116710>
+  pre_fork: <function Prefork.pre_fork at 0x7ff45d116830>
+  post_fork: <function Postfork.post_fork at 0x7ff45d116950>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7ff45d116a70>
+  worker_int: <function WorkerInt.worker_int at 0x7ff45d116b90>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7ff45d116cb0>
+  pre_exec: <function PreExec.pre_exec at 0x7ff45d116dd0>
+  pre_request: <function PreRequest.pre_request at 0x7ff45d116ef0>
+  post_request: <function PostRequest.post_request at 0x7ff45d116f80>
+  child_exit: <function ChildExit.child_exit at 0x7ff45d12f0e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7ff45d12f200>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7ff45d12f320>
+  on_exit: <function OnExit.on_exit at 0x7ff45d12f440>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-02-22 18:17:10 -0500] [21677] [INFO] Starting gunicorn 20.0.4
+[2021-02-22 18:17:10 -0500] [21677] [DEBUG] Arbiter booted
+[2021-02-22 18:17:10 -0500] [21677] [INFO] Listening at: http://0.0.0.0:5077 (21677)
+[2021-02-22 18:17:10 -0500] [21677] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-02-22 18:17:10 -0500] [21680] [INFO] Booting worker with pid: 21680
+[2021-02-22 18:17:10 -0500] [21681] [INFO] Booting worker with pid: 21681
+[2021-02-22 18:17:10 -0500] [21682] [INFO] Booting worker with pid: 21682
+[2021-02-22 18:17:10 -0500] [21683] [INFO] Booting worker with pid: 21683
+[2021-02-22 18:17:10 -0500] [21677] [DEBUG] 4 workers
+[2021-02-22 18:17:11 -0500] [21680] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:17:11 -0500] [21680] [INFO] Worker exiting (pid: 21680)
+[2021-02-22 18:17:11 -0500] [21681] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:17:11 -0500] [21681] [INFO] Worker exiting (pid: 21681)
+[2021-02-22 18:17:11 -0500] [21682] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:17:11 -0500] [21682] [INFO] Worker exiting (pid: 21682)
+[2021-02-22 18:17:11 -0500] [21683] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .api_registry import api_registry
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/api_registry.py", line 2, in <module>
+    from .routers.v1 import api_project, api_manifest, api_validation, api_lineage
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/routers/v1/api_project.py", line 8, in <module>
+    from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/resources/helpers.py", line 6, in <module>
+    from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/data_models.py", line 3, in <module>
+    from .database import Base
+  File "/Users/Jiayu/Desktop/Indoc/bff_vrecli/app/commons/data_providers/database.py", line 8, in <module>
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/__init__.py", line 520, in create_engine
+    return strategy.create(*args, **kwargs)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/engine/strategies.py", line 87, in create
+    dbapi = dialect_cls.dbapi(**dbapi_args)
+  File "/Users/Jiayu/opt/anaconda3/envs/env/lib/python3.7/site-packages/sqlalchemy/dialects/postgresql/psycopg2.py", line 778, in dbapi
+    import psycopg2
+ModuleNotFoundError: No module named 'psycopg2'
+[2021-02-22 18:17:11 -0500] [21683] [INFO] Worker exiting (pid: 21683)
+[2021-02-22 18:17:41 -0500] [21716] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5077']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/Jiayu/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 501
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7fbe59a16560>
+  on_reload: <function OnReload.on_reload at 0x7fbe59a16680>
+  when_ready: <function WhenReady.when_ready at 0x7fbe59a167a0>
+  pre_fork: <function Prefork.pre_fork at 0x7fbe59a168c0>
+  post_fork: <function Postfork.post_fork at 0x7fbe59a169e0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fbe59a16b00>
+  worker_int: <function WorkerInt.worker_int at 0x7fbe59a16c20>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7fbe59a16d40>
+  pre_exec: <function PreExec.pre_exec at 0x7fbe59a16e60>
+  pre_request: <function PreRequest.pre_request at 0x7fbe59a16f80>
+  post_request: <function PostRequest.post_request at 0x7fbe59a2e050>
+  child_exit: <function ChildExit.child_exit at 0x7fbe59a2e170>
+  worker_exit: <function WorkerExit.worker_exit at 0x7fbe59a2e290>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fbe59a2e3b0>
+  on_exit: <function OnExit.on_exit at 0x7fbe59a2e4d0>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-02-22 18:17:41 -0500] [21716] [INFO] Starting gunicorn 20.0.4
+[2021-02-22 18:17:41 -0500] [21716] [DEBUG] Arbiter booted
+[2021-02-22 18:17:41 -0500] [21716] [INFO] Listening at: http://0.0.0.0:5077 (21716)
+[2021-02-22 18:17:41 -0500] [21716] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-02-22 18:17:41 -0500] [21719] [INFO] Booting worker with pid: 21719
+[2021-02-22 18:17:41 -0500] [21720] [INFO] Booting worker with pid: 21720
+[2021-02-22 18:17:41 -0500] [21721] [INFO] Booting worker with pid: 21721
+[2021-02-22 18:17:42 -0500] [21722] [INFO] Booting worker with pid: 21722
+[2021-02-22 18:17:42 -0500] [21716] [DEBUG] 4 workers
+[2021-02-22 18:17:43 -0500] [21720] [INFO] Started server process [21720]
+[2021-02-22 18:17:43 -0500] [21719] [INFO] Started server process [21719]
+[2021-02-22 18:17:43 -0500] [21720] [INFO] Waiting for application startup.
+[2021-02-22 18:17:43 -0500] [21719] [INFO] Waiting for application startup.
+[2021-02-22 18:17:43 -0500] [21720] [INFO] Application startup complete.
+[2021-02-22 18:17:43 -0500] [21719] [INFO] Application startup complete.
+[2021-02-22 18:17:43 -0500] [21722] [INFO] Started server process [21722]
+[2021-02-22 18:17:43 -0500] [21722] [INFO] Waiting for application startup.
+[2021-02-22 18:17:43 -0500] [21722] [INFO] Application startup complete.
+[2021-02-22 18:17:43 -0500] [21721] [INFO] Started server process [21721]
+[2021-02-22 18:17:43 -0500] [21721] [INFO] Waiting for application startup.
+[2021-02-22 18:17:43 -0500] [21721] [INFO] Application startup complete.
+[2021-02-22 18:18:03 -0500] [21716] [INFO] Handling signal: int
+[2021-02-22 18:18:03 -0500] [21722] [INFO] Shutting down
+[2021-02-22 18:18:03 -0500] [21720] [INFO] Shutting down
+[2021-02-22 18:18:03 -0500] [21719] [INFO] Shutting down
+[2021-02-22 18:18:03 -0500] [21721] [INFO] Shutting down
+[2021-02-22 18:18:03 -0500] [21722] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-22 18:18:03 -0500] [21721] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-22 18:18:03 -0500] [21720] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-22 18:18:03 -0500] [21719] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-02-22 18:18:03 -0500] [21722] [INFO] Waiting for application shutdown.
+[2021-02-22 18:18:03 -0500] [21721] [INFO] Waiting for application shutdown.
+[2021-02-22 18:18:03 -0500] [21720] [INFO] Waiting for application shutdown.
+[2021-02-22 18:18:03 -0500] [21719] [INFO] Waiting for application shutdown.
+[2021-02-22 18:18:03 -0500] [21721] [INFO] Application shutdown complete.
+[2021-02-22 18:18:03 -0500] [21720] [INFO] Application shutdown complete.
+[2021-02-22 18:18:03 -0500] [21719] [INFO] Application shutdown complete.
+[2021-02-22 18:18:03 -0500] [21722] [INFO] Application shutdown complete.
+[2021-02-22 18:18:03 -0500] [21721] [INFO] Finished server process [21721]
+[2021-02-22 18:18:03 -0500] [21720] [INFO] Finished server process [21720]
+[2021-02-22 18:18:03 -0500] [21719] [INFO] Finished server process [21719]
+[2021-02-22 18:18:03 -0500] [21722] [INFO] Finished server process [21722]
+[2021-02-22 18:18:03 -0500] [21721] [INFO] Worker exiting (pid: 21721)
+[2021-02-22 18:18:03 -0500] [21722] [INFO] Worker exiting (pid: 21722)
+[2021-02-22 18:18:03 -0500] [21719] [INFO] Worker exiting (pid: 21719)
+[2021-02-22 18:18:03 -0500] [21720] [INFO] Worker exiting (pid: 21720)
+[2021-02-22 18:18:03 -0500] [21716] [INFO] Shutting down: Master
