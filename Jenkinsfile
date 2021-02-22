@@ -1,8 +1,8 @@
 pipeline {
     agent { label 'small' }
     environment {
-      imagename_dev = "10.3.7.221:5000/bff_vrecli"
-      imagename_staging = "10.3.7.241:5000/bff_vrecli"
+      imagename_dev = "10.3.7.221:5000/bff-vrecli"
+      imagename_staging = "10.3.7.241:5000/bff-vrecli"
       registryCredential = 'docker-registry'
       dockerImage = ''
     }
@@ -25,7 +25,7 @@ pipeline {
       steps{
         script {
             docker.withRegistry('http://10.3.7.221:5000', registryCredential) {
-                customImage = docker.build("10.3.7.221:5000/bff_vrecli:${env.BUILD_ID}")
+                customImage = docker.build("10.3.7.221:5000/bff-vrecli:${env.BUILD_ID}")
                 customImage.push()
             }
         }
@@ -63,7 +63,7 @@ pipeline {
       steps{
         script {
             docker.withRegistry('http://10.3.7.241:5000', registryCredential) {
-                customImage = docker.build("10.3.7.241:5000/bff_vrecli:${env.BUILD_ID}")
+                customImage = docker.build("10.3.7.241:5000/bff-vrecli:${env.BUILD_ID}")
                 customImage.push()
             }
         }
