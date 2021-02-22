@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff_vrecli
+  namespace: utility
+  labels:
+    app: bff_vrecli
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bff_vrecli
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 33%
+  template:
+    metadata:
+      labels:
+        app: bff_vrecli
+    spec:
+      containers:
+        - name: bff_vrecli
+          image: 10.3.7.241:5000/bff_vrecli:<VERSION>
+          ports:
+            - containerPort: 5077
+          env:
+          - name: env
+            value: "staging"
+      nodeSelector:
+        namespace: utility
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bff_vrecli
+  namespace: utility
+  labels:
+    app: bff_vrecli
+spec:
+  ports:
+  - name: http
+    port: 5077
+    targetPort: 5077
+  selector:
+    app: bff_vrecli
+  type: ClusterIP
