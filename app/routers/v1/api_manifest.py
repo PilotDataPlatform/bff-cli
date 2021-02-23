@@ -91,7 +91,7 @@ class APIManifest:
         manifest = get_manifest_name_from_project_in_db(manifest_event)
         if not manifest:
             api_response.code = EAPIResponseCode.not_found
-            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
+            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND % manifest_name)
             return api_response.json_response()
         manifest_event['manifest'] = manifest
         attributes = get_attributes_in_manifest_in_db(manifest_event)

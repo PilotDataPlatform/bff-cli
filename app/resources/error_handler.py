@@ -48,7 +48,7 @@ def customized_error_template(customized_error: ECustomizedError):
     return {
         "INTERNAL": "[Internal] %s",
         "FILE_NOT_FOUND": "File Not Exist",
-        "MANIFEST_NOT_FOUND": "Manifest Not Exist",
+        "MANIFEST_NOT_FOUND": "Manifest Not Exist %s",
         "INVALID_ATTRIBUTE": "Invalid Attribute %s",
         "TOKEN_EXPIRED": "Token Expired",
         "MISSING_REQUIRED_ATTRIBUTES": "Missing Required Attribute %s",
