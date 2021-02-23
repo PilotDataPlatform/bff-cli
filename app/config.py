@@ -10,8 +10,8 @@ class ConfigClass(object):
     FILEINFO_HOST = "http://entityinfo.utility:5066"
     # FILEINFO_HOST = "http://10.3.7.228:5066/"
 
-    # RDS_HOST = "opsdb.utility"
-    RDS_HOST = '10.3.7.215'
+    RDS_HOST = "opsdb.utility"
+    # RDS_HOST = '10.3.7.215'
     RDS_PORT = "5432"
     RDS_DBNAME = "INDOC_VRE"
     RDS_USER = "postgres"
