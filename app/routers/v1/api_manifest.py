@@ -54,10 +54,10 @@ class APIManifest:
                               current_identity: dict = Depends(jwt_required)):
         """CLI will call manifest validation API before attach manifest to file in uploading process"""
         api_response = ManifestListResponse()
-        try:
-            _username = current_identity['username']
-        except (AttributeError, TypeError):
-            return current_identity
+        # try:
+        #     _username = current_identity['username']
+        # except (AttributeError, TypeError):
+        #     return current_identity
         manifests = request_payload.manifest_json
         manifest_name = manifests["manifest_name"]
         file_path = manifests["file_path"]
@@ -65,17 +65,20 @@ class APIManifest:
         attributes = manifests.get("attributes", {})
         mani_project_event = {"project_code": project_code, "manifest_name": manifest_name, "session": db}
         manifest_info = get_manifest_name_from_project_in_db(mani_project_event)
+        if not manifest_info:
+            api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
+            api_response.code = EAPIResponseCode.bad_request
+            return api_response.json_response()
         manifest_id = manifest_info.get('id')
         response = attach_manifest_to_file(file_path, manifest_id, attributes)
         if not response:
-            result = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
-            res_code = EAPIResponseCode.bad_request
+            api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
+            api_response.code = EAPIResponseCode.bad_request
+            return api_response.json_response()
         else:
-            result = response
-            res_code = EAPIResponseCode.success
-        api_response.result = result
-        api_response.code = res_code
-        return api_response.json_response()
+            api_response.result = response
+            api_response.code = EAPIResponseCode.success
+            return api_response.json_response()
 
     @router.get("/manifest/export", tags=[_API_TAG],
                 response_model=ManifestExportResponse,
@@ -91,13 +94,14 @@ class APIManifest:
         manifest = get_manifest_name_from_project_in_db(manifest_event)
         if not manifest:
             api_response.code = EAPIResponseCode.not_found
-            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
+            api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             return api_response.json_response()
-        manifest_event['manifest'] = manifest
-        attributes = get_attributes_in_manifest_in_db(manifest_event)
-        result = {'name': manifest_name,
-                  'project_code': project_code,
-                  'attributes': attributes}
-        api_response.code = EAPIResponseCode.success
-        api_response.result = result
-        return api_response.json_response()
+        else:
+            manifest_event['manifest'] = manifest
+            attributes = get_attributes_in_manifest_in_db(manifest_event)
+            result = {'name': manifest_name,
+                      'project_code': project_code,
+                      'attributes': attributes}
+            api_response.code = EAPIResponseCode.success
+            api_response.result = result
+            return api_response.json_response()

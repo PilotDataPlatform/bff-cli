@@ -19,51 +19,47 @@ def get_manifest_name_from_project_in_db(event):
     project_code = event.get('project_code')
     manifest_name = event.get('manifest_name', None)
     db_session = event.get('session')
-    try:
-        if manifest_name:
-            m = db_session.query(DataManifestModel.name,
-                                 DataManifestModel.id)\
-                .filter_by(project_code=project_code, name=manifest_name)\
-                .first()
-            if not m:
-                return None
-            else:
-                manifest = {'name': m[0], 'id': m[1]}
-                return manifest
+    if manifest_name:
+        m = db_session.query(DataManifestModel.name,
+                             DataManifestModel.id)\
+            .filter_by(project_code=project_code, name=manifest_name)\
+            .first()
+        if not m:
+            return None
         else:
-            manifests = db_session.query(DataManifestModel.name,
-                                         DataManifestModel.id)\
-                .filter_by(project_code=project_code)\
-                .all()
-            manifest_in_project = []
-            for m in manifests:
-                manifest = {'name': m[0], 'id': m[1]}
-                manifest_in_project.append(manifest)
-            return manifest_in_project
-    except Exception:
-        return None
+            manifest = {'name': m[0], 'id': m[1]}
+            return manifest
+    else:
+        manifests = db_session.query(DataManifestModel.name,
+                                     DataManifestModel.id)\
+            .filter_by(project_code=project_code)\
+            .all()
+        manifest_in_project = []
+        for m in manifests:
+            manifest = {'name': m[0], 'id': m[1]}
+            manifest_in_project.append(manifest)
+        return manifest_in_project
 
 
 def get_attributes_in_manifest_in_db(event):
     manifest = event.get('manifest')
     db_session = event.get('session')
     attr_list = []
-    try:
-        attributes = db_session.query(DataAttributeModel.name,
-                                      DataAttributeModel.type,
-                                      DataAttributeModel.optional,
-                                      DataAttributeModel.value). \
-            filter_by(manifest_id=manifest.get('id')). \
-            order_by(DataAttributeModel.id.asc()).all()
-        for attr in attributes:
-            result = {"name": attr[0],
-                      "type": attr[1],
-                      "optional": attr[2],
-                      "value": attr[3]}
-            attr_list.append(result)
-        return attr_list
-    except Exception:
+    attributes = db_session.query(DataAttributeModel.name,
+                                  DataAttributeModel.type,
+                                  DataAttributeModel.optional,
+                                  DataAttributeModel.value). \
+        filter_by(manifest_id=manifest.get('id')). \
+        order_by(DataAttributeModel.id.asc()).all()
+    if not attributes:
         return None
+    for attr in attributes:
+        result = {"name": attr[0],
+                  "type": attr[1],
+                  "optional": attr[2],
+                  "value": attr[3]}
+        attr_list.append(result)
+    return attr_list
 
 
 def get_user_role(username):
@@ -158,13 +154,10 @@ def attach_manifest_to_file(file_path, manifest_id, attributes):
     if attributes:
         for key, value in attributes.items():
             post_data["attr_" + key] = value
-    try:
-        response = requests.put(ConfigClass.NEO4J_SERVICE + f"nodes/File/node/{file_id}", json=post_data)
-        if not response.json():
-            return None
-        return response.json()
-    except Exception:
+    response = requests.put(ConfigClass.NEO4J_SERVICE + f"nodes/File/node/{file_id}", json=post_data)
+    if not response.json():
         return None
+    return response.json()
 
 
 def validate_has_non_optional_attribute_field(input_attributes, compare_attr):
