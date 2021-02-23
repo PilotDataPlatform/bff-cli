@@ -41,7 +41,8 @@ class APIProject:
         for p in project_candidate:
             if p['labels'] == ['Dataset']:
                 res_projects = {'name': p.get('name'),
-                                'code': p.get('code')}
+                                'code': p.get('code'),
+                                'id': p.get('id')}
                 projects_list.append(res_projects)
         api_response.result = projects_list
         api_response.code = EAPIResponseCode.success
