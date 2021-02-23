@@ -2,7 +2,7 @@ FROM python:3.7-buster
 USER root
 WORKDIR /usr/src/app
 
-# set timezone 
+# set timezone
 ENV TZ=America/Toronto
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update
