@@ -132,7 +132,7 @@ class APIManifest:
         else:
             manifest_event['manifest'] = manifest
             attributes = get_attributes_in_manifest_in_db(manifest_event)
-            result = {'name': manifest_name,
+            result = {'manifest_name': manifest_name,
                       'project_code': project_code,
                       'attributes': attributes}
             api_response.code = EAPIResponseCode.success
