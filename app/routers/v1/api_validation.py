@@ -54,7 +54,7 @@ class APIValidation:
                             "session": db}
         manifest_info = get_manifest_name_from_project_in_db(validation_event)
         if not manifest_info:
-            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND % manifest_name)
+            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         validation_event["manifest"] = manifest_info
