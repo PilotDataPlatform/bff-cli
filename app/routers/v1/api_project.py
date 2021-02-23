@@ -5,7 +5,7 @@ from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...auth import jwt_required
 from fastapi_utils.cbv import cbv
-from ...resources.helpers import query_node_has_relation_for_user, query__node_has_relation_with_admin
+from ...resources.helpers import get_user_projects
 
 
 router = APIRouter()
@@ -33,17 +33,7 @@ class APIProject:
             user_role = current_identity['role']
         except (AttributeError, TypeError):
             return current_identity
-        projects_list = []
-        if user_role == "admin":
-            project_candidate = query__node_has_relation_with_admin()
-        else:
-            project_candidate = query_node_has_relation_for_user(username)
-        for p in project_candidate:
-            if p['labels'] == ['Dataset']:
-                res_projects = {'name': p.get('name'),
-                                'code': p.get('code'),
-                                'id': p.get('id')}
-                projects_list.append(res_projects)
-        api_response.result = projects_list
+        project_list = get_user_projects(user_role, username)
+        api_response.result = project_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()

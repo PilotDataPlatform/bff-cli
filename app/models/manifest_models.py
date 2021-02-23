@@ -139,7 +139,3 @@ class ManifestExportResponse(APIResponse):
                 }
             }
         )
-
-
-
-
