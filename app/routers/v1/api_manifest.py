@@ -36,7 +36,7 @@ class APIManifest:
         manifest_list = []
         for manifest in manifests:
             mani_project_event['manifest'] = manifest
-            attr = get_attributes_in_manifest_in_db(manifest)
+            attr = get_attributes_in_manifest_in_db(mani_project_event)
             single_manifest = {'manifest_name': manifest['name'],
                                'id': manifest['id'],
                                'attributes': attr}
