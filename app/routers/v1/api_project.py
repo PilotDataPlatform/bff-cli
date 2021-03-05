@@ -115,7 +115,7 @@ class APIProject:
             "Session-ID": request.headers.get("Session-ID")
         }
         try:
-            if data.zone == "vre":
+            if data.zone == "vrecore":
                 result = requests.post(ConfigClass.UPLOAD_VRE + "/v1/files/jobs", headers=headers, json=payload)
             else:
                 result = requests.post(ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs", headers=headers, json=payload)
