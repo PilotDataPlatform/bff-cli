@@ -44,6 +44,7 @@ class APIProject:
     @router.post("/project/{project_code}/files", 
             response_model=POSTProjectFileResponse, 
             summary="pre upload file to the target zone", tags=["V1 Files"])
+    @catch_internal(_API_NAMESPACE)
     async def project_file_preupload(self, project_code, request: Request, data: POSTProjectFile):
         api_response = POSTProjectFileResponse()
         role = self.current_identity["role"]
