@@ -11,7 +11,7 @@ import requests
 
 
 router = APIRouter()
-_API_TAG = 'v1/projects'
+_API_TAG = 'V1 Projects'
 _API_NAMESPACE = "api_project_list"
 
 
@@ -43,7 +43,7 @@ class APIProject:
 
     @router.post("/project/{project_code}/files", 
             response_model=POSTProjectFileResponse, 
-            summary="pre upload file to the target zone", tags=[_API_TAG])
+            summary="pre upload file to the target zone", tags=["V1 Files"])
     async def project_file_preupload(self, project_code, request: Request, data: POSTProjectFile):
         api_response = POSTProjectFileResponse()
         role = self.current_identity["role"]
