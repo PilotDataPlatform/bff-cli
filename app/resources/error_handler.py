@@ -40,6 +40,7 @@ class ECustomizedError(enum.Enum):
     INVALID_GENERATE_ID = "INVALID_GENERATE_ID"
     PROJECT_NOT_FOUND = "PROJECT_NOT_FOUND"
     PERMISSION_DENIED = "PERMISSION_DENIED"
+    USER_NOT_IN_PROJECT = "USER_NOT_IN_PROJECT"
 
 
 def customized_error_template(customized_error: ECustomizedError):
@@ -58,7 +59,8 @@ def customized_error_template(customized_error: ECustomizedError):
         "TEXT_TOO_LONG": "Text Too Long %s",
         "INVALID_GENERATE_ID": "Invalid Generate ID",
         "PROJECT_NOT_FOUND": "Project not found",
-        "PERMISSION_DENIED": "Permission Denied"
+        "PERMISSION_DENIED": "Permission Denied",
+        "USER_NOT_IN_PROJECT": "User not in the project"
     }.get(
         customized_error.name, "Unknown Error"
     )

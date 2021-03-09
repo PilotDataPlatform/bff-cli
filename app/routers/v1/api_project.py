@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi_utils.cbv import cbv
 from ...models.base_models import EAPIResponseCode
-from ...models.project_models import ProjectListResponse, POSTProjectFile, POSTProjectFileResponse
+from ...models.project_models import ProjectListResponse, POSTProjectFile, POSTProjectFileResponse, GetProjectRoleResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...auth import jwt_required
-from ...resources.helpers import get_user_projects
+from ...resources.helpers import *
 from app.config import ConfigClass  
 import requests
 
 
 router = APIRouter()
 _API_TAG = 'V1 Projects'
-_API_NAMESPACE = "api_project_list"
+_API_NAMESPACE = "api_project"
 
 
 @cbv(router)
@@ -35,15 +35,15 @@ class APIProject:
             username = self.current_identity['username']
             user_role = self.current_identity['role']
         except (AttributeError, TypeError):
-            return current_identity
+            return self.current_identity
         project_list = get_user_projects(user_role, username)
         api_response.result = project_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
 
-    @router.post("/project/{project_code}/files", 
-            response_model=POSTProjectFileResponse, 
-            summary="pre upload file to the target zone", tags=["V1 Files"])
+    @router.post("/project/{project_code}/files",
+                 response_model=POSTProjectFileResponse,
+                 summary="pre upload file to the target zone", tags=["V1 Files"])
     @catch_internal(_API_NAMESPACE)
     async def project_file_preupload(self, project_code, request: Request, data: POSTProjectFile):
         api_response = POSTProjectFileResponse()
@@ -131,4 +131,33 @@ class APIProject:
         api_response.result = result.json()["result"]
         return api_response.json_response()
 
+    @router.get("/project/{project_code}/role", tags=[_API_TAG],
+                response_model=GetProjectRoleResponse,
+                summary="Get user's project role")
+    @catch_internal(_API_NAMESPACE)
+    async def list_project(self, project_code):
+        """
+        Get user's role in the project
+        """
+        api_response = GetProjectRoleResponse()
+        try:
+            user_id = self.current_identity['user_id']
+        except (AttributeError, TypeError):
+            return self.current_identity
+        project = get_dataset_node(project_code)
+        if not project:
+            api_response.error_msg = customized_error_template(ECustomizedError.PROJECT_NOT_FOUND)
+            api_response.code = EAPIResponseCode.not_found
+            return api_response.json_response()
+        project_id = project.get("id")
+        role_check_result = get_user_role(user_id, project_id)
+        if role_check_result:
+            role = role_check_result.get("r").get('type')
+            api_response.result = role
+            api_response.code = EAPIResponseCode.success
+            return api_response.json_response()
+        else:
+            api_response.error_msg = customized_error_template(ECustomizedError.USER_NOT_IN_PROJECT)
+            api_response.code = EAPIResponseCode.not_found
+            return api_response.json_response()
 
