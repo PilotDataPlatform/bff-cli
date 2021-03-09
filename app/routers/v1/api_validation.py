@@ -12,7 +12,7 @@ router = APIRouter()
 
 @cbv(router)
 class APIValidation:
-    _API_TAG = 'v1/validate'
+    _API_TAG = 'V1 Validate'
     _API_NAMESPACE = "api_generate_validate"
 
     def __init__(self):

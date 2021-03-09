@@ -13,7 +13,7 @@ router = APIRouter()
 
 @cbv(router)
 class APIManifest:
-    _API_TAG = 'v1/manifest'
+    _API_TAG = 'V1 Manifest'
     _API_NAMESPACE = "api_manifest"
 
     def __init__(self):

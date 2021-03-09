@@ -13,7 +13,7 @@ router = APIRouter()
 
 @cbv(router)
 class APILineage:
-    _API_TAG = 'v1/lineage'
+    _API_TAG = 'V1 Lineage'
     _API_NAMESPACE = "api_lineage"
 
     def __init__(self):
