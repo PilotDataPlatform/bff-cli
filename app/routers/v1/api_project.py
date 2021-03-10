@@ -135,7 +135,7 @@ class APIProject:
                 response_model=GetProjectRoleResponse,
                 summary="Get user's project role")
     @catch_internal(_API_NAMESPACE)
-    async def list_project(self, project_code):
+    async def get_user_project_role(self, project_code):
         """
         Get user's role in the project
         """
