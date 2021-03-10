@@ -4,6 +4,7 @@ from ...models.base_models import EAPIResponseCode
 from ...models.project_models import ProjectListResponse, POSTProjectFile, POSTProjectFileResponse, GetProjectRoleResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
+from ...resources.dependencies import get_project_role
 from ...auth import jwt_required
 from ...resources.helpers import *
 from app.config import ConfigClass  
@@ -48,6 +49,7 @@ class APIProject:
     async def project_file_preupload(self, project_code, request: Request, data: POSTProjectFile):
         api_response = POSTProjectFileResponse()
         role = self.current_identity["role"]
+        user_id = self.current_identity["user_id"]
         if not data.zone in ["vrecore", "greenroom"]:
             api_response.error_msg = "Invalid Zone"
             api_response.code = EAPIResponseCode.bad_request
@@ -117,6 +119,17 @@ class APIProject:
         }
         try:
             if data.zone == "vrecore":
+                # Start permission check fail contributor
+                role, code = get_project_role(user_id, project_code)
+                if code != EAPIResponseCode.success:
+                    api_response.error_msg = role
+                    api_response.code = code
+                    return api_response.json_response()
+                elif role == "contributor":
+                    api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    api_response.code = EAPIResponseCode.forbidden
+                    return api_response.json_response()
+
                 result = requests.post(ConfigClass.UPLOAD_VRE + "/v1/files/jobs", headers=headers, json=payload)
             else:
                 result = requests.post(ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs", headers=headers, json=payload)
@@ -160,4 +173,3 @@ class APIProject:
             api_response.error_msg = customized_error_template(ECustomizedError.USER_NOT_IN_PROJECT)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
-
