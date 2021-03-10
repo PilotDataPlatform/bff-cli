@@ -120,15 +120,16 @@ class APIProject:
         try:
             if data.zone == "vrecore":
                 # Start permission check fail contributor
-                role, code = get_project_role(user_id, project_code)
-                if code != EAPIResponseCode.success:
-                    api_response.error_msg = role
-                    api_response.code = code
-                    return api_response.json_response()
-                elif role == "contributor":
-                    api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                    api_response.code = EAPIResponseCode.forbidden
-                    return api_response.json_response()
+                if role != "admin":
+                    project_role, code = get_project_role(user_id, project_code)
+                    if code != EAPIResponseCode.success:
+                        api_response.error_msg = project_role
+                        api_response.code = code
+                        return api_response.json_response()
+                    elif project_role == "contributor":
+                        api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                        api_response.code = EAPIResponseCode.forbidden
+                        return api_response.json_response()
 
                 result = requests.post(ConfigClass.UPLOAD_VRE + "/v1/files/jobs", headers=headers, json=payload)
             else:
