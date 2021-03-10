@@ -108,7 +108,7 @@ class APIProject:
         payload = {
             "project_code": project_code,
             "operator": data.operator,
-            "operator": data.upload_message,
+            "upload_message": data.upload_message,
             "resumable_filename": data.filename,
             #"resumable_dataType": data.type
         }
