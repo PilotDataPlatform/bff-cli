@@ -25,6 +25,7 @@ class ProjectListResponse(APIResponse):
         }
     )
 
+
 class POSTProjectFileResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
@@ -36,6 +37,7 @@ class POSTProjectFileResponse(APIResponse):
         }
     )
 
+
 class POSTProjectFile(BaseModel):
     operator: str
     #resumable_datatype: str
@@ -43,3 +45,15 @@ class POSTProjectFile(BaseModel):
     type: str
     zone: str
     filename: str
+
+
+class GetProjectRoleResponse(APIResponse):
+    result: dict = Field({}, example={
+            "code": 200,
+            "error_msg": "",
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1,
+            "result": "role"
+        }
+    )

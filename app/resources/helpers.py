@@ -62,21 +62,15 @@ def get_attributes_in_manifest_in_db(event):
     return attr_list
 
 
-def get_user_role(username):
-    api_response = APIResponse()
-    url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
+def get_user_role(user_id, project_id):
+    url = ConfigClass.NEO4J_SERVICE + "/relations"
     try:
-        res = requests.post(
+        res = requests.get(
             url=url,
-            json={"name": username}
-        )
-        users = json.loads(res.text)
-        if len(users) == 0:
-            api_response.error_msg = customized_error_template(ECustomizedError.TOKEN_EXPIRED)
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
-        user_role = users[0]['role']
-        return user_role
+            params={"start_id": user_id,
+                    "end_id": project_id})
+        _res = json.loads(res.text)[0]
+        return _res
     except Exception:
         return None
 
@@ -138,6 +132,17 @@ def get_file_node(full_path):
     post_data = {"full_path": full_path}
     try:
         response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/File/query", json=post_data)
+        if not response.json():
+            return None
+        return response.json()[0]
+    except Exception:
+        return None
+
+
+def get_dataset_node(project_code):
+    post_data = {"code": project_code}
+    try:
+        response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/Dataset/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
