@@ -4,8 +4,7 @@ from ...models.base_models import EAPIResponseCode
 from ...models.project_models import ProjectListResponse, POSTProjectFile, POSTProjectFileResponse, GetProjectRoleResponse
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
-from ...resources.dependencies import get_project_role
-from ...auth import jwt_required
+from ...resources.dependencies import get_project_role, jwt_required
 from ...resources.helpers import *
 from app.config import ConfigClass  
 import requests

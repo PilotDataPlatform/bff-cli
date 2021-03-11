@@ -8,10 +8,11 @@ class ConfigClass(object):
     NEO4J_SERVICE = "http://neo4j.utility:5062/v1/neo4j/"
     # NEO4J_SERVICE = "http://10.3.7.216:5062/v1/neo4j/"
     FILEINFO_HOST = "http://entityinfo.utility:5066"
-    # FILEINFO_HOST = "http://10.3.7.228:5066/"
+    # FILEINFO_HOST = "http://10.3.7.228:5066"
     UPLOAD_VRE = "http://upload.vre:5079"
     UPLOAD_GREENROOM = "http://upload.greenroom:5079"
     AUTH_SERVICE = "http://auth.utility:5061"
+    PROVENANCE_SERVICE = "http://provenance.utility:5077"
 
     RDS_HOST = "opsdb.utility"
     # RDS_HOST = '10.3.7.215'
