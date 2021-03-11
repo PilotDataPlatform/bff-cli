@@ -47,8 +47,11 @@ class APIProject:
     @catch_internal(_API_NAMESPACE)
     async def project_file_preupload(self, project_code, request: Request, data: POSTProjectFile):
         api_response = POSTProjectFileResponse()
-        role = self.current_identity["role"]
-        user_id = self.current_identity["user_id"]
+        try:
+            role = self.current_identity["role"]
+            user_id = self.current_identity["user_id"]
+        except (AttributeError, TypeError):
+            return self.current_identity
         if not data.zone in ["vrecore", "greenroom"]:
             api_response.error_msg = "Invalid Zone"
             api_response.code = EAPIResponseCode.bad_request

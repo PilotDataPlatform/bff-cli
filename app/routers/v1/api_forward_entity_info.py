@@ -26,7 +26,10 @@ class APIEntityInfo:
     @catch_internal(_API_NAMESPACE)
     async def check_source_file(self, project_code, zone, type, filename,
                                 current_identity: dict = Depends(jwt_required)):
-        api_response = APIResponse()
+        try:
+            role = current_identity["role"]
+        except (AttributeError, TypeError):
+            return current_identity
         query = {
             "project_code": project_code,
             "zone": zone,
