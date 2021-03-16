@@ -39,5 +39,5 @@ class APILineage:
         #     return api_response.json_response()
         proxy_payload = request_payload.__dict__
         fw_response = requests.post(
-            ConfigClass.PROVENANCE_SERVICE + "/v1/lineage", proxy_payload)
+            ConfigClass.PROVENANCE_SERVICE + "/v1/lineage", json=proxy_payload)
         return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)
