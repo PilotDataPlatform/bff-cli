@@ -5,8 +5,8 @@ from app.config import ConfigClass
 from .prepare_test import SetupTest
 from .logger import Logger
 import requests
-import requests_mock
-from unittest import mock
+# import requests_mock
+# from unittest import mock
 
 app = create_app()
 
@@ -57,6 +57,7 @@ class TestFiles(unittest.TestCase):
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 500)
 
+
     def test_02_post_files_vrecore_processed(self):
         project_code = self.project["code"]
         payload = {
@@ -67,6 +68,7 @@ class TestFiles(unittest.TestCase):
             "filename": "fake.png"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
+        print(response.text)
         self.assertEqual(response.status_code, 500)
 
     def test_03_post_files_greenroom_raw(self):

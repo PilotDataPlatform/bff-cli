@@ -4,19 +4,23 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
 
+
 class SetupTest:
     def __init__(self, log):
         self.log = log
+        app = create_app()
+        self.client = TestClient(app)
 
-    def auth(self):
-        payload = {
-            "username": "jzhang10",
-            "password": "CMDvrecli2021!",
-            "realm": "vre"
-        }
+    def auth(self, payload=None):
+        if not payload:
+            payload = {
+                "username": "jzhang10",
+                "password": "CMDvrecli2021!",
+                "realm": "vre"
+            }
         response = requests.post(ConfigClass.AUTH_SERVICE + "/v1/users/auth", json=payload)
         data = response.json()
-        print(data)
+        self.log.info(data)
         return data["result"].get("access_token")
 
     def get_user(self):
@@ -24,7 +28,7 @@ class SetupTest:
             "name": "jzhang10",
         }
         response = requests.post(ConfigClass.NEO4J_SERVICE + "nodes/User/query", json=payload)
-        print(response.json())
+        self.log.info(response.json())
         return response.json()[0]
 
     def create_project(self, code, discoverable='true'):
@@ -82,3 +86,19 @@ class SetupTest:
         response = requests.delete(ConfigClass.NEO4J_SERVICE + "relations", params=payload)
         if response.status_code != 200:
             raise Exception(f"Error removing user from project: {response.json()}")
+
+    def get_projects(self):
+        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Dataset/properties'
+        try:
+            response = requests.get(all_project_url)
+            if response.status_code == 200:
+                res = response.json()
+                projects = res.get('code')
+                return projects
+            else:
+                self.log.error(f"RESPONSE ERROR: {response.text}")
+                return None
+        except Exception as e:
+            raise e
+
+
