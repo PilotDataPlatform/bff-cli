@@ -2,7 +2,7 @@ import unittest
 from .prepare_test import SetupTest
 from .logger import Logger
 
-@unittest.skip('ready')
+
 class TestGetAttributes(unittest.TestCase):
     log = Logger(name='test_get_attributes.log')
     test = SetupTest(log)
@@ -116,7 +116,7 @@ class TestGetAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-@unittest.skip('ready')
+
 class TestExportAttributes(unittest.TestCase):
     log = Logger(name='test_export_attribute.log')
     test = SetupTest(log)
