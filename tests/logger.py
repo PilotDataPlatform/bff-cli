@@ -16,7 +16,7 @@ class Logger(object):
         level = logging.INFO
 
         self.logger.setLevel(level)
-        fh = RotatingFileHandler("./tests/logs/"+name, maxBytes=500000, backupCount=5)
+        fh = RotatingFileHandler("./tests/logs/"+name, maxBytes=500000, backupCount=1)
         formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s',
                                       '%Y-%m-%d %H:%M:%S')
         fh.setFormatter(formatter)
