@@ -24,7 +24,7 @@ spec:
         - name: bff-vrecli
           image: 10.3.7.221:5000/bff-vrecli:<VERSION>
           ports:
-            - containerPort: 5077
+            - containerPort: 5080
           env:
           - name: env
             value: "dev"
@@ -41,8 +41,8 @@ metadata:
 spec:
   ports:
   - name: http
-    port: 5077
-    targetPort: 5077
+    port: 5080
+    targetPort: 5080
   selector:
     app: bff-vrecli
   type: LoadBalancer
