@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
+# os.environ['env'] = 'test'
 from .config import ConfigClass
 from .api_registry import api_registry
 

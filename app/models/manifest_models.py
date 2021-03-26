@@ -53,11 +53,13 @@ class ManifestAttachPost(BaseModel):
     Attach Manifest post model
     """
     manifest_json: dict = Field({}, example={
-                "manifest_name": "Manifest1",
-                "project_code": "0216",
-                "attributes": {"attr1": "a1", "attr2": "test cli upload"},
-                "file_path": "/data/vre-storage/0216/raw/testf1"
-            }
+        "manifest_json": {
+            "manifest_name": "Manifest1",
+            "project_code": "vrecli",
+            "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
+            "file_path": "/data/vre-storage/vrecli/raw/test1"
+        }
+    }
     )
 
 

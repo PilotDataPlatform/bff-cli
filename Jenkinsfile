@@ -19,6 +19,16 @@ pipeline {
             }
         }
     }
+    
+    stage('DEV unit test') {
+      when {branch "k8s-dev"}
+      steps{
+        sh "pip3 install -r requirements.txt"
+        sh "pip3 install -r tests/test_requirements.txt"
+        sh "pytest -c tests/pytest.ini"
+      }
+    }
+
 
     stage('DEV Build and push image') {
       when {branch "k8s-dev"}

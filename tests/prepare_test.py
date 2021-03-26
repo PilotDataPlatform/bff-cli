@@ -4,19 +4,23 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
 
+
 class SetupTest:
     def __init__(self, log):
         self.log = log
+        app = create_app()
+        self.client = TestClient(app)
 
-    def auth(self):
-        payload = {
-            "username": "jzhang10",
-            "password": "CMDvrecli2021!",
-            "realm": "vre"
-        }
+    def auth(self, payload=None):
+        if not payload:
+            payload = {
+                "username": "jzhang10",
+                "password": "CMDvrecli2021!",
+                "realm": "vre"
+            }
         response = requests.post(ConfigClass.AUTH_SERVICE + "/v1/users/auth", json=payload)
         data = response.json()
-        print(data)
+        self.log.info(data)
         return data["result"].get("access_token")
 
     def get_user(self):
@@ -24,13 +28,13 @@ class SetupTest:
             "name": "jzhang10",
         }
         response = requests.post(ConfigClass.NEO4J_SERVICE + "nodes/User/query", json=payload)
-        print(response.json())
+        self.log.info(response.json())
         return response.json()[0]
 
     def create_project(self, code, discoverable='true'):
         self.log.info("\n")
         self.log.info("Preparing testing project".ljust(80, '-'))
-        testing_api = ConfigClass.NEO4J_SERVICE+ "nodes/Dataset"
+        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/Dataset"
         params = {"name": "BFFCLIUnitTest",
                   "path": code,
                   "code": code,
@@ -82,3 +86,67 @@ class SetupTest:
         response = requests.delete(ConfigClass.NEO4J_SERVICE + "relations", params=payload)
         if response.status_code != 200:
             raise Exception(f"Error removing user from project: {response.json()}")
+
+    def get_projects(self):
+        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Dataset/properties'
+        try:
+            response = requests.get(all_project_url)
+            if response.status_code == 200:
+                res = response.json()
+                projects = res.get('code')
+                return projects
+            else:
+                self.log.error(f"RESPONSE ERROR: {response.text}")
+                return None
+        except Exception as e:
+            raise e
+
+    def create_file(self, project_code, filename):
+        self.log.info("\n")
+        self.log.info("Preparing testing file".ljust(80, '-'))
+        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
+        payload = {
+                    "name": filename,
+                    "extra_labels": ["Greenroom", "Raw"],
+                    "file_size": 7120,
+                    "operator": "jzhang",
+                    "archived": False,
+                    "process_pipeline": "",
+                    "uploader": "jzhang",
+                    "generate_id": "undefined",
+                    "path": f"/data/vre-storage/{project_code}/raw",
+                    "full_path": f"/data/vre-storage/{project_code}/raw/{filename}"
+        }
+        self.log.info(f"POST API: {testing_api}")
+        self.log.info(f"POST params: {payload}")
+        try:
+            res = requests.post(testing_api, json=payload)
+            self.log.info(f"RESPONSE DATA: {res.text}")
+            self.log.info(f"RESPONSE STATUS: {res.status_code}")
+            assert res.status_code == 200
+            return res.json()[0]
+        except Exception as e:
+            self.log.info(f"ERROR CREATING PROJECT: {e}")
+            raise e
+
+    def delete_file(self, node_id):
+        self.log.info("\n")
+        self.log.info("Delete testing file".ljust(80, '-'))
+        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/File/node/%s" % node_id
+        payload = {
+                    "id": node_id,
+                    "label": "File"
+        }
+        self.log.info(f"POST API: {delete_api}")
+        self.log.info(f"POST params: {payload}")
+        try:
+            res = requests.delete(delete_api, json=payload)
+            self.log.info(f"RESPONSE DATA: {res.text}")
+            self.log.info(f"RESPONSE STATUS: {res.status_code}")
+            assert res.status_code == 200
+            return res.json()[0]
+        except Exception as e:
+            self.log.info(f"ERROR CREATING PROJECT: {e}")
+            raise e
+
+
