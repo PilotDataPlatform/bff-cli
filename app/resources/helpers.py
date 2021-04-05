@@ -101,7 +101,7 @@ def query_node_has_relation_for_user(username):
 
 
 def query_file_in_project(dataset_id, filename):
-    url = ConfigClass.FILEINFO_HOST + "v1/files/%s/query" % str(dataset_id)
+    url = ConfigClass.FILEINFO_HOST + "/v1/files/%s/query" % str(dataset_id)
     if filename:
         data = {"query": {
             "name": filename,
@@ -110,13 +110,13 @@ def query_file_in_project(dataset_id, filename):
         data = {"query": {"labels": ["File"]}}
     try:
         res = requests.post(url=url, json=data)
-        res = res.json()
+        res = res.json() if res else None
         return res
-    except Exception:
+    except Exception as e:
         return None
 
 
-def get_file_path(project_code, file_name):
+def get_file_entity_id(project_code, file_name):
     post_data = {"code": project_code}
     response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/Dataset/query", json=post_data)
     if not response.json():
@@ -124,8 +124,12 @@ def get_file_path(project_code, file_name):
     project_info = response.json()[0]
     project_id = project_info.get('id')
     res = query_file_in_project(project_id, file_name)
-    file_path = res.get('result')[0].get('path')
-    return file_path
+    res = res.get('result')
+    if not res:
+        return None
+    else:
+        global_entity_id = res[0].get('global_entity_id')
+        return global_entity_id
 
 
 def get_file_by_id(file_id):

@@ -3,6 +3,7 @@ import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
+from app.resources.helpers import get_dataset_node
 
 
 class SetupTest:
@@ -114,6 +115,7 @@ class SetupTest:
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
+        relation_api = ConfigClass.NEO4J_SERVICE + "relations/own"
         global_entity_id = self.generate_entity_id()
         payload = {
                     "name": filename,
@@ -135,7 +137,16 @@ class SetupTest:
             self.log.info(f"RESPONSE DATA: {res.text}")
             self.log.info(f"RESPONSE STATUS: {res.status_code}")
             assert res.status_code == 200
-            return res.json()[0]
+            res = res.json()[0]
+            project_info = get_dataset_node(project_code)
+            self.log.info(f"Project info: {project_info}")
+            project_id = project_info.get('id')
+            relation_payload = {'start_id': project_id,
+                                'end_id': res.get('id')}
+            relation_res = requests.post(relation_api, json=relation_payload)
+            self.log.info(f"Relation response: {relation_res.text}")
+            assert relation_res.status_code == 200
+            return res
         except Exception as e:
             self.log.info(f"ERROR CREATING PROJECT: {e}")
             raise e
