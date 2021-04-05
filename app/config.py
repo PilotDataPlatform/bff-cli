@@ -1,4 +1,5 @@
 import os
+os.environ['env'] = 'test'
 
 
 class ConfigClass(object):
@@ -12,6 +13,7 @@ class ConfigClass(object):
         RDS_HOST = '10.3.7.215'
         UPLOAD_VRE = "http://10.3.7.200:5079"
         UPLOAD_GREENROOM = "http://10.3.7.201:5079"
+        COMMON_SERVICE = "http://10.3.7.222:5062/v1/utility/id"
     else:
         NEO4J_SERVICE = "http://neo4j.utility:5062/v1/neo4j/"
         FILEINFO_HOST = "http://entityinfo.utility:5066"

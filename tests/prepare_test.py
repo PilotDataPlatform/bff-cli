@@ -101,12 +101,23 @@ class SetupTest:
         except Exception as e:
             raise e
 
+    def generate_entity_id(self):
+        self.log.info("Generating global entity ID")
+        testing_api = ConfigClass.COMMON_SERVICE
+        res = requests.get(testing_api)
+        if not res.json():
+            return None
+        else:
+            return res.json()['result']
+
     def create_file(self, project_code, filename):
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
+        global_entity_id = self.generate_entity_id()
         payload = {
                     "name": filename,
+                    "global_entity_id": global_entity_id,
                     "extra_labels": ["Greenroom", "Raw"],
                     "file_size": 7120,
                     "operator": "jzhang",
@@ -148,5 +159,3 @@ class SetupTest:
         except Exception as e:
             self.log.info(f"ERROR CREATING PROJECT: {e}")
             raise e
-
-

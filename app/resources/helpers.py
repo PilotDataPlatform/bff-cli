@@ -128,8 +128,8 @@ def get_file_path(project_code, file_name):
     return file_path
 
 
-def get_file_node(full_path):
-    post_data = {"full_path": full_path}
+def get_file_by_id(file_id):
+    post_data = {"global_entity_id": file_id}
     try:
         response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/File/query", json=post_data)
         if not response.json():
@@ -180,8 +180,8 @@ def get_user_projects(user_role, username):
     return projects_list
 
 
-def attach_manifest_to_file(file_path, manifest_id, attributes):
-    file_node = get_file_node(file_path)
+def attach_manifest_to_file(global_entity_id, manifest_id, attributes):
+    file_node = get_file_by_id(global_entity_id)
     if not file_node:
         return None
     file_id = file_node["id"]

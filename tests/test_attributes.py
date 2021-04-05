@@ -243,17 +243,15 @@ class TestAttachAttributes(unittest.TestCase):
     test_api = "/v1/manifest/attach"
     token = test.auth()
     file_id = ''
-    file_path = ''
     project_code = 'vrecli'
-
 
     @classmethod
     def setUpClass(cls):
         cls.log.info(f"{'Test setUp'.center(80, '=')}")
         create_res = cls.test.create_file('vrecli', 'unittest_file')
         cls.log.info(f"CREATE FILE: {create_res}")
+        cls.global_entity_id = create_res.get('global_entity_id')
         cls.file_id = create_res.get('id')
-        cls.file_path = create_res.get('full_path')
 
     @classmethod
     def tearDownClass(cls):
@@ -268,7 +266,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_path": self.file_path
+                  "global_entity_id": self.global_entity_id
                   }
                   }
         try:
@@ -292,7 +290,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_path": self.file_path
+                  "global_entity_id": self.global_entity_id
                   }
                   }
         headers = {
@@ -309,8 +307,8 @@ class TestAttachAttributes(unittest.TestCase):
             result = res_json.get('result')[0]
             self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'Greenroom', 'Raw']")
             self.assertEqual(result.get('labels'), ['File', 'Greenroom', 'Raw'])
-            self.log.info(f"COMPARING path: {result.get('full_path')}, {self.file_path}")
-            self.assertEqual(result.get('full_path'), self.file_path)
+            self.log.info(f"COMPARING entity ID: {result.get('global_entity_id')}, {self.global_entity_id}")
+            self.assertEqual(result.get('global_entity_id'), self.global_entity_id)
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -318,12 +316,12 @@ class TestAttachAttributes(unittest.TestCase):
     def test_03_attach_attributes_wrong_file(self):
         self.log.info('\n')
         self.log.info("test_03_attach_attributes_wrong_file".center(80, '-'))
-        wrong_file = self.file_path + '10000'
+        wrong_id = self.global_entity_id + '10000'
         payload = {"manifest_json": {
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_path": wrong_file
+                  "global_entity_id": wrong_id
                   }
                   }
         headers = {
@@ -335,8 +333,8 @@ class TestAttachAttributes(unittest.TestCase):
             res = self.app.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
-            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
-            self.assertEqual(res_json.get('code'), 400)
+            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
+            self.assertEqual(res_json.get('code'), 404)
             error = res_json.get('error_msg')
             self.log.info(f"COMPARING ERROR: {error} VS 'File Not Exist'")
             self.assertEqual(error, 'File Not Exist')
@@ -351,7 +349,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1000",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_path": self.file_path
+                  "global_entity_id": self.global_entity_id
                   }
                   }
         headers = {
@@ -374,12 +372,12 @@ class TestAttachAttributes(unittest.TestCase):
 
     def test_05_attach_attributes_no_access(self):
         self.log.info('\n')
-        self.log.info("test_04_attach_attributes_wrong_name".center(80, '-'))
+        self.log.info("test_05_attach_attributes_no_access".center(80, '-'))
         payload = {"manifest_json": {
             "manifest_name": "Manifest1000",
             "project_code": self.project_code,
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-            "file_path": self.file_path
+            "global_entity_id": self.global_entity_id
         }
         }
         login_user = {
