@@ -113,8 +113,8 @@ class APIProject:
             "project_code": project_code,
             "operator": data.operator,
             "upload_message": data.upload_message,
-            "resumable_filename": data.filename,
-            #"resumable_dataType": data.type
+            "data": [{"resumable_filename": data.filename, "filename": data.filename}],
+            "job_type": data.job_type
         }
         headers = {
             "Session-ID": request.headers.get("Session-ID")

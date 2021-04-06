@@ -70,7 +70,13 @@ class APIManifest:
             return current_identity
         manifests = request_payload.manifest_json
         manifest_name = manifests["manifest_name"]
-        file_path = manifests["file_path"]
+        project_code = manifests['project_code']
+        file_name = manifests['file_name']
+        global_entity_id = get_file_entity_id(project_code, file_name)
+        if not global_entity_id:
+            api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
+            api_response.code = EAPIResponseCode.not_found
+            return api_response.json_response()
         project_code = manifests['project_code']
         attributes = manifests.get("attributes", {})
         permission_check_event = {'user_role': _user_role,
@@ -88,10 +94,10 @@ class APIManifest:
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
         manifest_id = manifest_info.get('id')
-        response = attach_manifest_to_file(file_path, manifest_id, attributes)
+        response = attach_manifest_to_file(global_entity_id, manifest_id, attributes)
         if not response:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
-            api_response.code = EAPIResponseCode.bad_request
+            api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         else:
             api_response.result = response

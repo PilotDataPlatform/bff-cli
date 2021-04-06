@@ -3,6 +3,7 @@ import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
+from app.resources.helpers import get_dataset_node
 
 
 class SetupTest:
@@ -101,12 +102,24 @@ class SetupTest:
         except Exception as e:
             raise e
 
+    def generate_entity_id(self):
+        self.log.info("Generating global entity ID")
+        testing_api = ConfigClass.COMMON_SERVICE
+        res = requests.get(testing_api)
+        if not res.json():
+            return None
+        else:
+            return res.json()['result']
+
     def create_file(self, project_code, filename):
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
+        relation_api = ConfigClass.NEO4J_SERVICE + "relations/own"
+        global_entity_id = self.generate_entity_id()
         payload = {
                     "name": filename,
+                    "global_entity_id": global_entity_id,
                     "extra_labels": ["Greenroom", "Raw"],
                     "file_size": 7120,
                     "operator": "jzhang",
@@ -124,7 +137,16 @@ class SetupTest:
             self.log.info(f"RESPONSE DATA: {res.text}")
             self.log.info(f"RESPONSE STATUS: {res.status_code}")
             assert res.status_code == 200
-            return res.json()[0]
+            res = res.json()[0]
+            project_info = get_dataset_node(project_code)
+            self.log.info(f"Project info: {project_info}")
+            project_id = project_info.get('id')
+            relation_payload = {'start_id': project_id,
+                                'end_id': res.get('id')}
+            relation_res = requests.post(relation_api, json=relation_payload)
+            self.log.info(f"Relation response: {relation_res.text}")
+            assert relation_res.status_code == 200
+            return res
         except Exception as e:
             self.log.info(f"ERROR CREATING PROJECT: {e}")
             raise e
@@ -148,5 +170,3 @@ class SetupTest:
         except Exception as e:
             self.log.info(f"ERROR CREATING PROJECT: {e}")
             raise e
-
-

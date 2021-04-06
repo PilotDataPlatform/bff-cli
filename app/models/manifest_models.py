@@ -57,11 +57,10 @@ class ManifestAttachPost(BaseModel):
             "manifest_name": "Manifest1",
             "project_code": "vrecli",
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-            "file_path": "/data/vre-storage/vrecli/raw/test1"
+            "file_name": "file1"
         }
     }
     )
-
 
 class ManifestAttachResponse(APIResponse):
     """
