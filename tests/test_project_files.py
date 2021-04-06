@@ -52,7 +52,8 @@ class TestFiles(unittest.TestCase):
             "upload_message": "Greg Testing",
             "type": "processed",
             "zone": "greenroom",
-            "filename": "fake.png"
+            "filename": "fake.png",
+            "job_type": "AS_FILE"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 500)
@@ -65,7 +66,8 @@ class TestFiles(unittest.TestCase):
             "upload_message": "Greg Testing",
             "type": "processed",
             "zone": "vrecore",
-            "filename": "fake.png"
+            "filename": "fake.png",
+            "job_type": "AS_FILE"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         print(response.text)
@@ -78,7 +80,8 @@ class TestFiles(unittest.TestCase):
             "upload_message": "Greg Testing",
             "type": "raw",
             "zone": "greenroom",
-            "filename": "fake.png"
+            "filename": "fake.png",
+            "job_type": "AS_FILE"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 500)
@@ -90,7 +93,8 @@ class TestFiles(unittest.TestCase):
             "upload_message": "Greg Testing",
             "type": "raw",
             "zone": "wrong",
-            "filename": "fake.png"
+            "filename": "fake.png",
+            "job_type": "AS_FILE"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 400)
@@ -103,7 +107,8 @@ class TestFiles(unittest.TestCase):
             "upload_message": "Greg Testing",
             "type": "wrong",
             "zone": "vrecore",
-            "filename": "fake.png"
+            "filename": "fake.png",
+            "job_type": "AS_FILE"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 400)
@@ -117,7 +122,8 @@ class TestFiles(unittest.TestCase):
             "upload_message": "Greg Testing",
             "type": "raw",
             "zone": "vrecore",
-            "filename": "fake.png"
+            "filename": "fake.png",
+            "job_type": "AS_FILE"
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 403)

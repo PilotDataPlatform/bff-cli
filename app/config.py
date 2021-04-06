@@ -1,5 +1,5 @@
 import os
-os.environ['env'] = 'test'
+# os.environ['env'] = 'test'
 
 
 class ConfigClass(object):
