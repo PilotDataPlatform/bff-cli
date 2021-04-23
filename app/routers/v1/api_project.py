@@ -141,7 +141,11 @@ class APIProject:
             api_response.error_msg = f"Upload service  error: {e}"
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
-        if result.status_code != 200:
+        if result.status_code == 409:
+            api_response.error_msg = result.json()['error_msg']
+            api_response.code = EAPIResponseCode.conflict
+            return api_response.json_response()
+        elif result.status_code != 200:
             api_response.error_msg = "Upload Error: " + result.json()["error_msg"]
             api_response.code = EAPIResponseCode.internal_error
             return api_response.json_response()
