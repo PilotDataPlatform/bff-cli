@@ -45,6 +45,7 @@ class POSTProjectFile(BaseModel):
     type: str
     zone: str
     filename: str
+    data: list
 
 
 class GetProjectRoleResponse(APIResponse):

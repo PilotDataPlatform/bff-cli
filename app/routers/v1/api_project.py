@@ -113,7 +113,7 @@ class APIProject:
             "project_code": project_code,
             "operator": data.operator,
             "upload_message": data.upload_message,
-            "data": [{"resumable_filename": data.filename, "filename": data.filename}],
+            "data": data.data,
             "job_type": data.job_type
         }
         headers = {
@@ -131,6 +131,7 @@ class APIProject:
                     elif project_role == "contributor":
                         api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                         api_response.code = EAPIResponseCode.forbidden
+                        api_response.result = project_role
                         return api_response.json_response()
 
                 result = requests.post(ConfigClass.UPLOAD_VRE + "/v1/files/jobs", headers=headers, json=payload)
