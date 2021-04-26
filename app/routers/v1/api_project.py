@@ -90,23 +90,21 @@ class APIProject:
             "type": data.type,
             "zone": data.zone,
             "filename": data.filename,
+            "job_type": data.job_type
         }
         try:
             result = requests.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=params)
+            result = result.json()
         except Exception as e:
             api_response.error_msg = f"EntityInfo service  error: {e}"
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
-        if not result.status_code in [200, 404]:
-            error_msg = result.json().get("error_msg")
-            api_response.error_msg = f"File exist API error: {error_msg}"
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
-        if result.status_code == 404:
+        if result['code'] in [404, 200]:
             pass
         else:
             api_response.error_msg = "File with that name already exists"
             api_response.code = EAPIResponseCode.conflict
+            api_response.result = result
             return api_response.json_response()
 
         payload = {
@@ -144,6 +142,7 @@ class APIProject:
         if result.status_code == 409:
             api_response.error_msg = result.json()['error_msg']
             api_response.code = EAPIResponseCode.conflict
+            api_response.result = result.text
             return api_response.json_response()
         elif result.status_code != 200:
             api_response.error_msg = "Upload Error: " + result.json()["error_msg"]
