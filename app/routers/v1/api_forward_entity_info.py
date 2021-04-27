@@ -24,7 +24,7 @@ class APIEntityInfo:
                 response_model=CheckFileResponse,
                 summary="Check source file")
     @catch_internal(_API_NAMESPACE)
-    async def check_source_file(self, project_code, zone, type, filename,
+    async def check_source_file(self, project_code, zone, type, filename, job_type,
                                 current_identity: dict = Depends(jwt_required)):
         try:
             role = current_identity["role"]
@@ -34,7 +34,8 @@ class APIEntityInfo:
             "project_code": project_code,
             "zone": zone,
             "type": type,
-            "filename": filename
+            "filename": filename,
+            "job_type": job_type
         }
         fw_response = requests.get(
             ConfigClass.FILEINFO_HOST + "/v1/project/{}/file/exist".format(project_code), params=query)
