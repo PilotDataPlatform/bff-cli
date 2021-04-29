@@ -305,8 +305,8 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
             self.assertEqual(res_json.get('code'), 200)
             result = res_json.get('result')[0]
-            self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'Greenroom', 'Raw']")
-            self.assertEqual(result.get('labels'), ['File', 'Greenroom', 'Raw'])
+            self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'Greenroom']")
+            self.assertEqual(result.get('labels'), ['File', 'Greenroom'])
             self.log.info(f"COMPARING file_name: {result.get('name')}, {self.file_name}")
             self.assertEqual(result.get('name'), self.file_name)
         except Exception as e:
