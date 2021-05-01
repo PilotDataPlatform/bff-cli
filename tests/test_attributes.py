@@ -50,7 +50,7 @@ class TestGetAttributes(unittest.TestCase):
         self.log.info("test_03_get_attributes_no_access".center(80, '-'))
         param = {'project_code': 'vrecli'}
         login_user = {
-            "username": "jzhang21",
+            "username": "jzhang3",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
@@ -94,9 +94,9 @@ class TestGetAttributes(unittest.TestCase):
     def test_05_get_project_no_attribute(self):
         self.log.info('\n')
         self.log.info("test_05_get_project_no_attribute".center(80, '-'))
-        param = {'project_code': 'testmar04'}
+        param = {'project_code': 'noattribute0430'}
         login_user = {
-            "username": "jzhang21",
+            "username": "jzhang3",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
@@ -172,7 +172,7 @@ class TestExportAttributes(unittest.TestCase):
         param = {'project_code': 'vrecli',
                  'manifest_name': 'Manifest1'}
         login_user = {
-            "username": "jzhang21",
+            "username": "jzhang3",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
@@ -306,7 +306,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.assertEqual(res_json.get('code'), 200)
             result = res_json.get('result')[0]
             self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'Greenroom']")
-            self.assertEqual(result.get('labels'), ['File', 'Greenroom'])
+            self.assertEqual(set(result.get('labels')), {'File', 'Greenroom'})
             self.log.info(f"COMPARING file_name: {result.get('name')}, {self.file_name}")
             self.assertEqual(result.get('name'), self.file_name)
         except Exception as e:
@@ -374,14 +374,14 @@ class TestAttachAttributes(unittest.TestCase):
         self.log.info('\n')
         self.log.info("test_05_attach_attributes_no_access".center(80, '-'))
         payload = {"manifest_json": {
-            "manifest_name": "Manifest1000",
+            "manifest_name": "Manifest1",
             "project_code": self.project_code,
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
             "file_name": self.file_name
         }
         }
         login_user = {
-            "username": "jzhang21",
+            "username": "jzhang3",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
