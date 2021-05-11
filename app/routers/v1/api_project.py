@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
-from ...models.project_models import ProjectListResponse, POSTProjectFile, POSTProjectFileResponse, GetProjectRoleResponse
+from ...models.project_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
@@ -116,3 +116,94 @@ class APIProject:
             api_response.error_msg = customized_error_template(ECustomizedError.USER_NOT_IN_PROJECT)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
+
+    @router.get("/project/{project_code}/folder", tags=[_API_TAG],
+                response_model=GetProjectFolderResponse,
+                summary="Get folder in the project")
+    @catch_internal(_API_NAMESPACE)
+    async def get_project_folder(self, project_code, zone, folder, relative_path):
+        """
+        Get folder in project
+        """
+        api_response = GetProjectFolderResponse()
+        try:
+            role = self.current_identity["role"]
+            user_id = self.current_identity["user_id"]
+            user_name = self.current_identity['username']
+        except (AttributeError, TypeError):
+            return self.current_identity
+        error = validate_upload_event(zone)
+        if error:
+            api_response.error_msg = error
+            api_response.code = EAPIResponseCode.bad_request
+            return api_response.json_response()
+        if role == "admin":
+            project_role = 'admin'
+        else:
+            project_role, code = get_project_role(user_id, project_code)
+            if project_role == 'User not in the project':
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                api_response.result = project_role
+                return api_response.json_response()
+        folder_check_event = {
+            'namespace': zone,
+            'project_code': project_code,
+            'folder_name': folder,
+            'folder_relative_path': relative_path
+        }
+        response = http_query_node_zone(folder_check_event)
+        print(response.text)
+        print(project_role)
+        if response.status_code != 200:
+            error_msg = "Upload Error: " + response.json()["error_msg"]
+            response_code = EAPIResponseCode.internal_error
+            result = ''
+        else:
+            res = response.json().get('result')
+            if res:
+                res = res[0]
+                owner = res.get('uploader')
+                if project_role != 'admin' and owner != user_name and zone.lower() == 'greenroom':
+                    result = ''
+                    response_code = EAPIResponseCode.forbidden
+                    error_msg = 'Permission Denied'
+                elif project_role == 'contributor' and zone.lower() == 'vrecore':
+                    result = ''
+                    response_code = EAPIResponseCode.forbidden
+                    error_msg = 'Permission Denied'
+                else:
+                    result = res
+                    response_code = EAPIResponseCode.success
+                    error_msg = ''
+            else:
+                result = res
+                response_code = EAPIResponseCode.not_found
+                error_msg = 'Folder not exist'
+        api_response.result = result
+        api_response.code = response_code
+        api_response.error_msg = error_msg
+        return api_response.json_response()
+
+
+def http_query_node_zone(folder_event):
+    namespace = folder_event.get('namespace')
+    project_code = folder_event.get('project_code')
+    folder_name = folder_event.get('folder_name')
+    folder_relative_path = folder_event.get('folder_relative_path')
+    zone_label = get_zone(namespace)
+    payload = {
+        "query": {
+            "folder_relative_path": folder_relative_path,
+            "name": folder_name,
+            "project_code": project_code,
+            "labels": ['Folder', zone_label]}
+    }
+    node_query_url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+    response = requests.post(node_query_url, json=payload)
+    return response
+
+
+def get_zone(namespace):
+    return {"greenroom": "Greenroom",
+            "vrecore": "VRECore"}.get(namespace.lower(), 'greenroom')

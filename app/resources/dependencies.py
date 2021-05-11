@@ -104,11 +104,11 @@ def select_url_by_zone(zone):
     return url
 
 
-def validate_upload_event(zone, data_type):
+def validate_upload_event(zone, data_type=None):
     if zone not in ["vrecore", "greenroom"]:
         error_msg = "Invalid Zone"
         return error_msg
-    if data_type not in ["raw", "processed"]:
+    if data_type and data_type not in ["raw", "processed"]:
         error_msg = "Invalid Type"
         return error_msg
 
