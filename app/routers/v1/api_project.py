@@ -58,12 +58,22 @@ class APIProject:
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
         if role == "admin":
-            project_role = 'admin'
+            pass
         else:
             project_role, code = get_project_role(user_id, project_code)
+            if data.zone == "vrecore" and project_role == "contributor":
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                api_response.result = project_role
+                return api_response.json_response()
+            elif project_role == 'User not in the project':
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                api_response.result = project_role
+                return api_response.json_response()
         void_check_file_in_zone(data, project_code)
         session_id = request.headers.get("Session-ID")
-        result = transfer_to_pre(data, project_code, project_role, session_id)
+        result = transfer_to_pre(data, project_code, session_id)
         if result.status_code == 409:
             api_response.error_msg = result.json()['error_msg']
             api_response.code = EAPIResponseCode.conflict

@@ -1,7 +1,7 @@
 import unittest
 from .prepare_test import SetupTest
 from .logger import Logger
-
+import os
 
 class TestGetAttributes(unittest.TestCase):
     log = Logger(name='test_get_attributes.log')
@@ -9,11 +9,12 @@ class TestGetAttributes(unittest.TestCase):
     app = test.client
     test_api = "/v1/manifest"
     token = test.auth()
+    project_code = os.environ.get('project_code')
 
     def test_01_get_attributes_without_token(self):
         self.log.info('\n')
         self.log.info("test_01_get_attributes".center(80, '-'))
-        param = {'project_code': 'vrecli'}
+        param = {'project_code': self.project_code}
         try:
             self.log.info(f"GET API: {self.test_api}")
             res = self.app.get(self.test_api, params=param)
@@ -29,7 +30,7 @@ class TestGetAttributes(unittest.TestCase):
     def test_02_get_attributes(self):
         self.log.info('\n')
         self.log.info("test_02_get_attributes".center(80, '-'))
-        param = {'project_code': 'vrecli'}
+        param = {'project_code': self.project_code}
         headers = {
             'Authorization': 'Bearer ' + self.token
         }
@@ -48,7 +49,7 @@ class TestGetAttributes(unittest.TestCase):
     def test_03_get_attributes_no_access(self):
         self.log.info('\n')
         self.log.info("test_03_get_attributes_no_access".center(80, '-'))
-        param = {'project_code': 'vrecli'}
+        param = {'project_code': self.project_code}
         login_user = {
             "username": "jzhang3",
             "password": "Indoc1234567!",
@@ -94,7 +95,7 @@ class TestGetAttributes(unittest.TestCase):
     def test_05_get_project_no_attribute(self):
         self.log.info('\n')
         self.log.info("test_05_get_project_no_attribute".center(80, '-'))
-        param = {'project_code': 'noattribute0430'}
+        param = {'project_code': 'noattribute'}
         login_user = {
             "username": "jzhang3",
             "password": "Indoc1234567!",
@@ -123,11 +124,12 @@ class TestExportAttributes(unittest.TestCase):
     app = test.client
     test_api = "/v1/manifest/export"
     token = test.auth()
+    project_code = os.environ.get('project_code')
 
     def test_01_export_attributes_without_token(self):
         self.log.info('\n')
         self.log.info("test_01_export_attributes_without_token".center(80, '-'))
-        param = {'project_code': 'vrecli',
+        param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         try:
             self.log.info(f"GET API: {self.test_api}")
@@ -145,7 +147,7 @@ class TestExportAttributes(unittest.TestCase):
     def test_02_export_attributes(self):
         self.log.info('\n')
         self.log.info("test_02_export_attributes".center(80, '-'))
-        param = {'project_code': 'vrecli',
+        param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         headers = {
             'Authorization': 'Bearer ' + self.token
@@ -169,7 +171,7 @@ class TestExportAttributes(unittest.TestCase):
     def test_03_export_attributes_no_access(self):
         self.log.info('\n')
         self.log.info("test_03_export_attributes_no_access".center(80, '-'))
-        param = {'project_code': 'vrecli',
+        param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         login_user = {
             "username": "jzhang3",
@@ -196,7 +198,7 @@ class TestExportAttributes(unittest.TestCase):
     def test_04_export_attributes_not_exist(self):
         self.log.info('\n')
         self.log.info("test_04_export_attributes_not_exist".center(80, '-'))
-        param = {'project_code': 'vrecli',
+        param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest11111111'}
         headers = {
             'Authorization': 'Bearer ' + self.token
@@ -243,7 +245,7 @@ class TestAttachAttributes(unittest.TestCase):
     test_api = "/v1/manifest/attach"
     token = test.auth()
     file_id = ''
-    project_code = 'vrecli'
+    project_code = os.environ.get('project_code')
     file_name = 'unittest_file'
 
     @classmethod
@@ -256,8 +258,8 @@ class TestAttachAttributes(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.log.info('Test tearDown'.center(80, '='))
-        # delete_res = cls.test.delete_file(cls.file_id)
-        # cls.log.info(f"DELETE FILE: {delete_res}")
+        delete_res = cls.test.delete_file(cls.file_id)
+        cls.log.info(f"DELETE FILE: {delete_res}")
 
     def test_01_attach_attributes_without_token(self):
         self.log.info('\n')

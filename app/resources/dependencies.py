@@ -41,10 +41,10 @@ async def jwt_required(request: Request):
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
     exp = payload.get('exp')
-    # if time.time() - exp > 0:
-    #     api_response.code = EAPIResponseCode.forbidden
-    #     api_response.error_msg = "Token expired"
-    #     return api_response.json_response()
+    if time.time() - exp > 0:
+        api_response.code = EAPIResponseCode.forbidden
+        api_response.error_msg = "Token expired"
+        return api_response.json_response()
     # check if user is existed in neo4j
     url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
     res = requests.post(
@@ -95,15 +95,10 @@ def void_check_file_in_zone(data, project_code):
         return api_response.json_response()
 
 
-def select_url_by_zone(zone, project_role):
-    if zone == "vrecore" and project_role == "contributor":
-        api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-        api_response.code = EAPIResponseCode.forbidden
-        api_response.result = project_role
-        return api_response.json_response()
-    elif zone == "vrecore":
-        url = "http://127.0.0.1:5079" + "/v1/files/jobs"
-        # url = ConfigClass.UPLOAD_VRE + "/v1/files/jobs"
+def select_url_by_zone(zone):
+    if zone == "vrecore":
+        # url = "http://127.0.0.1:5079" + "/v1/files/jobs"
+        url = ConfigClass.UPLOAD_VRE + "/v1/files/jobs"
     else:
         url = ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs"
     return url
@@ -118,7 +113,7 @@ def validate_upload_event(zone, data_type):
         return error_msg
 
 
-def transfer_to_pre(data, project_code, project_role, session_id):
+def transfer_to_pre(data, project_code, session_id):
     try:
         payload = {
             "current_folder_node": data.current_folder_node,
@@ -131,7 +126,7 @@ def transfer_to_pre(data, project_code, project_role, session_id):
         headers = {
             "Session-ID": session_id
         }
-        url = select_url_by_zone(data.zone, project_role)
+        url = select_url_by_zone(data.zone)
         result = requests.post(url, headers=headers, json=payload)
         return result
     except Exception as e:
