@@ -7,6 +7,8 @@ import requests
 from ..config import ConfigClass
 from ..models.base_models import APIResponse, EAPIResponseCode
 
+api_response = APIResponse()
+
 
 def get_project_role(user_id, project_code):
     project = get_dataset_node(project_code)
@@ -24,12 +26,11 @@ def get_project_role(user_id, project_code):
     else:
         error_msg = customized_error_template(
             ECustomizedError.USER_NOT_IN_PROJECT)
-        code = EAPIResponseCode.not_found
+        code = EAPIResponseCode.forbidden
         return error_msg, code
 
 
 async def jwt_required(request: Request):
-    api_response = APIResponse()
     token = request.headers.get('Authorization')
     if token:
         token = token.replace("Bearer ", "")
@@ -40,10 +41,10 @@ async def jwt_required(request: Request):
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
     exp = payload.get('exp')
-    if time.time() - exp > 0:
-        api_response.code = EAPIResponseCode.forbidden
-        api_response.error_msg = "Token expired"
-        return api_response.json_response()
+    # if time.time() - exp > 0:
+    #     api_response.code = EAPIResponseCode.forbidden
+    #     api_response.error_msg = "Token expired"
+    #     return api_response.json_response()
     # check if user is existed in neo4j
     url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
     res = requests.post(
@@ -66,3 +67,74 @@ async def jwt_required(request: Request):
         api_response.error_msg = "User not found"
         return api_response.json_response()
     return {"code": 200, "user_id": user_id, "username": username, "role": role}
+
+
+def void_check_file_in_zone(data, project_code):
+    payload = {"type": data.type,
+               "zone": data.zone,
+               "filename": data.filename,
+               "job_type": data.job_type,
+               "project_code": project_code
+               }
+    try:
+        result = requests.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
+        result = result.json()
+    except Exception as e:
+        api_response.error_msg = f"EntityInfo service  error: {e}"
+        api_response.code = EAPIResponseCode.forbidden
+        return api_response.json_response()
+    if result['code'] in [404, 200]:
+        api_response.error_msg = "debug finding file"
+        api_response.code = EAPIResponseCode.bad_request
+        api_response.result = result
+        return api_response.json_response()
+    else:
+        api_response.error_msg = "File with that name already exists"
+        api_response.code = EAPIResponseCode.conflict
+        api_response.result = result
+        return api_response.json_response()
+
+
+def select_url_by_zone(zone, project_role):
+    if zone == "vrecore" and project_role == "contributor":
+        api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+        api_response.code = EAPIResponseCode.forbidden
+        api_response.result = project_role
+        return api_response.json_response()
+    elif zone == "vrecore":
+        url = "http://127.0.0.1:5079" + "/v1/files/jobs"
+        # url = ConfigClass.UPLOAD_VRE + "/v1/files/jobs"
+    else:
+        url = ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs"
+    return url
+
+
+def validate_upload_event(zone, data_type):
+    if zone not in ["vrecore", "greenroom"]:
+        error_msg = "Invalid Zone"
+        return error_msg
+    if data_type not in ["raw", "processed"]:
+        error_msg = "Invalid Type"
+        return error_msg
+
+
+def transfer_to_pre(data, project_code, project_role, session_id):
+    try:
+        payload = {
+            "current_folder_node": data.current_folder_node,
+            "project_code": project_code,
+            "operator": data.operator,
+            "upload_message": data.upload_message,
+            "data": data.data,
+            "job_type": data.job_type
+        }
+        headers = {
+            "Session-ID": session_id
+        }
+        url = select_url_by_zone(data.zone, project_role)
+        result = requests.post(url, headers=headers, json=payload)
+        return result
+    except Exception as e:
+        api_response.error_msg = f"Upload service  error: {e}"
+        api_response.code = EAPIResponseCode.forbidden
+        return api_response.json_response()
