@@ -8,6 +8,7 @@ class ConfigClass(object):
     version = "0.1.0"
     if env == 'test':
         NEO4J_SERVICE = "http://10.3.7.216:5062/v1/neo4j/"
+        NEO4J_SERVICE_v2 = "http://10.3.7.216:5062/v2/neo4j/"
         FILEINFO_HOST = "http://10.3.7.228:5066"
         AUTH_SERVICE = "http://10.3.7.217:5061"
         RDS_HOST = '10.3.7.215'
@@ -16,6 +17,7 @@ class ConfigClass(object):
         COMMON_SERVICE = "http://10.3.7.222:5062/v1/utility/id"
     else:
         NEO4J_SERVICE = "http://neo4j.utility:5062/v1/neo4j/"
+        NEO4J_SERVICE_v2 = "http://neo4j.utility:5062/v2/neo4j/"
         FILEINFO_HOST = "http://entityinfo.utility:5066"
         AUTH_SERVICE = "http://auth.utility:5061"
         RDS_HOST = "opsdb.utility"

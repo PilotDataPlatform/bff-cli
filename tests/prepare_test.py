@@ -85,6 +85,7 @@ class SetupTest:
             "end_id": project_id,
         }
         response = requests.delete(ConfigClass.NEO4J_SERVICE + "relations", params=payload)
+        self.log.info(f'User removed from project: {response.text}')
         if response.status_code != 200:
             raise Exception(f"Error removing user from project: {response.json()}")
 
@@ -120,7 +121,7 @@ class SetupTest:
         payload = {
                     "name": filename,
                     "global_entity_id": global_entity_id,
-                    "extra_labels": ["Greenroom", "Raw"],
+                    "extra_labels": ["Greenroom"],
                     "file_size": 7120,
                     "operator": "jzhang",
                     "archived": False,

@@ -34,7 +34,12 @@ class TestFiles(unittest.TestCase):
 
     def test_02_platform_user_get_list(self):
         self.log.info("test_02_platform_user_get_list".center(80, '-'))
-        token = self.test.auth()
+        payload = {
+            "username": "jzhang21",
+            "password": "Indoc1234567!",
+            "realm": "vre"
+        }
+        token = self.test.auth(payload)
         headers = {"Authorization": 'Bearer ' + token}
         self.log.info(f"GET API: {self.test_api}")
         try:

@@ -10,6 +10,7 @@ import requests
 
 app = create_app()
 
+
 def mocked_requests_post(*args, **kwargs):
     class MockResponse:
         def __init__(self, json_data, status_code):
@@ -54,11 +55,13 @@ class TestFiles(unittest.TestCase):
             "zone": "greenroom",
             "filename": "fake.png",
             "job_type": "AS_FILE",
+            "generate_id": "undefined",
+            "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
+        self.log.info(response.text)
         self.assertEqual(response.status_code, 500)
-
 
     def test_02_post_files_vrecore_processed(self):
         project_code = self.project["code"]
@@ -69,6 +72,8 @@ class TestFiles(unittest.TestCase):
             "zone": "vrecore",
             "filename": "fake.png",
             "job_type": "AS_FILE",
+            "generate_id": "undefined",
+            "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
@@ -84,6 +89,8 @@ class TestFiles(unittest.TestCase):
             "zone": "greenroom",
             "filename": "fake.png",
             "job_type": "AS_FILE",
+            "generate_id": "undefined",
+            "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
@@ -98,6 +105,8 @@ class TestFiles(unittest.TestCase):
             "zone": "wrong",
             "filename": "fake.png",
             "job_type": "AS_FILE",
+            "generate_id": "undefined",
+            "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
@@ -113,6 +122,8 @@ class TestFiles(unittest.TestCase):
             "zone": "vrecore",
             "filename": "fake.png",
             "job_type": "AS_FILE",
+            "generate_id": "undefined",
+            "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
@@ -129,10 +140,15 @@ class TestFiles(unittest.TestCase):
             "zone": "vrecore",
             "filename": "fake.png",
             "job_type": "AS_FILE",
+            "generate_id": "undefined",
+            "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
+        self.log.info(project_code)
+        self.log.info(self.user['id'])
         response = self.client.post(f"/v1/project/{project_code}/files", json=payload)
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.json()["error_msg"], "User doesn't belong to project")
+        self.assertEqual(response.json()["result"], "User not in the project")
+        self.assertEqual(response.json()["error_msg"], "Permission Denied")
 
 

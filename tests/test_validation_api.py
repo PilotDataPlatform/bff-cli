@@ -1,6 +1,7 @@
 import unittest
 from .prepare_test import SetupTest
 from .logger import Logger
+import os
 
 
 class TestGenerateIDValidation(unittest.TestCase):
@@ -143,6 +144,7 @@ class TestAttributeValidation(unittest.TestCase):
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/manifest"
+    project_code = os.environ.get('project_code')
 
     def test_01_validate_attribute(self):
         self.log.info('\n')
@@ -150,10 +152,10 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr1": "a1",
-                    "attr2": "Test manifest text value from vrecli",
+                    "attr2": "Test manifest text value",
                     "attr3": "t1"
                 }
             }
@@ -176,10 +178,10 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr1": "a1",
-                    "attr2": "Test manifest text value from vrecli",
+                    "attr2": "Test manifest text value",
                     "attr3": "t1"
                 }
             }
@@ -202,10 +204,10 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr1": "Test attr",
-                    "attr2": "Test attr text value from vrecli",
+                    "attr2": "Test attr text value",
                     "attr3": "t1"
                 }
             }
@@ -228,10 +230,10 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr1": "a1",
-                    "attr2": "Test attr text value from vrecli",
+                    "attr2": "Test attr text value",
                     "attr3": "t1000"
                 }
             }
@@ -254,7 +256,7 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr1": "a1",
                     "attr2": "z4S0zP2E2GR6UgINM9L4yqawILEsGVKRNzAW8p8fxwXZT85CHdtBvdBCXiPU1tX5zPKHa01MugMksD61QGcBan1RcXBOJekAjGFCI",
@@ -280,7 +282,7 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr1": "a1",
                     "attr2": "test attribute",
@@ -306,7 +308,7 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli",
+                "project_code": self.project_code,
                 "attributes": {
                     "attr2": "test attribute",
                     "attr3": "t1"
@@ -331,7 +333,7 @@ class TestAttributeValidation(unittest.TestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrecli100000000000",
+                "project_code": "vrec100000000000",
                 "attributes": {
                     "attr2": "test attribute",
                     "attr3": "t1"

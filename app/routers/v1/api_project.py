@@ -1,13 +1,10 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
-from ...models.base_models import EAPIResponseCode
-from ...models.project_models import ProjectListResponse, POSTProjectFile, POSTProjectFileResponse, GetProjectRoleResponse
+from ...models.project_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
-from ...resources.dependencies import get_project_role, jwt_required
+from ...resources.dependencies import *
 from ...resources.helpers import *
-from app.config import ConfigClass  
-import requests
 
 
 router = APIRouter()
@@ -46,99 +43,38 @@ class APIProject:
                  summary="pre upload file to the target zone", tags=["V1 Files"])
     @catch_internal(_API_NAMESPACE)
     async def project_file_preupload(self, project_code, request: Request, data: POSTProjectFile):
+        """
+        PRE upload and check existence of file in project
+        """
         api_response = POSTProjectFileResponse()
         try:
             role = self.current_identity["role"]
             user_id = self.current_identity["user_id"]
         except (AttributeError, TypeError):
             return self.current_identity
-        if not data.zone in ["vrecore", "greenroom"]:
-            api_response.error_msg = "Invalid Zone"
+        error = validate_upload_event(data.zone, data.type)
+        if error:
+            api_response.error_msg = error
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
-
-        if not data.type in ["raw", "processed"]:
-            api_response.error_msg = "Invalid Type"
-            api_response.code = EAPIResponseCode.bad_request
-            return api_response.json_response()
-
-        if role != "admin":
-            # Check user belongs to dataset
-            payload = {
-                "start_label": "User",
-                "end_label": "Dataset",
-                "start_params": {
-                    "id": int(self.current_identity["user_id"])
-                },
-                "end_params": {
-                    "code": project_code,
-                },
-            }
-            try:
-                result = requests.post(ConfigClass.NEO4J_SERVICE + 'relations/query', json=payload)
-            except Exception as e:
-                api_response.error_msg = f"Neo4J error: {e}"
-                api_response.code = EAPIResponseCode.forbidden
-                return api_response.json_response()
-            result = result.json()
-            if len(result) < 1:
-                api_response.error_msg = "User doesn't belong to project"
-                api_response.code = EAPIResponseCode.forbidden
-                return api_response.json_response()
-
-        params = {
-            "type": data.type,
-            "zone": data.zone,
-            "filename": data.filename,
-            "job_type": data.job_type
-        }
-        try:
-            result = requests.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=params)
-            result = result.json()
-        except Exception as e:
-            api_response.error_msg = f"EntityInfo service  error: {e}"
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
-        if result['code'] in [404, 200]:
+        if role == "admin":
             pass
         else:
-            api_response.error_msg = "File with that name already exists"
-            api_response.code = EAPIResponseCode.conflict
-            api_response.result = result
-            return api_response.json_response()
-
-        payload = {
-            "project_code": project_code,
-            "operator": data.operator,
-            "upload_message": data.upload_message,
-            "data": data.data,
-            "job_type": data.job_type
-        }
-        headers = {
-            "Session-ID": request.headers.get("Session-ID")
-        }
-        try:
-            if data.zone == "vrecore":
-                # Start permission check fail contributor
-                if role != "admin":
-                    project_role, code = get_project_role(user_id, project_code)
-                    if code != EAPIResponseCode.success:
-                        api_response.error_msg = project_role
-                        api_response.code = code
-                        return api_response.json_response()
-                    elif project_role == "contributor":
-                        api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                        api_response.code = EAPIResponseCode.forbidden
-                        api_response.result = project_role
-                        return api_response.json_response()
-
-                result = requests.post(ConfigClass.UPLOAD_VRE + "/v1/files/jobs", headers=headers, json=payload)
-            else:
-                result = requests.post(ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs", headers=headers, json=payload)
-        except Exception as e:
-            api_response.error_msg = f"Upload service  error: {e}"
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
+            project_role, code = get_project_role(user_id, project_code)
+            if data.zone == "vrecore" and project_role == "contributor":
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                api_response.result = project_role
+                return api_response.json_response()
+            elif project_role == 'User not in the project':
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                api_response.result = project_role
+                return api_response.json_response()
+        for file in data.data:
+            void_check_file_in_zone(data, file, project_code)
+        session_id = request.headers.get("Session-ID")
+        result = transfer_to_pre(data, project_code, session_id)
         if result.status_code == 409:
             api_response.error_msg = result.json()['error_msg']
             api_response.code = EAPIResponseCode.conflict
@@ -148,7 +84,8 @@ class APIProject:
             api_response.error_msg = "Upload Error: " + result.json()["error_msg"]
             api_response.code = EAPIResponseCode.internal_error
             return api_response.json_response()
-        api_response.result = result.json()["result"]
+        else:
+            api_response.result = result.json()["result"]
         return api_response.json_response()
 
     @router.get("/project/{project_code}/role", tags=[_API_TAG],
@@ -180,3 +117,92 @@ class APIProject:
             api_response.error_msg = customized_error_template(ECustomizedError.USER_NOT_IN_PROJECT)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
+
+    @router.get("/project/{project_code}/folder", tags=[_API_TAG],
+                response_model=GetProjectFolderResponse,
+                summary="Get folder in the project")
+    @catch_internal(_API_NAMESPACE)
+    async def get_project_folder(self, project_code, zone, folder, relative_path):
+        """
+        Get folder in project
+        """
+        api_response = GetProjectFolderResponse()
+        try:
+            role = self.current_identity["role"]
+            user_id = self.current_identity["user_id"]
+            user_name = self.current_identity['username']
+        except (AttributeError, TypeError):
+            return self.current_identity
+        error = validate_upload_event(zone)
+        if error:
+            api_response.error_msg = error
+            api_response.code = EAPIResponseCode.bad_request
+            return api_response.json_response()
+        if role == "admin":
+            project_role = 'admin'
+        else:
+            project_role, code = get_project_role(user_id, project_code)
+            if project_role == 'User not in the project':
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                api_response.result = project_role
+                return api_response.json_response()
+        folder_check_event = {
+            'namespace': zone,
+            'project_code': project_code,
+            'folder_name': folder,
+            'folder_relative_path': relative_path
+        }
+        response = http_query_node_zone(folder_check_event)
+        if response.status_code != 200:
+            error_msg = "Upload Error: " + response.json()["error_msg"]
+            response_code = EAPIResponseCode.internal_error
+            result = ''
+        else:
+            res = response.json().get('result')
+            if res:
+                res = res[0]
+                owner = res.get('uploader')
+                if project_role != 'admin' and owner != user_name and zone.lower() == 'greenroom':
+                    result = ''
+                    response_code = EAPIResponseCode.forbidden
+                    error_msg = 'Permission Denied'
+                elif project_role == 'contributor' and zone.lower() == 'vrecore':
+                    result = ''
+                    response_code = EAPIResponseCode.forbidden
+                    error_msg = 'Permission Denied'
+                else:
+                    result = res
+                    response_code = EAPIResponseCode.success
+                    error_msg = ''
+            else:
+                result = res
+                response_code = EAPIResponseCode.not_found
+                error_msg = 'Folder not exist'
+        api_response.result = result
+        api_response.code = response_code
+        api_response.error_msg = error_msg
+        return api_response.json_response()
+
+
+def http_query_node_zone(folder_event):
+    namespace = folder_event.get('namespace')
+    project_code = folder_event.get('project_code')
+    folder_name = folder_event.get('folder_name')
+    folder_relative_path = folder_event.get('folder_relative_path')
+    zone_label = get_zone(namespace)
+    payload = {
+        "query": {
+            "folder_relative_path": folder_relative_path,
+            "name": folder_name,
+            "project_code": project_code,
+            "labels": ['Folder', zone_label]}
+    }
+    node_query_url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+    response = requests.post(node_query_url, json=payload)
+    return response
+
+
+def get_zone(namespace):
+    return {"greenroom": "Greenroom",
+            "vrecore": "VRECore"}.get(namespace.lower(), 'greenroom')

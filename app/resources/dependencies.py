@@ -7,6 +7,8 @@ import requests
 from ..config import ConfigClass
 from ..models.base_models import APIResponse, EAPIResponseCode
 
+api_response = APIResponse()
+
 
 def get_project_role(user_id, project_code):
     project = get_dataset_node(project_code)
@@ -24,12 +26,11 @@ def get_project_role(user_id, project_code):
     else:
         error_msg = customized_error_template(
             ECustomizedError.USER_NOT_IN_PROJECT)
-        code = EAPIResponseCode.not_found
+        code = EAPIResponseCode.forbidden
         return error_msg, code
 
 
 async def jwt_required(request: Request):
-    api_response = APIResponse()
     token = request.headers.get('Authorization')
     if token:
         token = token.replace("Bearer ", "")
@@ -66,3 +67,69 @@ async def jwt_required(request: Request):
         api_response.error_msg = "User not found"
         return api_response.json_response()
     return {"code": 200, "user_id": user_id, "username": username, "role": role}
+
+
+def void_check_file_in_zone(data, file, project_code):
+    payload = {"type": data.type,
+               "zone": data.zone,
+               "file_relative_path": file.get('resumable_relative_path') + '/' +
+                                     file.get('resumable_filename'),
+               "project_code": project_code
+               }
+    try:
+        result = requests.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
+        result = result.json()
+    except Exception as e:
+        api_response.error_msg = f"EntityInfo service  error: {e}"
+        api_response.code = EAPIResponseCode.forbidden
+        return api_response.json_response()
+    if result['code'] in [404, 200]:
+        api_response.error_msg = "debug finding file"
+        api_response.code = EAPIResponseCode.bad_request
+        api_response.result = result
+        return api_response.json_response()
+    else:
+        api_response.error_msg = "File with that name already exists"
+        api_response.code = EAPIResponseCode.conflict
+        api_response.result = data
+        return api_response.json_response()
+
+
+def select_url_by_zone(zone):
+    if zone == "vrecore":
+        # url = "http://127.0.0.1:5079" + "/v1/files/jobs"
+        url = ConfigClass.UPLOAD_VRE + "/v1/files/jobs"
+    else:
+        url = ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs"
+    return url
+
+
+def validate_upload_event(zone, data_type=None):
+    if zone not in ["vrecore", "greenroom"]:
+        error_msg = "Invalid Zone"
+        return error_msg
+    if data_type and data_type not in ["raw", "processed"]:
+        error_msg = "Invalid Type"
+        return error_msg
+
+
+def transfer_to_pre(data, project_code, session_id):
+    try:
+        payload = {
+            "current_folder_node": data.current_folder_node,
+            "project_code": project_code,
+            "operator": data.operator,
+            "upload_message": data.upload_message,
+            "data": data.data,
+            "job_type": data.job_type
+        }
+        headers = {
+            "Session-ID": session_id
+        }
+        url = select_url_by_zone(data.zone)
+        result = requests.post(url, headers=headers, json=payload)
+        return result
+    except Exception as e:
+        api_response.error_msg = f"Upload service  error: {e}"
+        api_response.code = EAPIResponseCode.forbidden
+        return api_response.json_response()
