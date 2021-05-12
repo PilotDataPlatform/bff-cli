@@ -153,8 +153,6 @@ class APIProject:
             'folder_relative_path': relative_path
         }
         response = http_query_node_zone(folder_check_event)
-        print(response.text)
-        print(project_role)
         if response.status_code != 200:
             error_msg = "Upload Error: " + response.json()["error_msg"]
             response_code = EAPIResponseCode.internal_error
