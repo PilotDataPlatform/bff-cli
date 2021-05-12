@@ -71,7 +71,8 @@ class APIProject:
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role
                 return api_response.json_response()
-        void_check_file_in_zone(data, project_code)
+        for file in data.data:
+            void_check_file_in_zone(data, file, project_code)
         session_id = request.headers.get("Session-ID")
         result = transfer_to_pre(data, project_code, session_id)
         if result.status_code == 409:

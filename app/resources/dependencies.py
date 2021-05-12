@@ -41,10 +41,10 @@ async def jwt_required(request: Request):
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
     exp = payload.get('exp')
-    if time.time() - exp > 0:
-        api_response.code = EAPIResponseCode.forbidden
-        api_response.error_msg = "Token expired"
-        return api_response.json_response()
+    # if time.time() - exp > 0:
+    #     api_response.code = EAPIResponseCode.forbidden
+    #     api_response.error_msg = "Token expired"
+    #     return api_response.json_response()
     # check if user is existed in neo4j
     url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
     res = requests.post(
@@ -69,11 +69,11 @@ async def jwt_required(request: Request):
     return {"code": 200, "user_id": user_id, "username": username, "role": role}
 
 
-def void_check_file_in_zone(data, project_code):
+def void_check_file_in_zone(data, file, project_code):
     payload = {"type": data.type,
                "zone": data.zone,
-               "filename": data.filename,
-               "job_type": data.job_type,
+               "file_relative_path": file.get('resumable_relative_path') + '/' +
+                                     file.get('resumable_filename'),
                "project_code": project_code
                }
     try:
@@ -91,7 +91,7 @@ def void_check_file_in_zone(data, project_code):
     else:
         api_response.error_msg = "File with that name already exists"
         api_response.code = EAPIResponseCode.conflict
-        api_response.result = result
+        api_response.result = data
         return api_response.json_response()
 
 
