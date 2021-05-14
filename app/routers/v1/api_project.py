@@ -78,7 +78,7 @@ class APIProject:
         if result.status_code == 409:
             api_response.error_msg = result.json()['error_msg']
             api_response.code = EAPIResponseCode.conflict
-            api_response.result = result.text
+            # api_response.result = result.text
             return api_response.json_response()
         elif result.status_code != 200:
             api_response.error_msg = "Upload Error: " + result.json()["error_msg"]
