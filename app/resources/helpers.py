@@ -7,6 +7,11 @@ from ..commons.data_providers.data_models import DataManifestModel, DataAttribut
 from ..commons.data_providers.database import SessionLocal
 
 
+def get_zone(namespace):
+    return {"greenroom": "Greenroom",
+            "vrecore": "VRECore"}.get(namespace.lower(), 'greenroom')
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -244,3 +249,21 @@ def has_valid_attributes(event):
             _value_error = validate_attribute_field_by_value(attributes, attr)
             if _value_error:
                 return _value_error
+
+
+def http_query_node_zone(folder_event):
+    namespace = folder_event.get('namespace')
+    project_code = folder_event.get('project_code')
+    folder_name = folder_event.get('folder_name')
+    folder_relative_path = folder_event.get('folder_relative_path')
+    zone_label = get_zone(namespace)
+    payload = {
+        "query": {
+            "folder_relative_path": folder_relative_path,
+            "name": folder_name,
+            "project_code": project_code,
+            "labels": ['Folder', zone_label]}
+    }
+    node_query_url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+    response = requests.post(node_query_url, json=payload)
+    return response
