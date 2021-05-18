@@ -70,17 +70,16 @@ class APIProject:
             return file_response.json_response()
         if source_type == 'Folder':
             code, error_msg = check_folder_exist(zone, project_code, folder_name, rel_path)
-        if error_msg:
-            file_response.error_msg = error_msg
-            file_response.code = code
-            return file_response.json_response()
+            if error_msg:
+                file_response.error_msg = error_msg
+                file_response.code = code
+                return file_response.json_response()
         zone_label = [zone_type]
         url = ConfigClass.NEO4J_SERVICE + "relations/query"
         payload = {"start_label": parent_label,
                    "start_params": parent_attribute,
                    "end_label": zone_label,
                    "end_params": child_attribute}
-        print(payload)
         res = requests.post(url, json=payload)
         res = res.json()
         query_result = []

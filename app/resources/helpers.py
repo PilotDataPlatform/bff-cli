@@ -184,7 +184,8 @@ def get_user_projects(user_role, username):
         if p['labels'] == ['Dataset']:
             res_projects = {'name': p.get('name'),
                             'code': p.get('code'),
-                            'id': p.get('id')}
+                            'id': p.get('id'),
+                            'geid': p.get('global_entity_id')}
             projects_list.append(res_projects)
     return projects_list
 
@@ -267,6 +268,7 @@ def http_query_node_zone(folder_event):
     node_query_url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
     response = requests.post(node_query_url, json=payload)
     return response
+
 
 def get_parent_label(source):
     return {
