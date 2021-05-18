@@ -267,3 +267,54 @@ def http_query_node_zone(folder_event):
     node_query_url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
     response = requests.post(node_query_url, json=payload)
     return response
+
+def get_parent_label(source):
+    return {
+        'folder': 'Folder',
+        'dataset': 'Dataset'
+    }.get(source.lower(), None)
+
+
+def separate_rel_path(folder_path):
+    folder_layers = folder_path.strip('/').split('/')
+    if len(folder_layers) > 1:
+        rel_path = '/'.join(folder_layers[:-1])
+        folder_name = folder_layers[-1]
+    else:
+        rel_path = ''
+        folder_name = folder_path
+    return rel_path, folder_name
+
+
+def verify_list_event(source_type, folder):
+    if source_type == 'Folder' and not folder:
+        code = EAPIResponseCode.bad_request
+        error_msg = 'missing folder name'
+    elif source_type == 'Dataset' and folder:
+        code = EAPIResponseCode.bad_request
+        error_msg = 'Query project does not require folder name'
+    else:
+        code = EAPIResponseCode.success
+        error_msg = ''
+    return code, error_msg
+
+
+def check_folder_exist(zone, project_code, folder_name, relative_path):
+    folder_check_event = {
+        'namespace': zone,
+        'project_code': project_code,
+        'folder_name': folder_name,
+        'folder_relative_path': relative_path
+    }
+    folder_response = http_query_node_zone(folder_check_event)
+    res = folder_response.json().get('result')
+    if folder_response.status_code != 200:
+        error_msg = folder_response.json()["error_msg"]
+        code = EAPIResponseCode.internal_error
+    elif res:
+        error_msg = ''
+        code = EAPIResponseCode.success
+    else:
+        error_msg = 'Folder not exist'
+        code = EAPIResponseCode.not_found
+    return code, error_msg
