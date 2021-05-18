@@ -62,11 +62,14 @@ class APIProject:
                                'uploader': user_name}
         elif project_role != 'contributor' and zone_type == 'VRECore':
             child_attribute = {'project_code': project_code}
+        elif project_role == 'admin':
+            child_attribute = {'project_code': project_code}
         else:
             file_response.code = EAPIResponseCode.forbidden
             file_response.error_msg = 'Permission Denied'
             return file_response.json_response()
-        code, error_msg = check_folder_exist(zone, project_code, folder_name, rel_path)
+        if source_type == 'Folder':
+            code, error_msg = check_folder_exist(zone, project_code, folder_name, rel_path)
         if error_msg:
             file_response.error_msg = error_msg
             file_response.code = code
@@ -77,6 +80,7 @@ class APIProject:
                    "start_params": parent_attribute,
                    "end_label": zone_label,
                    "end_params": child_attribute}
+        print(payload)
         res = requests.post(url, json=payload)
         res = res.json()
         query_result = []
