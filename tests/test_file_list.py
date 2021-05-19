@@ -135,10 +135,13 @@ class TestGetProjectFilesFolders(unittest.TestCase):
             self.log.info(res.text)
             res_json = res.json()
             result = res_json.get('result')
-            self.assertEqual(res.status_code, 200)
-            self.assertEqual(res_json.get('code'), 200)
-            self.log.info(f"COMPARING RESULT: {result} VS " + '[]')
-            self.assertEqual(result, [])
+            error_msg = res_json.get('error_msg')
+            self.assertEqual(res.status_code, 404)
+            self.assertEqual(res_json.get('code'), 404)
+            self.log.info(f"COMPARING RESULT: {result} VS " + "{}")
+            self.assertEqual(result, {})
+            self.log.info(f"COMPARING ERROR: {error_msg} VS 'Project not found'")
+            self.assertEqual(error_msg, 'Project not found')
         except Exception as e:
             self.log.error(f"test_05 error: {e}")
             raise e
@@ -170,5 +173,31 @@ class TestGetProjectFilesFolders(unittest.TestCase):
             self.assertEqual(error_msg, 'Permission Denied')
         except Exception as e:
             self.log.error(f"test_06 error: {e}")
+            raise e
+
+    def test_07_get_files_in_folder_not_exist(self):
+        self.log.info('\n')
+        self.log.info("test_04_get_files_in_folder_not_exist".center(80, '-'))
+        self.log.info(f"GET API: {self.test_api}")
+        try:
+            param = {"project_code": self.project_code,
+                     "zone": 'greenroom',
+                     "folder": 'thefolderthatcannotexist05191047',
+                     "source_type": 'Folder'}
+            headers = {"Authorization": 'Bearer ' + self.token}
+            self.log.info(param)
+            res = self.app.get(self.test_api, headers=headers, params=param)
+            self.log.info(res.text)
+            res_json = res.json()
+            result = res_json.get('result')
+            self.assertEqual(res.status_code, 404)
+            self.assertEqual(res_json.get('code'), 404)
+            error_msg = res_json.get('error_msg')
+            self.log.info(f"COMPARING RESULT: {result} VS " + '{}')
+            self.assertEqual(result, {})
+            self.log.info(f"COMPARING ERROR: {error_msg} VS 'Folder not exist' ")
+            self.assertEqual(error_msg, 'Folder not exist')
+        except Exception as e:
+            self.log.error(f"test_04 error: {e}")
             raise e
 

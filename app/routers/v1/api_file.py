@@ -39,15 +39,18 @@ class APIProject:
             file_response.error_msg = error_msg
             file_response.code = code
             return file_response.json_response()
-        if role == "admin":
+        project_role, code = get_project_role(user_id, project_code)
+        if role == "admin" and code == EAPIResponseCode.success:
             project_role = 'admin'
-        else:
-            project_role, code = get_project_role(user_id, project_code)
-            if project_role == 'User not in the project':
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                file_response.code = EAPIResponseCode.forbidden
-                file_response.result = project_role
-                return file_response.json_response()
+        elif project_role == 'User not in the project':
+            file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+            file_response.code = EAPIResponseCode.forbidden
+            file_response.result = project_role
+            return file_response.json_response()
+        elif code == EAPIResponseCode.not_found:
+            file_response.error_msg = customized_error_template(ECustomizedError.PROJECT_NOT_FOUND)
+            file_response.code = code
+            return file_response.json_response()
         zone_type = get_zone(zone)
         parent_label = get_parent_label(source_type)
         rel_path, folder_name = separate_rel_path(folder)
