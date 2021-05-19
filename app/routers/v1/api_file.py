@@ -40,11 +40,11 @@ class APIProject:
             file_response.code = code
             return file_response.json_response()
         project_role, code = get_project_role(user_id, project_code)
-        if role == "admin" and code == EAPIResponseCode.success:
+        if role == "admin" and code != EAPIResponseCode.not_found:
             project_role = 'admin'
         elif project_role == 'User not in the project':
             file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-            file_response.code = EAPIResponseCode.forbidden
+            file_response.code = code
             file_response.result = project_role
             return file_response.json_response()
         elif code == EAPIResponseCode.not_found:

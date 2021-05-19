@@ -177,7 +177,7 @@ class TestGetProjectFilesFolders(unittest.TestCase):
 
     def test_07_get_files_in_folder_not_exist(self):
         self.log.info('\n')
-        self.log.info("test_04_get_files_in_folder_not_exist".center(80, '-'))
+        self.log.info("test_07_get_files_in_folder_not_exist".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         try:
             param = {"project_code": self.project_code,
@@ -198,6 +198,6 @@ class TestGetProjectFilesFolders(unittest.TestCase):
             self.log.info(f"COMPARING ERROR: {error_msg} VS 'Folder not exist' ")
             self.assertEqual(error_msg, 'Folder not exist')
         except Exception as e:
-            self.log.error(f"test_04 error: {e}")
+            self.log.error(f"test_07 error: {e}")
             raise e
 
