@@ -25,7 +25,7 @@ class APIProject:
     @catch_internal(_API_NAMESPACE)
     async def get_file_folders(self, project_code, zone, folder, source_type):
         """
-        Get folder in project
+        List files and folders in project
         """
         file_response = GetProjectFileListResponse()
         try:
