@@ -1,5 +1,5 @@
 import os
-os.environ['env'] = 'test'
+# os.environ['env'] = 'test'
 
 
 class ConfigClass(object):
@@ -26,8 +26,8 @@ class ConfigClass(object):
         UPLOAD_VRE = "http://upload.vre:5079"
         UPLOAD_GREENROOM = "http://upload.greenroom:5079"
         COMMON_SERVICE = "http://common.utility:5062/v1/utility/id"
-        url_download_greenroom = "http://download.greenroom:5077/download/gr/v1/download/pre/"
-        url_download_vrecore = "http://download.greenroom:5077/download/vre/v1/download/pre/"
+        url_download_greenroom = "http://download.greenroom:5077/v1/download/pre/"
+        url_download_vrecore = "http://download.vrecore:5077/v1/download/pre/"
 
     PROVENANCE_SERVICE = "http://provenance.utility:5077"
 
