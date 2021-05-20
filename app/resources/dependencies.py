@@ -98,10 +98,10 @@ def check_permission(event: dict):
         return permission
     else:
         permission = {'project_role': project_role}
-    if project_role != 'admin' and zone == 'Greenroom':
+    if project_role != 'admin' and zone.lower() == 'greenroom':
         permission['project_code'] = project_code
         permission['uploader'] = username
-    elif project_role != 'contributor' and zone == 'VRECore':
+    elif project_role != 'contributor' and zone.lower() == 'vrecore':
         permission['project_code'] = project_code
     elif project_role == 'admin':
         permission['project_code'] = project_code

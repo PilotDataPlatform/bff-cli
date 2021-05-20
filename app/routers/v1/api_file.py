@@ -96,7 +96,7 @@ class APIProject:
     def __init__(self):
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.post("/files/download/pre/", tags=[_API_TAG],
+    @router.post("/files/download/pre", tags=[_API_TAG],
                  response_model=POSTDownloadFileResponse,
                  summary="Permission check for downloading")
     @catch_internal(_API_NAMESPACE)
@@ -138,11 +138,11 @@ class APIProject:
                     download_response.result = 'No permission to access file'
                     return download_response.json_response()
             except Exception as e:
-                download_response.error_msg = customized_error_template(ECustomizedError.INTERNAL)
-                download_response.code = EAPIResponseCode.internal_error
+                download_response.error_msg = 'File may not exist in the given project (geid does not match project code)'
+                download_response.code = EAPIResponseCode.bad_request
                 download_response.result = str(e)
                 return download_response.json_response()
-        if zone == 'vrecore':
+        if zone == 'VRECore':
             url = ConfigClass.url_download_vrecore
         else:
             url = ConfigClass.url_download_greenroom

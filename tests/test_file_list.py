@@ -201,3 +201,33 @@ class TestGetProjectFilesFolders(unittest.TestCase):
             self.log.error(f"test_07 error: {e}")
             raise e
 
+    def test_08_collaborator_get_files_and_folders_vrecore(self):
+        self.log.info('\n')
+        self.log.info("test_08_collaborator_get_files_and_folders_vrecore".center(80, '-'))
+        self.log.info(f"GET API: {self.test_api}")
+        try:
+            auth_user = {'username': 'jzhang3',
+                         'password': 'Indoc1234567!',
+                         'realm': 'vre'}
+            token = self.test.auth(auth_user)
+            param = {"project_code": self.project_code,
+                     "zone": 'vrecore',
+                     "folder": '',
+                     "source_type": 'Dataset'}
+            headers = {"Authorization": 'Bearer ' + token}
+            res = self.app.get(self.test_api, headers=headers, params=param)
+            self.log.info(res.text)
+            res_json = res.json()
+            self.assertEqual(res.status_code, 200)
+            self.assertEqual(res_json.get('code'), 200)
+            result = res_json.get('result')
+            self.log.info(f'Get files: {len(result)}')
+            for f in result:
+                self.log.info(f"COMPARING LABELS: 'VRECore' VS {f.get('labels')}")
+                self.assertIn('VRECore', f.get('labels'))
+                self.log.info(f"COMPARING PROJECT CODE: {self.project_code} VS {f.get('project_code')}")
+                self.assertEqual(self.project_code, f.get('project_code'))
+        except Exception as e:
+            self.log.error(f"test_02 error: {e}")
+            raise e
+
