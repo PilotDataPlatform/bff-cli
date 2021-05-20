@@ -69,6 +69,50 @@ async def jwt_required(request: Request):
     return {"code": 200, "user_id": user_id, "username": username, "role": role}
 
 
+def check_permission(event: dict):
+    """
+    event = {'user_id': user_id,
+             'username': username,
+             'role': role,
+             'project_code': project_code,
+             'zone': zone}
+    """
+    user_id = event.get('user_id')
+    username = event.get('username')
+    role = event.get('role')
+    project_code = event.get('project_code')
+    zone = event.get('zone')
+    project_role, code = get_project_role(user_id, project_code)
+    if role == "admin" and code != EAPIResponseCode.not_found:
+        project_role = 'admin'
+        permission = {'project_role': project_role}
+    elif project_role == 'User not in the project':
+        permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
+                      'code': code,
+                      'result': project_role}
+        return permission
+    elif code == EAPIResponseCode.not_found:
+        permission = {'error_msg': customized_error_template(ECustomizedError.PROJECT_NOT_FOUND),
+                      'code': code,
+                      'result': {}}
+        return permission
+    else:
+        permission = {'project_role': project_role}
+    if project_role != 'admin' and zone == 'Greenroom':
+        permission['project_code'] = project_code
+        permission['uploader'] = username
+    elif project_role != 'contributor' and zone == 'VRECore':
+        permission['project_code'] = project_code
+    elif project_role == 'admin':
+        permission['project_code'] = project_code
+    else:
+        permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
+                      'code': EAPIResponseCode.forbidden,
+                      'result': {}}
+        return permission
+    return permission
+
+
 def void_check_file_in_zone(data, file, project_code):
     payload = {"type": data.type,
                "zone": data.zone,
