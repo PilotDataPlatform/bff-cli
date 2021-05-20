@@ -111,11 +111,12 @@ class APIProject:
             user_name = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
+        zone = get_zone(data.zone)
         permission_event = {'user_id': user_id,
                             'username': user_name,
                             'role': role,
                             'project_code': data.project_code,
-                            'zone': data.zone}
+                            'zone': zone}
         permission = check_permission(permission_event)
         error_msg = permission.get('error_msg', '')
         if error_msg:
@@ -141,7 +142,7 @@ class APIProject:
                 download_response.code = EAPIResponseCode.internal_error
                 download_response.result = str(e)
                 return download_response.json_response()
-        if data.zone == 'vrecore':
+        if zone == 'vrecore':
             url = ConfigClass.url_download_vrecore
         else:
             url = ConfigClass.url_download_greenroom
