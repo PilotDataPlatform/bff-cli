@@ -127,15 +127,19 @@ class APIProject:
         limited_file_access = permission.get('uploader', '')
         if limited_file_access:
             try:
-                payload = {"global_entity_id": data.files[0].get('geid'),
-                           "project_code": data.project_code}
-                file_res = requests.post(ConfigClass.NEO4J_SERVICE + 'nodes/File/query', json=payload)
-                file_info = file_res.json()[0]
+                payload = {"query": {
+                    "global_entity_id": data.files[0].get('geid'),
+                    "project_code": data.project_code,
+                    "labels": [zone]
+                }
+                }
+                file_res = requests.post(ConfigClass.NEO4J_SERVICE_v2 + 'nodes/query', json=payload)
+                file_info = file_res.json().get('result')[0]
                 owner = file_info.get('uploader')
                 if owner != permission.get('uploader'):
                     download_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                     download_response.code = EAPIResponseCode.forbidden
-                    download_response.result = 'No permission to access file'
+                    download_response.result = f"{permission.get('uploader')} No permission to access file {file_info}"
                     return download_response.json_response()
             except Exception as e:
                 download_response.error_msg = 'File may not exist in the given project (geid does not match project code)'
