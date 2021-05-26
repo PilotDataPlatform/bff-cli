@@ -51,7 +51,7 @@ class TestGetAttributes(unittest.TestCase):
         self.log.info("test_03_get_attributes_no_access".center(80, '-'))
         param = {'project_code': self.project_code}
         login_user = {
-            "username": "jzhang3",
+            "username": "jzhang4",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
@@ -174,7 +174,7 @@ class TestExportAttributes(unittest.TestCase):
         param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         login_user = {
-            "username": "jzhang3",
+            "username": "jzhang4",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
@@ -383,7 +383,7 @@ class TestAttachAttributes(unittest.TestCase):
         }
         }
         login_user = {
-            "username": "jzhang3",
+            "username": "jzhang4",
             "password": "Indoc1234567!",
             "realm": "vre"
         }
