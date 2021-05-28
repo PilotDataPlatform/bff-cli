@@ -56,9 +56,11 @@ class APIProject:
         uploader = permission.get('uploader')
         if uploader:
             child_attribute = {'project_code': project_code,
-                               'uploader': user_name}
+                               'uploader': user_name,
+                               'archived': False}
         else:
-            child_attribute = {'project_code': project_code}
+            child_attribute = {'project_code': project_code,
+                               'archived': False}
         parent_label = get_parent_label(source_type)
         rel_path, folder_name = separate_rel_path(folder)
         if parent_label == 'Dataset':
