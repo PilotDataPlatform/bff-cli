@@ -3,7 +3,7 @@ import os
 
 
 class ConfigClass(object):
-    env = os.environ.get('env')
+    env = os.environ.get('env', 'test')
 
     version = "0.1.0"
     if env == 'test':
