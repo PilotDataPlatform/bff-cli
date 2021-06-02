@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from .base_models import APIResponse, PaginationRequest
+from .base_models import APIResponse
 
 
 class CheckFileResponse(APIResponse):

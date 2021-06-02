@@ -35,14 +35,14 @@ async def jwt_required(request: Request):
     if token:
         token = token.replace("Bearer ", "")
     else:
-        api_response.code = EAPIResponseCode.forbidden
+        api_response.code = EAPIResponseCode.unauthorized
         api_response.error_msg = "Token required"
         return api_response.json_response()
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
     exp = payload.get('exp')
     if time.time() - exp > 0:
-        api_response.code = EAPIResponseCode.forbidden
+        api_response.code = EAPIResponseCode.unauthorized
         api_response.error_msg = "Token expired"
         return api_response.json_response()
     # check if user is existed in neo4j

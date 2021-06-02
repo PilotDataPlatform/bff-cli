@@ -21,7 +21,7 @@ class TestGetAttributes(unittest.TestCase):
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
-            self.assertEqual(res_json.get('code'), 403)
+            self.assertEqual(res_json.get('code'), 401)
             self.assertEqual(res_json.get('error_msg'), "Token required")
         except Exception as e:
             self.log.error(f"ERROR: {e}")
@@ -136,8 +136,8 @@ class TestExportAttributes(unittest.TestCase):
             res = self.app.get(self.test_api, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
-            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
-            self.assertEqual(res_json.get('code'), 403)
+            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 401")
+            self.assertEqual(res_json.get('code'), 401)
             self.log.info(f"COMPARING ERROR: {res_json.get('error_msg')}, Token required")
             self.assertEqual(res_json.get('error_msg'), "Token required")
         except Exception as e:
@@ -268,7 +268,8 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_name": self.file_name
+                  "file_name": self.file_name,
+                  "zone": "Greenroom"
                   }
                   }
         try:
@@ -277,8 +278,8 @@ class TestAttachAttributes(unittest.TestCase):
             res = self.app.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
-            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
-            self.assertEqual(res_json.get('code'), 403)
+            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 401")
+            self.assertEqual(res_json.get('code'), 401)
             self.log.info(f"COMPARING ERROR: {res_json.get('error_msg')}, Token required")
             self.assertEqual(res_json.get('error_msg'), "Token required")
         except Exception as e:
@@ -292,7 +293,8 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_name": self.file_name
+                  "file_name": self.file_name,
+                  "zone": "Greenroom"
                   }
                   }
         headers = {
@@ -323,6 +325,7 @@ class TestAttachAttributes(unittest.TestCase):
                    "manifest_name": "Manifest1",
                    "project_code": self.project_code,
                    "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
+                   "zone": "Greenroom",
                    "file_name": wrong_file
                    }
                    }
@@ -351,6 +354,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1000",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
+                  "zone": "Greenroom",
                   "file_name": self.file_name
                   }
                   }
@@ -379,6 +383,7 @@ class TestAttachAttributes(unittest.TestCase):
             "manifest_name": "Manifest1",
             "project_code": self.project_code,
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
+            "zone": "Greenroom",
             "file_name": self.file_name
         }
         }

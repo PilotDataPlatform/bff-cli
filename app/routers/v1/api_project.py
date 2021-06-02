@@ -33,7 +33,10 @@ class APIProject:
             user_role = self.current_identity['role']
         except (AttributeError, TypeError):
             return self.current_identity
+        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info(f"User request with identity: {self.current_identity}")
         project_list = get_user_projects(user_role, username)
+        self._logger.info(f"Getting user projects: {project_list}")
         api_response.result = project_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
@@ -52,15 +55,20 @@ class APIProject:
             user_id = self.current_identity["user_id"]
         except (AttributeError, TypeError):
             return self.current_identity
+        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info(f"User request with identity: {self.current_identity}")
         error = validate_upload_event(data.zone, data.type)
         if error:
+            self._logger.error(f"Upload event error: {error}")
             api_response.error_msg = error
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
         if role == "admin":
-            pass
+            self._logger.info(f"User platform role: {role}")
         else:
+            self._logger.info(f"User platform role: {role}")
             project_role, code = get_project_role(user_id, project_code)
+            self._logger.info(f"User project role: {project_role}, {code}")
             if data.zone == "vrecore" and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
@@ -132,11 +140,15 @@ class APIProject:
             user_name = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
+        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info(f"User request with identity: {self.current_identity}")
         error = validate_upload_event(zone)
         if error:
+            self._logger.info(f"Upload event error: {error}")
             api_response.error_msg = error
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
+        self._logger.info(f"User platform role: {role}")
         if role == "admin":
             project_role = 'admin'
         else:
@@ -146,6 +158,7 @@ class APIProject:
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role
                 return api_response.json_response()
+        self._logger.info(f"User project role: {project_role}, {code}")
         folder_check_event = {
             'namespace': zone,
             'project_code': project_code,
@@ -153,6 +166,8 @@ class APIProject:
             'folder_relative_path': relative_path
         }
         response = http_query_node_zone(folder_check_event)
+        self._logger.info(f"Folder check event: {folder_check_event}")
+        self._logger.info(f"Folder check response: {response.text}")
         if response.status_code != 200:
             error_msg = "Upload Error: " + response.json()["error_msg"]
             response_code = EAPIResponseCode.internal_error

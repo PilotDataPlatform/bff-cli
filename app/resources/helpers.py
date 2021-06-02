@@ -12,6 +12,12 @@ def get_zone(namespace):
             "vrecore": "VRECore"}.get(namespace.lower(), 'greenroom')
 
 
+def get_path_by_zone(namespace, project_code):
+    return {"greenroom": f"/data/vre-storage/{project_code}/raw/",
+            "vrecore": f"/vre-data/{project_code}/"
+            }.get(namespace.lower(), 'greenroom')
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -105,14 +111,22 @@ def query_node_has_relation_for_user(username):
         return None
 
 
-def query_file_in_project(dataset_id, filename):
-    url = ConfigClass.FILEINFO_HOST + "/v1/files/%s/query" % str(dataset_id)
+def query_file_in_project(project_code, filename, zone='Greenroom'):
+    url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+    path = get_path_by_zone(zone, project_code) + filename
     if filename:
         data = {"query": {
-            "name": filename,
-            "labels": ["File"]}}
+            "name": filename.split('/')[-1],
+            "full_path": path,
+            "archived": False,
+            "project_code": project_code,
+            "labels": ["File", zone]}}
     else:
-        data = {"query": {"labels": ["File"]}}
+        data = {"query": {
+            "full_path": path,
+            "archived": False,
+            "project_code": project_code,
+            "labels": ["File", zone]}}
     try:
         res = requests.post(url=url, json=data)
         res = res.json() if res else None
@@ -121,14 +135,8 @@ def query_file_in_project(dataset_id, filename):
         return None
 
 
-def get_file_entity_id(project_code, file_name):
-    post_data = {"code": project_code}
-    response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/Dataset/query", json=post_data)
-    if not response.json():
-        return None
-    project_info = response.json()[0]
-    project_id = project_info.get('id')
-    res = query_file_in_project(project_id, file_name)
+def get_file_entity_id(project_code, file_name, zone='Greenroom'):
+    res = query_file_in_project(project_code, file_name, zone)
     res = res.get('result')
     if not res:
         return None

@@ -9,9 +9,6 @@ class ManifestListResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1,
             "result": [
                 {
                     "manifest_name": "Manifest1",
@@ -69,9 +66,6 @@ class ManifestAttachResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1,
             "result": [
                 {
                     "id": 690,
@@ -117,9 +111,6 @@ class ManifestExportResponse(APIResponse):
     result: dict = Field({}, example={
                 "code": 200,
                 "error_msg": "",
-                "page": 0,
-                "total": 1,
-                "num_of_pages": 1,
                 "result": {
                     "name": "Manifest1",
                     "project_code": "0216",

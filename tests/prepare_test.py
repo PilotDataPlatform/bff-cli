@@ -126,6 +126,7 @@ class SetupTest:
                     "operator": "jzhang",
                     "archived": False,
                     "process_pipeline": "",
+                    "project_code": project_code,
                     "uploader": "jzhang",
                     "generate_id": "undefined",
                     "path": f"/data/vre-storage/{project_code}/raw",
