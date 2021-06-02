@@ -13,7 +13,7 @@ def get_zone(namespace):
 
 
 def get_path_by_zone(namespace, project_code):
-    return {"greenroom": f"/data/vre-storage/{project_code}/raw/",
+    return {"greenroom": f"/data/vre-storage/{project_code}/",
             "vrecore": f"/vre-data/{project_code}/"
             }.get(namespace.lower(), 'greenroom')
 
@@ -129,6 +129,8 @@ def query_file_in_project(project_code, filename, zone='Greenroom'):
             "labels": ["File", zone]}}
     try:
         res = requests.post(url=url, json=data)
+        print(data)
+        print(res.text)
         res = res.json() if res else None
         return res
     except Exception as e:
