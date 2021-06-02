@@ -129,8 +129,8 @@ class SetupTest:
                     "project_code": project_code,
                     "uploader": "jzhang",
                     "generate_id": "undefined",
-                    "path": f"/data/vre-storage/{project_code}/raw",
-                    "full_path": f"/data/vre-storage/{project_code}/raw/{filename}"
+                    "path": f"/data/vre-storage/{project_code}/",
+                    "full_path": f"/data/vre-storage/{project_code}/{filename}"
         }
         self.log.info(f"POST API: {testing_api}")
         self.log.info(f"POST params: {payload}")
