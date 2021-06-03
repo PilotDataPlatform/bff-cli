@@ -158,7 +158,7 @@ class APIProject:
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role
                 return api_response.json_response()
-        self._logger.info(f"User project role: {project_role}, {code}")
+            self._logger.info(f"User project role: {project_role}, {code}")
         folder_check_event = {
             'namespace': zone,
             'project_code': project_code,

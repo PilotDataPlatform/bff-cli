@@ -129,8 +129,6 @@ def query_file_in_project(project_code, filename, zone='Greenroom'):
             "labels": ["File", zone]}}
     try:
         res = requests.post(url=url, json=data)
-        print(data)
-        print(res.text)
         res = res.json() if res else None
         return res
     except Exception as e:
