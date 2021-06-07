@@ -136,3 +136,4 @@ vrecli.egg-info
 .DS_Store
 *.__pycache__
 *.logs
+logs
