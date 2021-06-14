@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.resources.helpers import get_dataset_node
+import time
 
 unittest_folder_id = 6498
 
@@ -144,7 +145,8 @@ class SetupTest:
                 "path": f"/data/vre-storage/{project_code}/{folder}",
                 "list_priority": 20,
                 "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
-                "full_path": f"{root_path}/{project_code}/{folder}/{filename}"
+                "full_path": f"{root_path}/{project_code}/{folder}/{filename}",
+                "tags": []
             }
             relation_payload = {'start_id': unittest_folder_id}
         else:
@@ -162,7 +164,8 @@ class SetupTest:
                         "path": f"/data/vre-storage/{project_code}",
                         "list_priority": 20,
                         "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
-                        "full_path": f"{root_path}/{project_code}/{filename}"
+                        "full_path": f"{root_path}/{project_code}/{filename}",
+                        "tags": []
             }
             relation_payload = {'start_id': project_id}
         self.log.info(f"POST API: {testing_api}")
@@ -178,10 +181,36 @@ class SetupTest:
             relation_res = requests.post(relation_api, json=relation_payload)
             self.log.info(f"Relation response: {relation_res.text}")
             assert relation_res.status_code == 200
+            es_record = self.create_es_record(payload)
+            assert es_record.json().get('code') == 200
             return res
         except Exception as e:
             self.log.info(f"ERROR CREATING PROJECT: {e}")
             raise e
+
+    def create_es_record(self, data):
+        url = ConfigClass.PROVENANCE_SERVICE + '/v1/entity/file'
+        path = data.get('path')
+        root_path = path.strip('/').split('/')[0]
+        self.log.info(f"File root path: {root_path}")
+        if root_path == 'data':
+            zone = 'Greenroom'
+        else:
+            zone = 'VRECore'
+        time_stamp = int(time.time()*1000)
+        payload = data.copy()
+        payload['zone'] = zone
+        payload['time_created'] = time_stamp
+        payload['time_lastmodified'] = time_stamp
+        payload['atlas_guid'] = 'unittest file'
+        payload['data_type'] = 'File'
+        payload['file_type'] = 'raw'
+        payload['file_name'] = payload.get('name')
+        self.log.info(f"ES URL: {url}")
+        self.log.info(f"ES PAYLOAD: {payload}")
+        res = requests.post(url, json=payload)
+        self.log.info(f"ES RESPONSE: {res.text}")
+        return res
 
     def delete_file(self, node_id):
         self.log.info("\n")

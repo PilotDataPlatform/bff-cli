@@ -5,6 +5,9 @@ from ..resources. error_handler import customized_error_template, ECustomizedErr
 from ..models.base_models import APIResponse, EAPIResponseCode
 from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
 from ..commons.data_providers.database import SessionLocal
+from ..service_logger.logger_factory_service import SrvLoggerFactory
+
+_logger = SrvLoggerFactory("Helpers").get_logger()
 
 
 def get_zone(namespace):
@@ -198,16 +201,26 @@ def get_user_projects(user_role, username):
     return projects_list
 
 
-def attach_manifest_to_file(global_entity_id, manifest_id, attributes):
-    file_node = get_file_by_id(global_entity_id)
-    if not file_node:
-        return None
-    file_id = file_node["id"]
-    post_data = {"manifest_id": manifest_id}
-    if attributes:
-        for key, value in attributes.items():
-            post_data["attr_" + key] = value
-    response = requests.put(ConfigClass.NEO4J_SERVICE + f"nodes/File/node/{file_id}", json=post_data)
+def attach_manifest_to_file(event):
+    project_code = event.get('project_code')
+    global_entity_id = event.get('global_entity_id')
+    manifest_id = event.get('manifest_id')
+    attributes = event.get('attributes')
+    username = event.get('username')
+    project_role = event.get('project_role')
+    _logger.info("attach_manifest_to_file".center(80, '-'))
+    url = ConfigClass.FILEINFO_HOST + "/v1/file/attributes/attach"
+    payload = {"project_code": project_code,
+               "manifest_id": manifest_id,
+               "global_entity_id": [global_entity_id],
+               "attributes": attributes,
+               "inherit": True,
+               "project_role": project_role,
+               "username": username}
+    _logger.info(f"POSTING: {url}")
+    _logger.info(f"PAYLOAD: {payload}")
+    response = requests.post(url=url, json=payload)
+    _logger.info(f"RESPONSE: {response.text}")
     if not response.json():
         return None
     return response.json()
