@@ -116,12 +116,12 @@ class APIManifest:
         project_role = permission.get('project_role')
         self._logger.info(f"Getting info for file: {file_name} IN {project_code}")
         file_node = query_file_in_project(project_code, file_name, zone)
-        file_node = file_node.get('result')
         if not file_node:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         else:
+            file_node = file_node.get('result')
             global_entity_id = file_node[0].get('global_entity_id')
             file_owner = file_node[0].get('uploader')
         self._logger.info(f"Globale entity id for {file_name}: {global_entity_id}")

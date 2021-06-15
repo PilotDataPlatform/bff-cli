@@ -115,27 +115,49 @@ def query_node_has_relation_for_user(username):
 
 
 def query_file_in_project(project_code, filename, zone='Greenroom'):
+    _logger.info("query_file_in_project".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
     path = get_path_by_zone(zone, project_code) + filename
-    if filename:
-        data = {"query": {
-            "name": filename.split('/')[-1],
-            "full_path": path,
-            "archived": False,
-            "project_code": project_code,
-            "labels": ["File", zone]}}
-    else:
-        data = {"query": {
-            "full_path": path,
-            "archived": False,
-            "project_code": project_code,
-            "labels": ["File", zone]}}
+    data = {"query": {
+        "name": filename.split('/')[-1],
+        "full_path": path,
+        "archived": False,
+        "project_code": project_code,
+        "labels": ["File", zone]}}
+    _logger.info(f"Query url: {url}")
     try:
+        _logger.info(f"Get file info payload: {data}")
         res = requests.post(url=url, json=data)
-        res = res.json() if res else None
-        return res
+        _logger.info(f"Query file response: {res.text}")
+        file_res = res.json()
+        _logger.info(f"file response: {file_res}")
+        if file_res.get('code') == 200 and file_res.get('result'):
+            return file_res
+        else:
+            _logger.info("Get name as folder")
+            _logger.info(filename.split('/'))
+            if len(filename.split('/')) < 2:
+                relative_path = ''
+            else:
+                relative_path = '/'.join(filename.split('/')[0: -1])
+            _logger.info(f'relative_path: {relative_path}')
+            folder = {"query": {
+                "name": filename.split('/')[-1],
+                "folder_relative_path": relative_path,
+                "archived": False,
+                "project_code": project_code,
+                "labels": ["Folder", zone]}}
+            _logger.info(f"Query folder payload: {folder}")
+            _res = requests.post(url=url, json=folder)
+            _logger.info(f"Query folder response: {_res.text}")
+            _res = _res.json()
+            if _res.get('code') == 200 and _res.get('result'):
+                return _res
+            else:
+                return []
     except Exception as e:
-        return None
+        _logger.error(str(e))
+        return []
 
 
 def get_file_entity_id(project_code, file_name, zone='Greenroom'):
