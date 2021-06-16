@@ -38,7 +38,7 @@ class SetupTest:
     def create_project(self, code, discoverable='true'):
         self.log.info("\n")
         self.log.info("Preparing testing project".ljust(80, '-'))
-        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/Dataset"
+        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/Container"
         params = {"name": "BFFCLIUnitTest",
                   "path": code,
                   "code": code,
@@ -62,7 +62,7 @@ class SetupTest:
     def delete_project(self, node_id):
         self.log.info("\n")
         self.log.info("Preparing delete project".ljust(80, '-'))
-        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/node/%s" % str(node_id)
+        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/Container/node/%s" % str(node_id)
         try:
             delete_res = requests.delete(delete_api)
             self.log.info(f"DELETE STATUS: {delete_res.status_code}")
@@ -92,12 +92,13 @@ class SetupTest:
             raise Exception(f"Error removing user from project: {response.json()}")
 
     def get_projects(self):
-        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Dataset/properties'
+        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Container/properties'
         try:
             response = requests.get(all_project_url)
             if response.status_code == 200:
                 res = response.json()
                 projects = res.get('code')
+                self.log.info(f'Get projects total number: {len(projects)}')
                 return projects
             else:
                 self.log.error(f"RESPONSE ERROR: {response.text}")

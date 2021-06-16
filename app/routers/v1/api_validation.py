@@ -14,6 +14,7 @@ router = APIRouter()
 class APIValidation:
     _API_TAG = 'V1 Validate'
     _API_NAMESPACE = "api_generate_validate"
+    db = DBConnection()
 
     def __init__(self):
         self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
@@ -41,7 +42,7 @@ class APIValidation:
                  summary="Validate manifest for project")
     @catch_internal(_API_NAMESPACE)
     async def validate_manifest(self, request_payload: ManifestValidatePost,
-                                db: Session = Depends(get_db)):
+                                db: Session = Depends(db.get_db)):
         """Validate the manifest based on the project"""
         api_response = ManifestValidateResponse()
         manifests = request_payload.manifest_json

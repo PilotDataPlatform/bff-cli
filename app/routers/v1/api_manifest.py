@@ -16,6 +16,7 @@ router = APIRouter()
 class APIManifest:
     _API_TAG = 'V1 Manifest'
     _API_NAMESPACE = "api_manifest"
+    db = DBConnection()
 
     def __init__(self):
         self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
@@ -25,7 +26,7 @@ class APIManifest:
                 summary="Get manifest list by project code (project_code required)")
     @catch_internal(_API_NAMESPACE)
     async def list_manifest(self, project_code: str,
-                            db: Session = Depends(get_db),
+                            db: Session = Depends(db.get_db),
                             current_identity: dict = Depends(jwt_required)):
         api_response = ManifestListResponse()
         try:
@@ -72,7 +73,7 @@ class APIManifest:
                  summary="Attach manifest to file")
     @catch_internal(_API_NAMESPACE)
     async def attach_manifest(self, request_payload: ManifestAttachPost,
-                              db: Session = Depends(get_db),
+                              db: Session = Depends(db.get_db),
                               current_identity: dict = Depends(jwt_required)):
         """CLI will call manifest validation API before attach manifest to file in uploading process"""
         api_response = ManifestAttachResponse()
@@ -169,7 +170,7 @@ class APIManifest:
                 summary="Export manifest from project")
     @catch_internal(_API_NAMESPACE)
     async def export_manifest(self, project_code, manifest_name,
-                              db: Session = Depends(get_db),
+                              db: Session = Depends(db.get_db),
                               current_identity: dict = Depends(jwt_required)):
         """Export manifest from the project"""
         api_response = ManifestExportResponse()
