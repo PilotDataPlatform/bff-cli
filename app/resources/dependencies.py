@@ -66,7 +66,7 @@ async def jwt_required(request: Request):
         api_response.code = EAPIResponseCode.not_found
         api_response.error_msg = "User not found"
         return api_response.json_response()
-    return {"code": 200, "user_id": user_id, "username": username, "role": role}
+    return {"code": 200, "user_id": user_id, "username": username, "role": role, "token": token}
 
 
 def check_permission(event: dict):

@@ -5,6 +5,9 @@ from ..resources. error_handler import customized_error_template, ECustomizedErr
 from ..models.base_models import APIResponse, EAPIResponseCode
 from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel
 from ..commons.data_providers.database import SessionLocal
+from ..service_logger.logger_factory_service import SrvLoggerFactory
+
+_logger = SrvLoggerFactory("Helpers").get_logger()
 
 
 def get_zone(namespace):
@@ -18,12 +21,26 @@ def get_path_by_zone(namespace, project_code):
             }.get(namespace.lower(), 'greenroom')
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class DBConnection(metaclass=Singleton):
+
+    def __init__(self):
+        self.session = SessionLocal()
+
+    def get_db(self):
+        db = self.session
+        try:
+            yield db
+        finally:
+            db.close()
 
 
 def get_manifest_name_from_project_in_db(event):
@@ -87,7 +104,7 @@ def get_user_role(user_id, project_id):
 
 
 def query__node_has_relation_with_admin():
-    url = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/query"
+    url = ConfigClass.NEO4J_SERVICE + "nodes/Container/query"
     data = {'is_all': 'true'}
     try:
         res = requests.post(url=url, json=data)
@@ -112,27 +129,49 @@ def query_node_has_relation_for_user(username):
 
 
 def query_file_in_project(project_code, filename, zone='Greenroom'):
+    _logger.info("query_file_in_project".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
     path = get_path_by_zone(zone, project_code) + filename
-    if filename:
-        data = {"query": {
-            "name": filename.split('/')[-1],
-            "full_path": path,
-            "archived": False,
-            "project_code": project_code,
-            "labels": ["File", zone]}}
-    else:
-        data = {"query": {
-            "full_path": path,
-            "archived": False,
-            "project_code": project_code,
-            "labels": ["File", zone]}}
+    data = {"query": {
+        "name": filename.split('/')[-1],
+        "full_path": path,
+        "archived": False,
+        "project_code": project_code,
+        "labels": ["File", zone]}}
+    _logger.info(f"Query url: {url}")
     try:
+        _logger.info(f"Get file info payload: {data}")
         res = requests.post(url=url, json=data)
-        res = res.json() if res else None
-        return res
+        _logger.info(f"Query file response: {res.text}")
+        file_res = res.json()
+        _logger.info(f"file response: {file_res}")
+        if file_res.get('code') == 200 and file_res.get('result'):
+            return file_res
+        else:
+            _logger.info("Get name as folder")
+            _logger.info(filename.split('/'))
+            if len(filename.split('/')) < 2:
+                relative_path = ''
+            else:
+                relative_path = '/'.join(filename.split('/')[0: -1])
+            _logger.info(f'relative_path: {relative_path}')
+            folder = {"query": {
+                "name": filename.split('/')[-1],
+                "folder_relative_path": relative_path,
+                "archived": False,
+                "project_code": project_code,
+                "labels": ["Folder", zone]}}
+            _logger.info(f"Query folder payload: {folder}")
+            _res = requests.post(url=url, json=folder)
+            _logger.info(f"Query folder response: {_res.text}")
+            _res = _res.json()
+            if _res.get('code') == 200 and _res.get('result'):
+                return _res
+            else:
+                return []
     except Exception as e:
-        return None
+        _logger.error(str(e))
+        return []
 
 
 def get_file_entity_id(project_code, file_name, zone='Greenroom'):
@@ -159,7 +198,7 @@ def get_file_by_id(file_id):
 def get_dataset_node(project_code):
     post_data = {"code": project_code}
     try:
-        response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/Dataset/query", json=post_data)
+        response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/Container/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
@@ -183,31 +222,46 @@ def has_permission(event):
 
 
 def get_user_projects(user_role, username):
+    _logger.info("get_user_projects".center(80, '-'))
     projects_list = []
     if user_role == "admin":
-        project_candidate = query__node_has_relation_with_admin()
+        projects_list = query__node_has_relation_with_admin()
     else:
         project_candidate = query_node_has_relation_for_user(username)
-    for p in project_candidate:
-        if p['labels'] == ['Dataset']:
-            res_projects = {'name': p.get('name'),
-                            'code': p.get('code'),
-                            'id': p.get('id'),
-                            'geid': p.get('global_entity_id')}
-            projects_list.append(res_projects)
+        _logger.info(f"Number of candidates: {len(project_candidate)}")
+        for p in project_candidate:
+            if 'Container' in p['labels']:
+                res_projects = {'name': p.get('name'),
+                                'code': p.get('code'),
+                                'id': p.get('id'),
+                                'geid': p.get('global_entity_id')}
+                projects_list.append(res_projects)
+            else:
+                _logger.info(f'Non-candidate: {p}')
+    _logger.info(f"Number of projects found: {len(projects_list)}")
     return projects_list
 
 
-def attach_manifest_to_file(global_entity_id, manifest_id, attributes):
-    file_node = get_file_by_id(global_entity_id)
-    if not file_node:
-        return None
-    file_id = file_node["id"]
-    post_data = {"manifest_id": manifest_id}
-    if attributes:
-        for key, value in attributes.items():
-            post_data["attr_" + key] = value
-    response = requests.put(ConfigClass.NEO4J_SERVICE + f"nodes/File/node/{file_id}", json=post_data)
+def attach_manifest_to_file(event):
+    project_code = event.get('project_code')
+    global_entity_id = event.get('global_entity_id')
+    manifest_id = event.get('manifest_id')
+    attributes = event.get('attributes')
+    username = event.get('username')
+    project_role = event.get('project_role')
+    _logger.info("attach_manifest_to_file".center(80, '-'))
+    url = ConfigClass.FILEINFO_HOST + "/v1/file/attributes/attach"
+    payload = {"project_code": project_code,
+               "manifest_id": manifest_id,
+               "global_entity_id": [global_entity_id],
+               "attributes": attributes,
+               "inherit": True,
+               "project_role": project_role,
+               "username": username}
+    _logger.info(f"POSTING: {url}")
+    _logger.info(f"PAYLOAD: {payload}")
+    response = requests.post(url=url, json=payload)
+    _logger.info(f"RESPONSE: {response.text}")
     if not response.json():
         return None
     return response.json()
@@ -281,7 +335,7 @@ def http_query_node_zone(folder_event):
 def get_parent_label(source):
     return {
         'folder': 'Folder',
-        'dataset': 'Dataset'
+        'container': 'Container'
     }.get(source.lower(), None)
 
 
@@ -300,7 +354,7 @@ def verify_list_event(source_type, folder):
     if source_type == 'Folder' and not folder:
         code = EAPIResponseCode.bad_request
         error_msg = 'missing folder name'
-    elif source_type == 'Dataset' and folder:
+    elif source_type == 'Container' and folder:
         code = EAPIResponseCode.bad_request
         error_msg = 'Query project does not require folder name'
     else:

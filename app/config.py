@@ -16,6 +16,7 @@ class ConfigClass(object):
         COMMON_SERVICE = "http://10.3.7.222:5062/v1/utility/id"
         url_download_greenroom = "http://10.3.7.220/vre/api/vre/portal/download/gr/v1/download/pre/"
         url_download_vrecore = "http://10.3.7.220/vre/api/vre/portal/download/vre/v1/download/pre/"
+        PROVENANCE_SERVICE = "http://10.3.7.202:5077"
     else:
         NEO4J_SERVICE = "http://neo4j.utility:5062/v1/neo4j/"
         NEO4J_SERVICE_v2 = "http://neo4j.utility:5062/v2/neo4j/"
@@ -27,8 +28,7 @@ class ConfigClass(object):
         COMMON_SERVICE = "http://common.utility:5062/v1/utility/id"
         url_download_greenroom = "http://download.greenroom:5077/v1/download/pre/"
         url_download_vrecore = "http://download.vre:5077/v1/download/pre/"
-
-    PROVENANCE_SERVICE = "http://provenance.utility:5077"
+        PROVENANCE_SERVICE = "http://provenance.utility:5077"
 
     RDS_PORT = "5432"
     RDS_DBNAME = "INDOC_VRE"

@@ -1,7 +1,8 @@
 import unittest
+import time
+import os
 from .prepare_test import SetupTest
 from .logger import Logger
-import os
 
 # To run particular test, edit the case_to_run_variable with following values:
 # export attribute: export
@@ -161,6 +162,7 @@ class TestExportAttributes(unittest.TestCase):
     def test_02_export_attributes(self):
         self.log.info('\n')
         self.log.info("test_02_export_attributes".center(80, '-'))
+        self.log.info(f'Project code: {self.project_code}')
         param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         headers = {
@@ -263,7 +265,7 @@ class TestAttachAttributes(unittest.TestCase):
     folder_file_id = ''
     folder_file_core_id = ''
     project_code = os.environ.get('project_code')
-    file_name = 'unittest_file'
+    file_name = 'unittest_file_' + str(time.time())[0:10]
     folder = "unittest folder1"
     folder_core = "unittest core1"
 
@@ -283,13 +285,14 @@ class TestAttachAttributes(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.log.info('Test tearDown'.center(80, '='))
-        delete_res = cls.test.delete_file(cls.file_id)
-        cls.log.info(f"DELETE FILE: {delete_res}")
-        delete_folder_file_res = cls.test.delete_file(cls.folder_file_id)
-        cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_res}")
-        delete_folder_file_core_res = cls.test.delete_file(cls.folder_file_core_id)
-        cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_core_res}")
+        pass
+        # cls.log.info('Test tearDown'.center(80, '='))
+        # delete_res = cls.test.delete_file(cls.file_id)
+        # cls.log.info(f"DELETE FILE: {delete_res}")
+        # delete_folder_file_res = cls.test.delete_file(cls.folder_file_id)
+        # cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_res}")
+        # delete_folder_file_core_res = cls.test.delete_file(cls.folder_file_core_id)
+        # cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_core_res}")
 
     def test_01_attach_attributes_without_token(self):
         self.log.info('\n')
@@ -339,10 +342,8 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
             self.assertEqual(res_json.get('code'), 200)
             result = res_json.get('result')[0]
-            self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'Greenroom']")
-            self.assertEqual(set(result.get('labels')), {'File', 'Greenroom'})
-            self.log.info(f"COMPARING file_name: {result.get('name')}, {self.file_name}")
-            self.assertEqual(result.get('name'), self.file_name)
+            self.log.info(f"COMPARING status: {result.get('operation_status')}, 'SUCCEED'")
+            self.assertEqual(result.get('operation_status'), 'SUCCEED')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -464,10 +465,8 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
             self.assertEqual(res_json.get('code'), 200)
             result = res_json.get('result')[0]
-            self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'Greenroom']")
-            self.assertEqual(set(result.get('labels')), {'File', 'Greenroom'})
-            self.log.info(f"COMPARING file_name: {result.get('name')}, {self.file_name}")
-            self.assertEqual(result.get('name'), self.file_name)
+            self.log.info(f"COMPARING status: {result.get('operation_status')}, 'SUCCEED'")
+            self.assertEqual(result.get('operation_status'), 'SUCCEED')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -495,10 +494,8 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
             self.assertEqual(res_json.get('code'), 200)
             result = res_json.get('result')[0]
-            self.log.info(f"COMPARING labels: {result.get('labels')}, ['File', 'VRECore']")
-            self.assertEqual(set(result.get('labels')), {'File', 'VRECore'})
-            self.log.info(f"COMPARING file_name: {result.get('name')}, {self.file_name}")
-            self.assertEqual(result.get('name'), self.file_name)
+            self.log.info(f"COMPARING status: {result.get('operation_status')}, 'SUCCEED'")
+            self.assertEqual(result.get('operation_status'), 'SUCCEED')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
