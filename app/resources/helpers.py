@@ -225,19 +225,19 @@ def get_user_projects(user_role, username):
     _logger.info("get_user_projects".center(80, '-'))
     projects_list = []
     if user_role == "admin":
-        projects_list = query__node_has_relation_with_admin()
+        project_candidate = query__node_has_relation_with_admin()
     else:
         project_candidate = query_node_has_relation_for_user(username)
-        _logger.info(f"Number of candidates: {len(project_candidate)}")
-        for p in project_candidate:
-            if 'Container' in p['labels']:
-                res_projects = {'name': p.get('name'),
-                                'code': p.get('code'),
-                                'id': p.get('id'),
-                                'geid': p.get('global_entity_id')}
-                projects_list.append(res_projects)
-            else:
-                _logger.info(f'Non-candidate: {p}')
+    _logger.info(f"Number of candidates: {len(project_candidate)}")
+    for p in project_candidate:
+        if 'Container' in p['labels']:
+            res_projects = {'name': p.get('name'),
+                            'code': p.get('code'),
+                            'id': p.get('id'),
+                            'geid': p.get('global_entity_id')}
+            projects_list.append(res_projects)
+        else:
+            _logger.info(f'Non-candidate: {p}')
     _logger.info(f"Number of projects found: {len(projects_list)}")
     return projects_list
 
