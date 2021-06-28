@@ -16,9 +16,6 @@ class EAPIResponseCode(Enum):
 class APIResponse(BaseModel):
     code: EAPIResponseCode = EAPIResponseCode.success
     error_msg: str = ""
-    page: int = 0
-    total: int = 1
-    num_of_pages: int = 1
     result = []
 
     def json_response(self):
@@ -26,9 +23,3 @@ class APIResponse(BaseModel):
         data["code"] = self.code.value
         return JSONResponse(status_code=self.code.value, content=data)
 
-
-class PaginationRequest(BaseModel):
-    page: int = 0
-    page_size: int = 25
-    order: str = "asc"
-    sorting: str = "createTime"

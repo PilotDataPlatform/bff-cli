@@ -4,6 +4,9 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
 from app.resources.helpers import get_dataset_node
+import time
+
+unittest_folder_id = 6498
 
 
 class SetupTest:
@@ -35,7 +38,7 @@ class SetupTest:
     def create_project(self, code, discoverable='true'):
         self.log.info("\n")
         self.log.info("Preparing testing project".ljust(80, '-'))
-        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/Dataset"
+        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/Container"
         params = {"name": "BFFCLIUnitTest",
                   "path": code,
                   "code": code,
@@ -59,7 +62,7 @@ class SetupTest:
     def delete_project(self, node_id):
         self.log.info("\n")
         self.log.info("Preparing delete project".ljust(80, '-'))
-        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/Dataset/node/%s" % str(node_id)
+        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/Container/node/%s" % str(node_id)
         try:
             delete_res = requests.delete(delete_api)
             self.log.info(f"DELETE STATUS: {delete_res.status_code}")
@@ -78,7 +81,6 @@ class SetupTest:
         if response.status_code != 200:
             raise Exception(f"Error adding user to project: {response.json()}")
 
-
     def remove_user_from_project(self, user_id, project_id):
         payload = {
             "start_id": user_id,
@@ -90,12 +92,13 @@ class SetupTest:
             raise Exception(f"Error removing user from project: {response.json()}")
 
     def get_projects(self):
-        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Dataset/properties'
+        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Container/properties'
         try:
             response = requests.get(all_project_url)
             if response.status_code == 200:
                 res = response.json()
                 projects = res.get('code')
+                self.log.info(f'Get projects total number: {len(projects)}')
                 return projects
             else:
                 self.log.error(f"RESPONSE ERROR: {response.text}")
@@ -112,25 +115,60 @@ class SetupTest:
         else:
             return res.json()['result']
 
-    def create_file(self, project_code, filename):
+    def create_file(self, project_code, filename, folder=None, zone='Greenroom'):
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
+        self.log.info(f"File will be created in {zone} under {folder}")
         testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
         relation_api = ConfigClass.NEO4J_SERVICE + "relations/own"
         global_entity_id = self.generate_entity_id()
-        payload = {
-                    "name": filename,
-                    "global_entity_id": global_entity_id,
-                    "extra_labels": ["Greenroom"],
-                    "file_size": 7120,
-                    "operator": "jzhang",
-                    "archived": False,
-                    "process_pipeline": "",
-                    "uploader": "jzhang",
-                    "generate_id": "undefined",
-                    "path": f"/data/vre-storage/{project_code}/raw",
-                    "full_path": f"/data/vre-storage/{project_code}/raw/{filename}"
-        }
+        project_info = get_dataset_node(project_code)
+        self.log.info(f"Project info: {project_info}")
+        project_id = project_info.get('id')
+        if zone.lower() == 'vrecore':
+            root_path = "/vre-data"
+            file_label = 'VRECore'
+        else:
+            root_path = "/data/vre-storage"
+            file_label = 'Greenroom'
+        if folder:
+            payload = {
+                "name": filename,
+                "global_entity_id": global_entity_id,
+                "extra_labels": [file_label],
+                "file_size": 7120,
+                "operator": "jzhang",
+                "archived": False,
+                "process_pipeline": "",
+                "project_code": project_code,
+                "uploader": "jzhang",
+                "generate_id": "undefined",
+                "path": f"/data/vre-storage/{project_code}/{folder}",
+                "list_priority": 20,
+                "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
+                "full_path": f"{root_path}/{project_code}/{folder}/{filename}",
+                "tags": []
+            }
+            relation_payload = {'start_id': unittest_folder_id}
+        else:
+            payload = {
+                        "name": filename,
+                        "global_entity_id": global_entity_id,
+                        "extra_labels": [file_label],
+                        "file_size": 7120,
+                        "operator": "jzhang",
+                        "archived": False,
+                        "process_pipeline": "unittest",
+                        "project_code": project_code,
+                        "uploader": "jzhang",
+                        "generate_id": "undefined",
+                        "path": f"/data/vre-storage/{project_code}",
+                        "list_priority": 20,
+                        "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
+                        "full_path": f"{root_path}/{project_code}/{filename}",
+                        "tags": []
+            }
+            relation_payload = {'start_id': project_id}
         self.log.info(f"POST API: {testing_api}")
         self.log.info(f"POST params: {payload}")
         try:
@@ -139,18 +177,41 @@ class SetupTest:
             self.log.info(f"RESPONSE STATUS: {res.status_code}")
             assert res.status_code == 200
             res = res.json()[0]
-            project_info = get_dataset_node(project_code)
-            self.log.info(f"Project info: {project_info}")
-            project_id = project_info.get('id')
-            relation_payload = {'start_id': project_id,
-                                'end_id': res.get('id')}
+            relation_payload['end_id'] = res.get('id')
+            self.log.info(f"CREATING RELATION WITH start_id: {relation_payload.get('start_id')}")
             relation_res = requests.post(relation_api, json=relation_payload)
             self.log.info(f"Relation response: {relation_res.text}")
             assert relation_res.status_code == 200
+            es_record = self.create_es_record(payload)
+            assert es_record.json().get('code') == 200
             return res
         except Exception as e:
             self.log.info(f"ERROR CREATING PROJECT: {e}")
             raise e
+
+    def create_es_record(self, data):
+        url = ConfigClass.PROVENANCE_SERVICE + '/v1/entity/file'
+        path = data.get('path')
+        root_path = path.strip('/').split('/')[0]
+        self.log.info(f"File root path: {root_path}")
+        if root_path == 'data':
+            zone = 'Greenroom'
+        else:
+            zone = 'VRECore'
+        time_stamp = int(time.time()*1000)
+        payload = data.copy()
+        payload['zone'] = zone
+        payload['time_created'] = time_stamp
+        payload['time_lastmodified'] = time_stamp
+        payload['atlas_guid'] = 'unittest file'
+        payload['data_type'] = 'File'
+        payload['file_type'] = 'raw'
+        payload['file_name'] = payload.get('name')
+        self.log.info(f"ES URL: {url}")
+        self.log.info(f"ES PAYLOAD: {payload}")
+        res = requests.post(url, json=payload)
+        self.log.info(f"ES RESPONSE: {res.text}")
+        return res
 
     def delete_file(self, node_id):
         self.log.info("\n")

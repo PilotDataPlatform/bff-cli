@@ -11,8 +11,8 @@ class TestGetProjectFilesFolders(unittest.TestCase):
     token = test.auth()
     project_code = os.environ.get('project_code')
     test_api = f"/v1/project/{project_code}/folder"
-    folder_name = 'unittest folder'
-    folder_core = 'unittest core'
+    folder_name = 'unittest2'
+    folder_core = 'core-test'
 
     def test_01_get_folder_gr(self):
         self.log.info('\n')
@@ -137,6 +137,7 @@ class TestGetProjectFilesFolders(unittest.TestCase):
                      'folder': self.folder_core,
                      'relative_path': ''}
             headers = {"Authorization": 'Bearer ' + self.token}
+            self.log.info(f"Get params: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
@@ -171,6 +172,7 @@ class TestGetProjectFilesFolders(unittest.TestCase):
                      'folder': sub_folder,
                      'relative_path': relative_path}
             headers = {"Authorization": 'Bearer ' + self.token}
+            self.log.info(f"Get param: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
@@ -205,6 +207,7 @@ class TestGetProjectFilesFolders(unittest.TestCase):
                      'folder': sub_folder,
                      'relative_path': relative_path}
             headers = {"Authorization": 'Bearer ' + self.token}
+            self.log.info(f"Get param: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()

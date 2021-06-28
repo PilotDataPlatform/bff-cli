@@ -25,6 +25,7 @@ class TestFiles(unittest.TestCase):
             self.assertEqual(res.status_code, 200)
             res_json = res.json()
             projects = res_json.get('result')
+            self.log.info(f"Total projects get in API: {len(projects)}")
             all_project = self.test.get_projects()
             self.log.info(f"COMPARING LENGTH: {len(projects)} VS {len(all_project)}")
             self.assertEqual(len(projects), len(all_project))
@@ -48,8 +49,9 @@ class TestFiles(unittest.TestCase):
             self.assertEqual(res.status_code, 200)
             res_json = res.json()
             projects = res_json.get('result')
-            self.log.info(f"COMPARING LENGTH: {len(projects)} 2")
-            self.assertEqual(len(projects), 2)
+            self.log.info(f"COMPARING LENGTH: {len(projects)} 3")
+            # user in generate, vrevlitest, pacs 3 projects
+            self.assertEqual(len(projects), 3)
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
