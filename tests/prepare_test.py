@@ -115,7 +115,8 @@ class SetupTest:
         else:
             return res.json()['result']
 
-    def create_file(self, project_code, filename, folder=None, zone='Greenroom'):
+    def create_file(self, project_code, filename,
+                    folder=None, zone='Greenroom', uploader='jzhang'):
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         self.log.info(f"File will be created in {zone} under {folder}")
@@ -137,16 +138,17 @@ class SetupTest:
                 "global_entity_id": global_entity_id,
                 "extra_labels": [file_label],
                 "file_size": 7120,
-                "operator": "jzhang",
+                "operator": uploader,
                 "archived": False,
                 "process_pipeline": "",
                 "project_code": project_code,
-                "uploader": "jzhang",
+                "uploader": uploader,
                 "generate_id": "undefined",
-                "path": f"/data/vre-storage/{project_code}/{folder}",
+                "display_path": f"/{uploader}/{folder}/{filename}",
                 "list_priority": 20,
+                "location": f"unittest://fake-minio-location/{project_code}/{uploader}",
                 "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
-                "full_path": f"{root_path}/{project_code}/{folder}/{filename}",
+                "full_path": f"{root_path}/{project_code}/{uploader}/{folder}/{filename}",
                 "tags": []
             }
             relation_payload = {'start_id': unittest_folder_id}
@@ -156,16 +158,17 @@ class SetupTest:
                         "global_entity_id": global_entity_id,
                         "extra_labels": [file_label],
                         "file_size": 7120,
-                        "operator": "jzhang",
+                        "operator": uploader,
                         "archived": False,
                         "process_pipeline": "unittest",
                         "project_code": project_code,
-                        "uploader": "jzhang",
+                        "uploader": uploader,
                         "generate_id": "undefined",
-                        "path": f"/data/vre-storage/{project_code}",
+                        "display_path": f"/{uploader}/{folder}/{filename}",
                         "list_priority": 20,
+                        "location": f"unittest://fake-minio-location/{project_code}/{uploader}",
                         "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
-                        "full_path": f"{root_path}/{project_code}/{filename}",
+                        "full_path": f"{root_path}/{project_code}/{uploader}/{filename}",
                         "tags": []
             }
             relation_payload = {'start_id': project_id}
@@ -186,32 +189,36 @@ class SetupTest:
             assert es_record.json().get('code') == 200
             return res
         except Exception as e:
-            self.log.info(f"ERROR CREATING PROJECT: {e}")
+            self.log.info(f"ERROR CREATING FILE: {e}")
             raise e
 
     def create_es_record(self, data):
-        url = ConfigClass.PROVENANCE_SERVICE + '/v1/entity/file'
-        path = data.get('path')
-        root_path = path.strip('/').split('/')[0]
-        self.log.info(f"File root path: {root_path}")
-        if root_path == 'data':
-            zone = 'Greenroom'
-        else:
-            zone = 'VRECore'
-        time_stamp = int(time.time()*1000)
-        payload = data.copy()
-        payload['zone'] = zone
-        payload['time_created'] = time_stamp
-        payload['time_lastmodified'] = time_stamp
-        payload['atlas_guid'] = 'unittest file'
-        payload['data_type'] = 'File'
-        payload['file_type'] = 'raw'
-        payload['file_name'] = payload.get('name')
-        self.log.info(f"ES URL: {url}")
-        self.log.info(f"ES PAYLOAD: {payload}")
-        res = requests.post(url, json=payload)
-        self.log.info(f"ES RESPONSE: {res.text}")
-        return res
+        self.log.info(f"CREATING ES RECORD: {data}")
+        try:
+            url = ConfigClass.PROVENANCE_SERVICE + '/v1/entity/file'
+            path = data.get('full_path')
+            root_path = path.strip('/').split('/')[0]
+            self.log.info(f"File root path: {root_path}")
+            if root_path == 'data':
+                zone = 'Greenroom'
+            else:
+                zone = 'VRECore'
+            time_stamp = int(time.time()*1000)
+            payload = data.copy()
+            payload['zone'] = zone
+            payload['time_created'] = time_stamp
+            payload['time_lastmodified'] = time_stamp
+            payload['atlas_guid'] = 'unittest file'
+            payload['data_type'] = 'File'
+            payload['file_type'] = 'raw'
+            payload['file_name'] = payload.get('name')
+            self.log.info(f"ES URL: {url}")
+            self.log.info(f"ES PAYLOAD: {payload}")
+            res = requests.post(url, json=payload)
+            self.log.info(f"ES RESPONSE: {res.text}")
+            return res
+        except Exception as e:
+            raise e
 
     def delete_file(self, node_id):
         self.log.info("\n")
@@ -230,5 +237,5 @@ class SetupTest:
             assert res.status_code == 200
             return res.json()[0]
         except Exception as e:
-            self.log.info(f"ERROR CREATING PROJECT: {e}")
+            self.log.info(f"ERROR DELETE FILE: {e}")
             raise e

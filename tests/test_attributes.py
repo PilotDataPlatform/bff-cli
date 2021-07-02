@@ -12,7 +12,7 @@ from .logger import Logger
 
 case_to_run = 'all'
 
-no_access_user_name = "jzhang4"
+no_access_user_name = "jzhang53"
 no_access_user_password = "Indoc1234567!"
 
 
@@ -65,8 +65,8 @@ class TestGetAttributes(unittest.TestCase):
         self.log.info("test_03_get_attributes_no_access".center(80, '-'))
         param = {'project_code': self.project_code}
         login_user = {
-            "username": "jzhang4",
-            "password": "Indoc1234567!",
+            "username": no_access_user_name,
+            "password": no_access_user_password,
             "realm": "vre"
         }
         _token = self.test.auth(login_user)
@@ -190,8 +190,8 @@ class TestExportAttributes(unittest.TestCase):
         param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         login_user = {
-            "username": "jzhang4",
-            "password": "Indoc1234567!",
+            "username": no_access_user_name,
+            "password": no_access_user_password,
             "realm": "vre"
         }
         _token = self.test.auth(login_user)
@@ -268,14 +268,15 @@ class TestAttachAttributes(unittest.TestCase):
     file_name = 'unittest_file_' + str(time.time())[0:10]
     folder = "unittest folder1"
     folder_core = "unittest core1"
+    uploader = 'jzhang'
 
     @classmethod
     def setUpClass(cls):
         cls.log.info(f"{'Test setUp'.center(80, '=')}")
-        create_res = cls.test.create_file(cls.project_code, cls.file_name)
+        create_res = cls.test.create_file(cls.project_code, cls.file_name, uploader=cls.uploader)
         create_folder_file_res = cls.test.create_file(cls.project_code, cls.file_name, folder=cls.folder)
         folder_file_core_res = cls.test.create_file(cls.project_code, cls.file_name,
-                                                    folder=cls.folder_core, zone='VRECore')
+                                                    folder=cls.folder_core, zone='VRECore', uploader=cls.uploader)
         cls.log.info(f"CREATE FILE: {create_res}")
         cls.file_id = create_res.get('id')
         cls.log.info(f"CREATE FOLDER FILE: {create_folder_file_res}")
@@ -326,7 +327,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_name": self.file_name,
+                  "file_name": f"{self.uploader}/{self.file_name}",
                   "zone": "Greenroom"
                   }
                   }
@@ -386,7 +387,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
                   "zone": "Greenroom",
-                  "file_name": self.file_name
+                  "file_name": f"{self.uploader}/{self.file_name}"
                   }
                   }
         headers = {
@@ -415,7 +416,7 @@ class TestAttachAttributes(unittest.TestCase):
             "project_code": self.project_code,
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
             "zone": "Greenroom",
-            "file_name": self.file_name
+            "file_name": f"{self.uploader}/{self.file_name}"
         }
         }
         login_user = {
@@ -449,7 +450,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_name": f"{self.folder}/{self.file_name}",
+                  "file_name": f"{self.uploader}/{self.folder}/{self.file_name}",
                   "zone": "Greenroom"
                   }
                   }
@@ -478,7 +479,7 @@ class TestAttachAttributes(unittest.TestCase):
                   "manifest_name": "Manifest1",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "file_name": f"{self.folder_core}/{self.file_name}",
+                  "file_name": f"{self.uploader}/{self.folder_core}/{self.file_name}",
                   "zone": "VRECore"
                   }
                   }

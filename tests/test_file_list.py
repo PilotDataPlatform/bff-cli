@@ -3,6 +3,9 @@ from .prepare_test import SetupTest
 from .logger import Logger
 import os
 
+no_access_user_name = "jzhang53"
+no_access_user_password = "Indoc1234567!"
+
 
 class TestGetProjectFilesFolders(unittest.TestCase):
     log = Logger(name='test_list_files_folders.log')
@@ -151,8 +154,8 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         self.log.info("test_06_non_project_member_get_files".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         try:
-            auth_user = {'username': 'jzhang4',
-                         'password': 'Indoc1234567!',
+            auth_user = {'username': no_access_user_name,
+                         'password': no_access_user_password,
                          'realm': 'vre'}
             token = self.test.auth(auth_user)
             param = {"project_code": self.project_code,
