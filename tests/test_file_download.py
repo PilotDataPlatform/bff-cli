@@ -4,6 +4,7 @@ from .logger import Logger
 import os
 
 
+@unittest.skip("Deprecated for now")
 class TestGetProjectFilesFolders(unittest.TestCase):
     log = Logger(name='test_file_download.log')
     test = SetupTest(log)

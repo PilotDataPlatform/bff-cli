@@ -318,11 +318,13 @@ def http_query_node_zone(folder_event):
     namespace = folder_event.get('namespace')
     project_code = folder_event.get('project_code')
     folder_name = folder_event.get('folder_name')
+    display_path = folder_event.get('display_path')
     folder_relative_path = folder_event.get('folder_relative_path')
     zone_label = get_zone(namespace)
     payload = {
         "query": {
             "folder_relative_path": folder_relative_path,
+            "display_path": display_path,
             "name": folder_name,
             "project_code": project_code,
             "labels": ['Folder', zone_label]}
@@ -363,12 +365,13 @@ def verify_list_event(source_type, folder):
     return code, error_msg
 
 
-def check_folder_exist(zone, project_code, folder_name, relative_path):
+def check_folder_exist(zone, project_code, folder):
     folder_check_event = {
         'namespace': zone,
         'project_code': project_code,
-        'folder_name': folder_name,
-        'folder_relative_path': relative_path
+        'display_path': folder,
+        'folder_name': folder.split('/')[-1],
+        'folder_relative_path': '/'.join(folder.split('/')[0:-1])
     }
     folder_response = http_query_node_zone(folder_check_event)
     res = folder_response.json().get('result')

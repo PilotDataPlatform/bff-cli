@@ -37,7 +37,7 @@ class APIProject:
         except (AttributeError, TypeError):
             return self.current_identity
         code, error_msg = verify_list_event(source_type, folder)
-        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info("API file_list_query".center(80, '-'))
         self._logger.info(f"Received information project_code: {project_code}, zone: {zone}, "
                           f"folder: {folder}, source_type: {source_type}")
         self._logger.info(f"User request with identity: {self.current_identity}")
@@ -62,9 +62,12 @@ class APIProject:
             file_response.result = permission.get('result')
             return file_response.json_response()
         uploader = permission.get('uploader')
-        if uploader:
+        if uploader and source_type == 'Container':
             child_attribute = {'project_code': project_code,
                                'uploader': user_name,
+                               'archived': False}
+        elif uploader and source_type == 'Folder':
+            child_attribute = {'project_code': project_code,
                                'archived': False}
         else:
             child_attribute = {'project_code': project_code,
@@ -75,18 +78,35 @@ class APIProject:
         self._logger.info(f"Getting parent_label: {parent_label}")
         self._logger.info(f"Getting relative_path: {rel_path}")
         self._logger.info(f"Getting folder_name: {folder_name}")
-        if parent_label == 'Dataset':
+        if parent_label == 'Container':
             parent_attribute = {'code': project_code}
         else:
             parent_attribute = {'project_code': project_code,
                                 'name': folder_name,
                                 'folder_relative_path': rel_path}
         if source_type == 'Folder':
-            code, error_msg = check_folder_exist(zone, project_code, folder_name, rel_path)
-            self._logger.info(f"Check folder exist: {code}, {error_msg}")
+            code, error_msg = check_folder_exist(zone, project_code, folder)
+            self._logger.info(f"Check folder exist payload: 'zone':{zone}, 'project_code':{project_code}, 'folder_name':{folder_name}, 'rel_path':{rel_path}")
+            self._logger.info(f"Check folder exist response: {code}, {error_msg}")
+            self._logger.debug(
+                f"uploader != '': {uploader != ''}, not rel_path: {not rel_path}, folder != uploader: {folder != uploader}")
+            self._logger.debug(f"uploader: {uploader}, rel_path: {rel_path}, folder: {folder}")
             if error_msg:
                 file_response.error_msg = error_msg
-                file_response.code = code
+                file_response.code = EAPIResponseCode.forbidden
+                self._logger.error(f'Returning error: {EAPIResponseCode.forbidden}, {error_msg}')
+                return file_response.json_response()
+            elif uploader and not rel_path and folder_name != uploader:
+                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                file_response.code = EAPIResponseCode.forbidden
+                self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
+                                   f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                return file_response.json_response()
+            elif uploader and rel_path and rel_path.split('/')[0] != uploader:
+                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                file_response.code = EAPIResponseCode.forbidden
+                self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
+                                   f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
                 return file_response.json_response()
         zone_label = [zone_type]
         url = ConfigClass.NEO4J_SERVICE + "relations/query"

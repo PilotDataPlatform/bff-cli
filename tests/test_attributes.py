@@ -10,7 +10,7 @@ from .logger import Logger
 # attach attribute: attach
 # run all tests: '' or 'all'
 
-case_to_run = 'all'
+case_to_run = ''
 
 no_access_user_name = "jzhang53"
 no_access_user_password = "Indoc1234567!"
@@ -268,15 +268,17 @@ class TestAttachAttributes(unittest.TestCase):
     file_name = 'unittest_file_' + str(time.time())[0:10]
     folder = "unittest folder1"
     folder_core = "unittest core1"
-    uploader = 'jzhang'
+    uploader = 'jzhang10'
 
     @classmethod
     def setUpClass(cls):
         cls.log.info(f"{'Test setUp'.center(80, '=')}")
         create_res = cls.test.create_file(cls.project_code, cls.file_name, uploader=cls.uploader)
-        create_folder_file_res = cls.test.create_file(cls.project_code, cls.file_name, folder=cls.folder)
+        create_folder_file_res = cls.test.create_file(cls.project_code, cls.file_name,
+                                                      folder=cls.folder, uploader=cls.uploader)
         folder_file_core_res = cls.test.create_file(cls.project_code, cls.file_name,
-                                                    folder=cls.folder_core, zone='VRECore', uploader=cls.uploader)
+                                                    folder=cls.folder_core, zone='VRECore',
+                                                    uploader=cls.uploader)
         cls.log.info(f"CREATE FILE: {create_res}")
         cls.file_id = create_res.get('id')
         cls.log.info(f"CREATE FOLDER FILE: {create_folder_file_res}")
@@ -286,14 +288,13 @@ class TestAttachAttributes(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
-        # cls.log.info('Test tearDown'.center(80, '='))
-        # delete_res = cls.test.delete_file(cls.file_id)
-        # cls.log.info(f"DELETE FILE: {delete_res}")
-        # delete_folder_file_res = cls.test.delete_file(cls.folder_file_id)
-        # cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_res}")
-        # delete_folder_file_core_res = cls.test.delete_file(cls.folder_file_core_id)
-        # cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_core_res}")
+        cls.log.info('Test tearDown'.center(80, '='))
+        delete_res = cls.test.delete_file(cls.file_id)
+        cls.log.info(f"DELETE FILE: {delete_res}")
+        delete_folder_file_res = cls.test.delete_file(cls.folder_file_id)
+        cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_res}")
+        delete_folder_file_core_res = cls.test.delete_file(cls.folder_file_core_id)
+        cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_core_res}")
 
     def test_01_attach_attributes_without_token(self):
         self.log.info('\n')
