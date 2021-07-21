@@ -11,8 +11,10 @@ class TestGetProjectFilesFolders(unittest.TestCase):
     token = test.auth()
     project_code = os.environ.get('project_code')
     test_api = f"/v1/project/{project_code}/folder"
-    folder_name = 'unittest2'
-    folder_core = 'core-test'
+    folder_name = 'unittest folder1'
+    folder_core = 'unittest core1'
+    admin_user = 'jzhang10'
+    contributor_user = 'jzhang33'
 
     def test_01_get_folder_gr(self):
         self.log.info('\n')
@@ -21,9 +23,10 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         try:
             param = {'zone': 'greenroom',
                      'project_code': self.project_code,
-                     'folder': self.folder_name,
-                     'relative_path': ''}
+                     'folder': f"{self.admin_user}/{self.folder_name}"
+                     }
             headers = {"Authorization": 'Bearer ' + self.token}
+            self.log.info(f"GET PARAM: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
@@ -47,13 +50,13 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         self.log.info('\n')
         self.log.info("test_02_get_sub_folder_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
-        sub_foldername = 'folder2'
-        relative_path = f'{self.folder_name}/folder1'
+        sub_foldername = 'folder1'
+        relative_path = f'{self.admin_user}/{self.folder_name}'
+        folder_path = f'{self.admin_user}/{self.folder_name}/{sub_foldername}'
         try:
             param = {'zone': 'greenroom',
                      'project_code': self.project_code,
-                     'folder': sub_foldername,
-                     'relative_path': relative_path}
+                     'folder': folder_path}
             headers = {"Authorization": 'Bearer ' + self.token}
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
@@ -82,14 +85,10 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         self.log.info("test_03_get_folder_no_access_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         try:
-            auth_user = {'username': 'jzhang33',
-                         'password': 'Indoc1234567!',
-                         'realm': 'vre'}
-            token = self.test.auth(auth_user)
+            token = self.test.auth(self.test.login_contributor())
             param = {'zone': 'greenroom',
                      'project_code': self.project_code,
-                     'folder': self.folder_name,
-                     'relative_path': ''}
+                     'folder': f'{self.admin_user}/{self.folder_name}'}
             headers = {"Authorization": 'Bearer ' + token}
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
@@ -107,15 +106,12 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         self.log.info("test_04_get_folder_no_access_vrecore".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         try:
-            auth_user = {'username': 'jzhang33',
-                         'password': 'Indoc1234567!',
-                         'realm': 'vre'}
-            token = self.test.auth(auth_user)
+            token = self.test.auth(self.test.login_contributor())
             param = {'zone': 'vrecore',
                      'project_code': self.project_code,
-                     'folder': self.folder_core,
-                     'relative_path': ''}
+                     'folder': f'{self.contributor_user}/{self.folder_core}'}
             headers = {"Authorization": 'Bearer ' + token}
+            self.log.info(f"GET PARAM: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
@@ -134,8 +130,7 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         try:
             param = {'zone': 'vrecore',
                      'project_code': self.project_code,
-                     'folder': self.folder_core,
-                     'relative_path': ''}
+                     'folder': f'{self.admin_user}/{self.folder_core}'}
             headers = {"Authorization": 'Bearer ' + self.token}
             self.log.info(f"Get params: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
@@ -154,8 +149,8 @@ class TestGetProjectFilesFolders(unittest.TestCase):
             self.assertEqual(name, self.folder_core)
             self.log.info(f"COMPARING project: {project} VS {self.project_code}")
             self.assertEqual(project, self.project_code)
-            self.log.info(f"COMPARING relative_path: {rel_path} VS {''}")
-            self.assertEqual(rel_path, '')
+            self.log.info(f"COMPARING relative_path: {rel_path} VS {self.admin_user}")
+            self.assertEqual(rel_path, self.admin_user)
         except Exception as e:
             self.log.error(f"test_05 error: {e}")
             raise e
@@ -164,13 +159,13 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         self.log.info('\n')
         self.log.info("test_06_get_sub_folder_vrecore".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
-        sub_folder = 'core2'
-        relative_path = f'{self.folder_core}/core1'
+        sub_folder = 'core1'
+        folder_path = f'{self.admin_user}/{self.folder_core}/{sub_folder}'
+        relative_path = f'{self.admin_user}/{self.folder_core}'
         try:
             param = {'zone': 'vrecore',
                      'project_code': self.project_code,
-                     'folder': sub_folder,
-                     'relative_path': relative_path}
+                     'folder': folder_path}
             headers = {"Authorization": 'Bearer ' + self.token}
             self.log.info(f"Get param: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)
@@ -200,12 +195,11 @@ class TestGetProjectFilesFolders(unittest.TestCase):
         self.log.info("test_07_get_folder_not_exist_vrecore".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         sub_folder = 'core2021'
-        relative_path = f'{self.folder_core}/core1'
+        relative_path = f'{self.admin_user}/{self.folder_core}/{sub_folder}'
         try:
             param = {'zone': 'vrecore',
                      'project_code': self.project_code,
-                     'folder': sub_folder,
-                     'relative_path': relative_path}
+                     'folder': relative_path}
             headers = {"Authorization": 'Bearer ' + self.token}
             self.log.info(f"Get param: {param}")
             res = self.app.get(self.test_api, headers=headers, params=param)

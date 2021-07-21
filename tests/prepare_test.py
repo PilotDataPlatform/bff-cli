@@ -19,13 +19,18 @@ class SetupTest:
         if not payload:
             payload = {
                 "username": "jzhang10",
-                "password": "CMDvrecli2021!",
-                "realm": "vre"
+                "password": "CMDvrecli2021!"
             }
         response = requests.post(ConfigClass.AUTH_SERVICE + "/v1/users/auth", json=payload)
         data = response.json()
         self.log.info(data)
         return data["result"].get("access_token")
+
+    def login_collaborator(self):
+        return {"username": "jzhang3", "password": "Indoc1234567!"}
+
+    def login_contributor(self):
+        return {"username": "jzhang33", "password": "Indoc1234567!"}
 
     def get_user(self):
         payload = {
@@ -115,16 +120,43 @@ class SetupTest:
         else:
             return res.json()['result']
 
-    def create_file(self, project_code, filename, folder=None, zone='Greenroom'):
+    def get_folder(self, folder, project_code, zone):
+        try:
+            url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+            layers = folder.split('/')
+            self.log.info(f"Folder layers: {layers}")
+            if len(layers) == 1:
+                folder_name = layers[0]
+            else:
+                folder_name = layers[-1]
+            payload = {
+                "query": {
+                    "name": folder_name,
+                    "project_code": project_code,
+                    "display_path": folder,
+                    "labels": [
+                        "Folder",
+                        zone,
+                    ]
+                }
+            }
+            self.log.info(f"Getting folder payload: {payload}")
+            res = requests.post(url, json=payload)
+            self.log.info(f"Getting folder response: {res.text}")
+            result = res.json().get("result")[0]
+            self.log.info(f'Getting folder result: {result}')
+            return result
+        except Exception as e:
+            raise Exception(f"Error getting folder: {e}")
+
+    def create_file(self, project_code, filename,
+                    folder=None, zone='Greenroom', uploader='jzhang'):
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         self.log.info(f"File will be created in {zone} under {folder}")
         testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
         relation_api = ConfigClass.NEO4J_SERVICE + "relations/own"
         global_entity_id = self.generate_entity_id()
-        project_info = get_dataset_node(project_code)
-        self.log.info(f"Project info: {project_info}")
-        project_id = project_info.get('id')
         if zone.lower() == 'vrecore':
             root_path = "/vre-data"
             file_label = 'VRECore'
@@ -137,38 +169,42 @@ class SetupTest:
                 "global_entity_id": global_entity_id,
                 "extra_labels": [file_label],
                 "file_size": 7120,
-                "operator": "jzhang",
+                "operator": uploader,
                 "archived": False,
                 "process_pipeline": "",
                 "project_code": project_code,
-                "uploader": "jzhang",
+                "uploader": uploader,
                 "generate_id": "undefined",
-                "path": f"/data/vre-storage/{project_code}/{folder}",
+                "display_path": f"{uploader}/{folder}/{filename}",
                 "list_priority": 20,
+                "location": f"unittest://fake-minio-location/{project_code}/{uploader}",
                 "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
-                "full_path": f"{root_path}/{project_code}/{folder}/{filename}",
+                "full_path": f"{root_path}/{project_code}/{uploader}/{folder}/{filename}",
                 "tags": []
             }
-            relation_payload = {'start_id': unittest_folder_id}
+            folder_information = self.get_folder(f"{uploader}/{folder}", project_code, file_label)
+            relation_payload = {'start_id': folder_information.get('id')}
         else:
             payload = {
                         "name": filename,
                         "global_entity_id": global_entity_id,
                         "extra_labels": [file_label],
                         "file_size": 7120,
-                        "operator": "jzhang",
+                        "operator": uploader,
                         "archived": False,
                         "process_pipeline": "unittest",
                         "project_code": project_code,
-                        "uploader": "jzhang",
+                        "uploader": uploader,
                         "generate_id": "undefined",
-                        "path": f"/data/vre-storage/{project_code}",
+                        "display_path": f"{uploader}/{filename}",
                         "list_priority": 20,
-                        "parent_folder_geid": "a451d123-9e1d-4648-b3a2-5f207560c8a1-1622475624",
-                        "full_path": f"{root_path}/{project_code}/{filename}",
+                        "location": f"unittest://fake-minio-location/gr-{project_code}/{uploader}/{filename}",
+                        "parent_folder_geid": "c01ceeb2-9fd0-4c7c-8dba-c4e5a760a935-1625673658",
+                        "full_path": f"{root_path}/{project_code}/{uploader}/{filename}",
                         "tags": []
             }
-            relation_payload = {'start_id': project_id}
+            folder_information = self.get_folder(uploader, project_code, file_label)
+            relation_payload = {'start_id': folder_information.get('id')}
         self.log.info(f"POST API: {testing_api}")
         self.log.info(f"POST params: {payload}")
         try:
@@ -186,32 +222,36 @@ class SetupTest:
             assert es_record.json().get('code') == 200
             return res
         except Exception as e:
-            self.log.info(f"ERROR CREATING PROJECT: {e}")
+            self.log.info(f"ERROR CREATING FILE: {e}")
             raise e
 
     def create_es_record(self, data):
-        url = ConfigClass.PROVENANCE_SERVICE + '/v1/entity/file'
-        path = data.get('path')
-        root_path = path.strip('/').split('/')[0]
-        self.log.info(f"File root path: {root_path}")
-        if root_path == 'data':
-            zone = 'Greenroom'
-        else:
-            zone = 'VRECore'
-        time_stamp = int(time.time()*1000)
-        payload = data.copy()
-        payload['zone'] = zone
-        payload['time_created'] = time_stamp
-        payload['time_lastmodified'] = time_stamp
-        payload['atlas_guid'] = 'unittest file'
-        payload['data_type'] = 'File'
-        payload['file_type'] = 'raw'
-        payload['file_name'] = payload.get('name')
-        self.log.info(f"ES URL: {url}")
-        self.log.info(f"ES PAYLOAD: {payload}")
-        res = requests.post(url, json=payload)
-        self.log.info(f"ES RESPONSE: {res.text}")
-        return res
+        self.log.info(f"CREATING ES RECORD: {data}")
+        try:
+            url = ConfigClass.PROVENANCE_SERVICE + '/v1/entity/file'
+            path = data.get('full_path')
+            root_path = path.strip('/').split('/')[0]
+            self.log.info(f"File root path: {root_path}")
+            if root_path == 'data':
+                zone = 'Greenroom'
+            else:
+                zone = 'VRECore'
+            time_stamp = int(time.time()*1000)
+            payload = data.copy()
+            payload['zone'] = zone
+            payload['time_created'] = time_stamp
+            payload['time_lastmodified'] = time_stamp
+            payload['atlas_guid'] = 'unittest file'
+            payload['data_type'] = 'File'
+            payload['file_type'] = 'raw'
+            payload['file_name'] = payload.get('name')
+            self.log.info(f"ES URL: {url}")
+            self.log.info(f"ES PAYLOAD: {payload}")
+            res = requests.post(url, json=payload)
+            self.log.info(f"ES RESPONSE: {res.text}")
+            return res
+        except Exception as e:
+            raise e
 
     def delete_file(self, node_id):
         self.log.info("\n")
@@ -230,5 +270,5 @@ class SetupTest:
             assert res.status_code == 200
             return res.json()[0]
         except Exception as e:
-            self.log.info(f"ERROR CREATING PROJECT: {e}")
+            self.log.info(f"ERROR DELETE FILE: {e}")
             raise e
