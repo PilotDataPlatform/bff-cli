@@ -34,8 +34,8 @@ class ConfigClass(object):
     FILEINFO_HOST = vault['FILEINFO_HOST']
     AUTH_SERVICE = vault['AUTH_SERVICE']
     # RDS_HOST = vault['RDS_HOST']
-    UPLOAD_VRE = vault['UPLOAD_VRE']
-    UPLOAD_GREENROOM = vault['UPLOAD_GREENROOM']
+    UPLOAD_VRE = vault['"DATA_UPLOAD_SERVICE_VRE"']
+    UPLOAD_GREENROOM = vault['"DATA_UPLOAD_SERVICE_GREENROOM"']
     COMMON_SERVICE = vault['UTILITY_SERVICE']+"/v1/utility/id"
     url_download_greenroom = vault['url_download_greenroom']+"/vre/api/vre/portal/download/gr/v1/download/pre/"
     url_download_vrecore = vault['url_download_greenroom']+"/vre/api/vre/portal/download/vre/v1/download/pre/"
