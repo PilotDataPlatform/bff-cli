@@ -21,6 +21,73 @@ class APIProject:
     def __init__(self):
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
+    @router.post("/query/geid", tags=[_API_TAG],
+                response_model=QueryDataInfoResponse,
+                summary="Query file/folder information by geid")
+    @catch_internal(_API_NAMESPACE)
+    async def query_file_folders_by_geid(self, data: QueryDataInfo):
+        """
+        Get file/folder information by geid
+        """
+        file_response = QueryDataInfoResponse()
+        try:
+            role = self.current_identity["role"]
+            user_id = self.current_identity["user_id"]
+            user_name = self.current_identity['username']
+        except (AttributeError, TypeError):
+            return self.current_identity
+        geid = data.geid
+        self._logger.info("API /query/geid".center(80, '-'))
+        self._logger.info(f"Received information geid: {geid}")
+        self._logger.info(f"User request with identity: {self.current_identity}")
+        response_list = []
+        for global_entity_id in geid: 
+            self._logger.info(f'Query geid: {global_entity_id}')
+            res = get_node_by_geid(global_entity_id)
+            if not res:
+                status = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
+                result = []
+                self._logger.info(f'status: {status}')
+            else:
+                self._logger.info(f'Query result: {res}')
+                project_code = res[0].get('project_code')
+                labels = res[0].get('labels')
+                display_path = res[0].get('display_path').lstrip('/')
+                name_folder = display_path.split('/')[0]
+                zone = 'VRECore' if 'VRECore' in labels else 'Greenroom'
+                self._logger.info(f'File zone: {zone}')
+                permission_event = {'user_id': user_id,
+                                    'username': user_name,
+                                    'role': role,
+                                    'project_code': project_code,
+                                    'zone': zone}
+                permission = check_permission(permission_event)
+                self._logger.info(f"Permission check event: {permission_event}")
+                self._logger.info(f"Permission check result: {permission}")
+                error_msg = permission.get('error_msg', '')
+                uploader = permission.get('uploader')
+                if error_msg:
+                    status = error_msg
+                    result = []
+                    # file_response.error_msg = error_msg
+                    # file_response.code = permission.get('code')
+                    # file_response.result = permission.get('result')
+                    # return file_response.json_response()
+                elif uploader and uploader != name_folder:
+                    self._logger.info(f'User {user_name} attempt getting file: {display_path}')
+                    status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    result = []
+                else:
+                    status = 'success'
+                    result = res
+                self._logger.info(f'file result: {result}')
+            response_list.append({'status': status, 'result': result, 'geid': global_entity_id})
+        self._logger.info(f'Query file/folder result: {response_list}')
+        file_response.result = response_list
+        file_response.code = EAPIResponseCode.success
+        return file_response.json_response()
+
+
     @router.get("/{project_code}/files/query", tags=[_API_TAG],
                 response_model=GetProjectFileListResponse,
                 summary="Get files and folders in the project/folder")

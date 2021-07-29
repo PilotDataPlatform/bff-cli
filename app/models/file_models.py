@@ -99,3 +99,36 @@ class POSTDownloadFileResponse(APIResponse):
             "update_timestamp": "1621521356"
         }
     })
+
+class QueryDataInfo(BaseModel):
+    geid: list
+
+
+class QueryDataInfoResponse(APIResponse):
+    result: dict = Field({}, example={
+        "code": 200,
+        "error_msg": "",
+        "page": 0,
+        "total": 1,
+        "num_of_pages": 1,
+        "result": {
+            "session_id": "downloadtest",
+            "job_id": "data-download-1621521355",
+            "geid": "6c890078-1596-44a5-b695-1a9a1b1d974a-1621347776",
+            "source": "/data/vre-storage/may511/raw/contributor_file_a",
+            "action": "data_download",
+            "status": "READY_FOR_DOWNLOADING",
+            "project_code": "may511",
+            "operator": "jzhang33",
+            "progress": 0,
+            "payload": {
+                "hash_code": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZWlkIjoiNmM4OTAwNzgtMTU5Ni00NGE1LWI2OTUtMWE5YTFiMWQ5NzRhLTE2MjEzNDc3NzYiLCJmdWxsX3BhdGgiOiIvZGF0YS92cmUtc3RvcmFnZS9tYXk1MTEvcmF3L2NvbnRyaWJ1dG9yX2ZpbGVfYSIsImlzc3VlciI6IlNFUlZJQ0UgREFUQSBET1dOTE9BRCIsIm9wZXJhdG9yIjoianpoYW5nMzMiLCJzZXNzaW9uX2lkIjoiZG93bmxvYWR0ZXN0Iiwiam9iX2lkIjoiZGF0YS1kb3dubG9hZC0xNjIxNTIxMzU1IiwicHJvamVjdF9jb2RlIjoibWF5NTExIiwiaWF0IjoxNjIxNTIxMzU1LCJleHAiOjE2MjE1MjE2NTV9.t0pMGdvZ-KDgDBi2Q7rpOlwJerd7g6PLxnDPEx80QjA",
+                "files": [
+                    "/data/vre-storage/may511/raw/contributor_file_a"
+                ],
+                "zone": "greenroom",
+                "frontend_zone": "Green Room"
+            },
+            "update_timestamp": "1621521356"
+        }
+    })
