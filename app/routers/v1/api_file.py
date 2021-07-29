@@ -48,6 +48,11 @@ class APIProject:
                 status = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
                 result = []
                 self._logger.info(f'status: {status}')
+            elif 'File' not in res[0].get('labels') and 'Folder' not in res[0].get('labels'):
+                self._logger.info(f'User {user_name} attempt getting node: {res}')
+                status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
+                result = []
+                self._logger.info(f'status: {status}')
             else:
                 self._logger.info(f'Query result: {res}')
                 project_code = res[0].get('project_code')
@@ -69,10 +74,6 @@ class APIProject:
                 if error_msg:
                     status = error_msg
                     result = []
-                    # file_response.error_msg = error_msg
-                    # file_response.code = permission.get('code')
-                    # file_response.result = permission.get('result')
-                    # return file_response.json_response()
                 elif uploader and uploader != name_folder:
                     self._logger.info(f'User {user_name} attempt getting file: {display_path}')
                     status = customized_error_template(ECustomizedError.PERMISSION_DENIED)

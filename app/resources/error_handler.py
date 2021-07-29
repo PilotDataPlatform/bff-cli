@@ -42,6 +42,7 @@ class ECustomizedError(enum.Enum):
     PERMISSION_DENIED = "PERMISSION_DENIED"
     USER_NOT_IN_PROJECT = "USER_NOT_IN_PROJECT"
     MISSING_INFO = "MISSING_INFO"
+    FILE_FOLDER_ONLY = "FILE_FOLDER_ONLY"
 
 
 def customized_error_template(customized_error: ECustomizedError):
@@ -62,7 +63,8 @@ def customized_error_template(customized_error: ECustomizedError):
         "PROJECT_NOT_FOUND": "Project not found",
         "PERMISSION_DENIED": "Permission Denied",
         "USER_NOT_IN_PROJECT": "User not in the project",
-        "MISSING_INFO": "%s is required"
+        "MISSING_INFO": "%s is required",
+        "FILE_FOLDER_ONLY": "Can only work on file or folder"
     }.get(
         customized_error.name, "Unknown Error"
     )
