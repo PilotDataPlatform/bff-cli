@@ -36,10 +36,12 @@ class APIManifest:
             return current_identity
         self._logger.info("API list_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {current_identity}")
+        self._logger.info(f"User request information: project_code: {project_code},")
         try:
             permission_check_event = {'user_role': _user_role,
                                       'username': _username,
                                       'project_code': project_code}
+            self._logger.info(f"User permission check event: {permission_check_event}")
             code, result = has_permission(permission_check_event)
             self._logger.info(f"User permission code: {code}, permission result: {result}")
             if result != 'permit':
@@ -64,6 +66,7 @@ class APIManifest:
             api_response.code = EAPIResponseCode.success
             return api_response.json_response()
         except Exception as e:
+            self._logger.error(f'Error listing manifest: {e}')
             api_response.code = EAPIResponseCode.internal_error
             api_response.error_msg = str(e)
             return api_response.json_response()

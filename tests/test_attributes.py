@@ -50,6 +50,7 @@ class TestGetAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
+            self.log.info(f'GET PARAM: {param}')
             res = self.app.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
