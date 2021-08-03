@@ -53,6 +53,11 @@ class APIProject:
                 status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
                 result = []
                 self._logger.info(f'status: {status}')
+            elif res[0].get('archived'):
+                self._logger.info(f'User {user_name} attempt getting node: {res}')
+                status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
+                result = []
+                self._logger.info(f'status: {status}')
             else:
                 self._logger.info(f'Query result: {res}')
                 project_code = res[0].get('project_code')

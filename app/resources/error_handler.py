@@ -64,7 +64,7 @@ def customized_error_template(customized_error: ECustomizedError):
         "PERMISSION_DENIED": "Permission Denied",
         "USER_NOT_IN_PROJECT": "User not in the project",
         "MISSING_INFO": "%s is required",
-        "FILE_FOLDER_ONLY": "Can only work on file or folder"
+        "FILE_FOLDER_ONLY": "Can only work on file or folder not in Trash Bin"
     }.get(
         customized_error.name, "Unknown Error"
     )
