@@ -2,7 +2,7 @@ import os
 import requests
 from requests.models import HTTPError
 
-# os.environ['env'] = 'test'
+os.environ['env'] = 'test'
 
 srv_namespace = "bff_vrecli"
 CONFIG_CENTER = "http://10.3.7.222:5062" \
