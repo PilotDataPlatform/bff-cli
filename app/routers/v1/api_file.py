@@ -36,33 +36,34 @@ class APIProject:
             user_name = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
-        geid = data.geid
+        geid_list = data.geid
         self._logger.info("API /query/geid".center(80, '-'))
-        self._logger.info(f"Received information geid: {geid}")
+        self._logger.info(f"Received information geid: {geid_list}")
         self._logger.info(f"User request with identity: {self.current_identity}")
         response_list = []
-        for global_entity_id in geid: 
+        located_geid, query_result = batch_query_node_by_geid(geid_list)
+        for global_entity_id in geid_list:
             self._logger.info(f'Query geid: {global_entity_id}')
-            res = get_node_by_geid(global_entity_id)
-            if not res:
+            if global_entity_id not in located_geid:
                 status = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
                 result = []
                 self._logger.info(f'status: {status}')
-            elif 'File' not in res[0].get('labels') and 'Folder' not in res[0].get('labels'):
-                self._logger.info(f'User {user_name} attempt getting node: {res}')
+            elif 'File' not in query_result[global_entity_id].get('labels') and \
+                    'Folder' not in query_result[global_entity_id].get('labels'):
+                self._logger.info(f'User {user_name} attempt getting node: {query_result[global_entity_id]}')
                 status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
                 result = []
                 self._logger.info(f'status: {status}')
-            elif res[0].get('archived'):
-                self._logger.info(f'User {user_name} attempt getting node: {res}')
+            elif query_result[global_entity_id].get('archived'):
+                self._logger.info(f'User {user_name} attempt getting node: {query_result[global_entity_id]}')
                 status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
                 result = []
                 self._logger.info(f'status: {status}')
             else:
-                self._logger.info(f'Query result: {res}')
-                project_code = res[0].get('project_code')
-                labels = res[0].get('labels')
-                display_path = res[0].get('display_path').lstrip('/')
+                self._logger.info(f'Query result: {query_result[global_entity_id]}')
+                project_code = query_result[global_entity_id].get('project_code')
+                labels = query_result[global_entity_id].get('labels')
+                display_path = query_result[global_entity_id].get('display_path').lstrip('/')
                 name_folder = display_path.split('/')[0]
                 zone = 'VRECore' if 'VRECore' in labels else 'Greenroom'
                 self._logger.info(f'File zone: {zone}')
@@ -85,7 +86,7 @@ class APIProject:
                     result = []
                 else:
                     status = 'success'
-                    result = res
+                    result = [query_result[global_entity_id]]
                 self._logger.info(f'file result: {result}')
             response_list.append({'status': status, 'result': result, 'geid': global_entity_id})
         self._logger.info(f'Query file/folder result: {response_list}')

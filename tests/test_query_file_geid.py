@@ -73,9 +73,12 @@ class TestQueryFileGeid(unittest.TestCase):
             for file in result:
                 status = file.get('status')
                 self.log.info(f'Query status: {status}')
+                self.log.info(f"Comparing status: 'success' VS {status}")
                 self.assertEqual('success', status)
                 file_info = file.get('result')[0]
+                self.log.info(f'File info: {file_info}')
                 geid = file_info.get('global_entity_id')
+                self.log.info(f'File geid: {geid}')
                 project_code = file_info.get('project_code')
                 self.log.info(f"Comparing project code: {self.project_code} VS {project_code}")
                 self.assertEqual(self.project_code, project_code)

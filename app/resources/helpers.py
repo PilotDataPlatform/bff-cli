@@ -146,10 +146,28 @@ def get_node_by_geid(geid):
         res = requests.get(url)
         _logger.info(f'Getting node info: {res.text}')
         result = res.json()
-    except Exceptions as e:
+    except Exception as e:
         _logger.error(f'Error getting node by geid: {e}')
         result = None
     return result
+
+
+def batch_query_node_by_geid(geid_list):
+    url = ConfigClass.NEO4J_SERVICE + "nodes/query/geids"
+    payload = {
+        "geids": geid_list
+    }
+    res = requests.post(url, json=payload)
+    res_json = res.json()
+    result = res_json.get('result')
+    located_geid = []
+    query_result = {}
+    for node in result:
+        geid = node.get('global_entity_id', '')
+        if geid in geid_list:
+            located_geid.append(geid)
+            query_result[geid] = node
+    return located_geid, query_result
 
 
 def query_file_in_project(project_code, filename, zone='Greenroom'):
