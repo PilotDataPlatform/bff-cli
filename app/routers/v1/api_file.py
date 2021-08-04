@@ -22,8 +22,8 @@ class APIProject:
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
     @router.post("/query/geid", tags=[_API_TAG],
-                response_model=QueryDataInfoResponse,
-                summary="Query file/folder information by geid")
+                 response_model=QueryDataInfoResponse,
+                 summary="Query file/folder information by geid")
     @catch_internal(_API_NAMESPACE)
     async def query_file_folders_by_geid(self, data: QueryDataInfo):
         """
@@ -92,7 +92,6 @@ class APIProject:
         file_response.result = response_list
         file_response.code = EAPIResponseCode.success
         return file_response.json_response()
-
 
     @router.get("/{project_code}/files/query", tags=[_API_TAG],
                 response_model=GetProjectFileListResponse,

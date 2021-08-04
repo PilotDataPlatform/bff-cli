@@ -272,7 +272,7 @@ def attach_manifest_to_file(event):
     username = event.get('username')
     project_role = event.get('project_role')
     _logger.info("attach_manifest_to_file".center(80, '-'))
-    url = ConfigClass.FILEINFO_HOST + "/v1/file/attributes/attach"
+    url = ConfigClass.FILEINFO_HOST + "/v1/files/attributes/attach"
     payload = {"project_code": project_code,
                "manifest_id": manifest_id,
                "global_entity_id": [global_entity_id],
