@@ -22,6 +22,7 @@ class TestQueryFileGeid(unittest.TestCase):
     folder = "unittest folder1"
     folder_core = "unittest core1"
     uploader = 'jzhang10'
+    trash_geid = '18aff571-1669-4d39-932f-01f4d1495ec7-1626111037'
 
     @classmethod
     def setUpClass(cls):
@@ -143,7 +144,6 @@ class TestQueryFileGeid(unittest.TestCase):
     def test_03_query_file_by_no_access_user(self):
         self.log.info('\n')
         self.log.info("test_03_query_file_by_no_access_user".center(80, '-'))
-        fake_geid = 'abcdefg-1234567'
         file_geid_list = [self.file_geid, self.folder_file_geid, self.folder_file_core_geid]
         payload = {'geid': file_geid_list}
         login_user = {
@@ -170,6 +170,34 @@ class TestQueryFileGeid(unittest.TestCase):
                 file_result = file.get('result')
                 self.assertEqual(file_result, [])
                 self.assertIn(geid, file_geid_list)
+        except Exception as e:
+            self.log.error(f"ERROR: {e}")
+            raise e
+
+    def test_04_query_file_by_no_access_user(self):
+        self.log.info('\n')
+        self.log.info("test_04_query_file_by_no_access_user".center(80, '-'))
+        payload = {'geid': [self.trash_geid]}
+        _token = self.test.auth()
+        headers = {
+            'Authorization': 'Bearer ' + _token
+        }
+        try:
+            self.log.info(f"POST API: {self.test_api}")
+            self.log.info(f"POST PAYLOAD: {payload}")
+            res = self.app.post(self.test_api, headers=headers, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            res_json = res.json()
+            result = res_json.get('result')
+            self.log.info(f"Query result: {result}")
+            for file in result:
+                status = file.get('status')
+                self.log.info(f'Query status: {status}')
+                self.assertEqual('Can only work on file or folder not in Trash Bin', status)
+                geid = file.get('geid')
+                file_result = file.get('result')
+                self.assertEqual(file_result, [])
+                self.assertIn(geid, self.trash_geid)
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
