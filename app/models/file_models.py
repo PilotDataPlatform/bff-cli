@@ -99,3 +99,43 @@ class POSTDownloadFileResponse(APIResponse):
             "update_timestamp": "1621521356"
         }
     })
+
+class QueryDataInfo(BaseModel):
+    geid: list
+
+
+class QueryDataInfoResponse(APIResponse):
+    result: dict = Field({}, example={
+        "code": 200,
+        "error_msg": "",
+        "result": [
+            {"status":"Permission Denied","result":[],"geid":"2b60f036-9642-44e7-883b-c8ed247b1152-1627407935"},
+            {"status":"success","result":[
+                {
+                    "id":23279,
+                    "labels":["Greenroom","File"],
+                    "global_entity_id":"3586fa29-18ef-4a68-b833-5c04d3c2831c-1627582679",
+                    "display_path":"jzhang33/Testdateiäöüßs14",
+                    "project_code":"jul08",
+                    "version_id":"08cac0b1-75cf-4c2e-8bed-c43fa99d682f",
+                    "operator":"jzhang7",
+                    "file_size":1048576,
+                    "tags":[],
+                    "archived": False,
+                    "list_priority":20,
+                    "path":"/data/vre-storage/jul08/jzhang33",
+                    "time_lastmodified":"2021-07-29T18:18:00",
+                    "process_pipeline":"",
+                    "uploader":"jzhang7",
+                    "parent_folder_geid":"22508bda-38c0-4a76-afb2-071520e9ee19-1626095423",
+                    "name":"Testdateiäöüßs14",
+                    "time_created":"2021-07-29T18:18:00",
+                    "guid":"12e23fb5-51d5-4ee9-8fb4-78fe9f9810d9",
+                    "location":"minio://http://minio.minio:9000/gr-jul08/jzhang33/Testdateiäöüßs14",
+                    "full_path":"/data/vre-storage/jul08/jzhang33/Testdateiäöüßs14",
+                    "generate_id":"undefined"}],
+             "geid":"3586fa29-18ef-4a68-b833-5c04d3c2831c-1627582679"},
+            {"status":"Permission Denied","result":[],"geid":"a17fcf3a-179c-4099-a607-1438464527e2-1626816193"},
+            {"status":"File Not Exist","result":[],"geid":"80c08693-9ac8-4b94-bb02-9aebe0ec9f20-16274078223"}
+        ]}
+)

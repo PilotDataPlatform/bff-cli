@@ -49,6 +49,7 @@ class TestFiles(unittest.TestCase):
             self.assertEqual(res.status_code, 200)
             res_json = res.json()
             projects = res_json.get('result')
+            self.log.info(f"Listed projects: {projects}")
             self.log.info(f"COMPARING LENGTH: {len(projects)} 3")
             # user in generate, vrevlitest, pacs 3 projects
             self.assertEqual(len(projects), 3)
