@@ -111,21 +111,63 @@ def query__node_has_relation_with_admin():
         project = res.json()
         return project
     except Exception:
-        return None
-
+        return []
 
 def query_node_has_relation_for_user(username):
+    _logger.info("query_node_has_relation_for_user".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE + "relations/query"
-    data = {'start_params': {'name': username}}
+    data = {
+        'start_label': 'User',
+        'start_params': {'name': username},
+        'end_label': 'Container'
+    }
+    _logger.info(f'Query payload: {data}')
     try:
         res = requests.post(url=url, json=data)
+        _logger.info(f'Query response: {res.text}')
         res = res.json()
-        project = []
-        for i in res:
-            project.append(i['end_node'])
-        return project
+        projects = []
+        for p in res:
+            _logger.info(f"Found project status: {p['r']}")
+            if p['r'].get('status', 'hibernated') == 'active':
+                projects.append(p['end_node'])
+            else:
+                _logger.info(f"Disabled project: {p['end_node']}")
+        _logger.info(f'Found projects: {projects}')
+        return projects
     except Exception:
-        return None
+        return []
+    
+def get_node_by_geid(geid):
+    _logger.info("get_node_by_geid".center(80, '-'))
+    url = ConfigClass.NEO4J_SERVICE + f"nodes/geid/{geid}"
+    _logger.info(f'Getting node: {url}')
+    try:
+        res = requests.get(url)
+        _logger.info(f'Getting node info: {res.text}')
+        result = res.json()
+    except Exception as e:
+        _logger.error(f'Error getting node by geid: {e}')
+        result = None
+    return result
+
+
+def batch_query_node_by_geid(geid_list):
+    url = ConfigClass.NEO4J_SERVICE + "nodes/query/geids"
+    payload = {
+        "geids": geid_list
+    }
+    res = requests.post(url, json=payload)
+    res_json = res.json()
+    result = res_json.get('result')
+    located_geid = []
+    query_result = {}
+    for node in result:
+        geid = node.get('global_entity_id', '')
+        if geid in geid_list:
+            located_geid.append(geid)
+            query_result[geid] = node
+    return located_geid, query_result
 
 
 def query_file_in_project(project_code, filename, zone='Greenroom'):
@@ -223,6 +265,7 @@ def has_permission(event):
 
 def get_user_projects(user_role, username):
     _logger.info("get_user_projects".center(80, '-'))
+    _logger.info(f'Current username: {username}')
     projects_list = []
     if user_role == "admin":
         project_candidate = query__node_has_relation_with_admin()
@@ -230,14 +273,11 @@ def get_user_projects(user_role, username):
         project_candidate = query_node_has_relation_for_user(username)
     _logger.info(f"Number of candidates: {len(project_candidate)}")
     for p in project_candidate:
-        if 'Container' in p['labels']:
-            res_projects = {'name': p.get('name'),
-                            'code': p.get('code'),
-                            'id': p.get('id'),
-                            'geid': p.get('global_entity_id')}
-            projects_list.append(res_projects)
-        else:
-            _logger.info(f'Non-candidate: {p}')
+        res_projects = {'name': p.get('name'),
+                        'code': p.get('code'),
+                        'id': p.get('id'),
+                        'geid': p.get('global_entity_id')}
+        projects_list.append(res_projects)
     _logger.info(f"Number of projects found: {len(projects_list)}")
     return projects_list
 
@@ -250,7 +290,7 @@ def attach_manifest_to_file(event):
     username = event.get('username')
     project_role = event.get('project_role')
     _logger.info("attach_manifest_to_file".center(80, '-'))
-    url = ConfigClass.FILEINFO_HOST + "/v1/file/attributes/attach"
+    url = ConfigClass.FILEINFO_HOST + "/v1/files/attributes/attach"
     payload = {"project_code": project_code,
                "manifest_id": manifest_id,
                "global_entity_id": [global_entity_id],
