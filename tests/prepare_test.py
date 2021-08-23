@@ -3,7 +3,6 @@ import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
-from app.resources.helpers import get_dataset_node
 import time
 
 unittest_folder_id = 6498
