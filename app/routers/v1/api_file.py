@@ -15,7 +15,7 @@ _API_NAMESPACE = "api_files"
 
 
 @cbv(router)
-class APIProject:
+class APIFile:
     current_identity: dict = Depends(jwt_required)
 
     def __init__(self):
@@ -206,7 +206,7 @@ class APIProject:
 
 
 @cbv(router)
-class APIProject:
+class APIDownload:
     current_identity: dict = Depends(jwt_required)
 
     def __init__(self):

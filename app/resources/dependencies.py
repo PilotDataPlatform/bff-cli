@@ -11,7 +11,7 @@ api_response = APIResponse()
 
 
 def get_project_role(user_id, project_code):
-    project = get_dataset_node(project_code)
+    project = get_node_by_code(project_code, 'Container')
     if not project:
         error_msg = customized_error_template(
             ECustomizedError.PROJECT_NOT_FOUND)
@@ -141,7 +141,6 @@ def void_check_file_in_zone(data, file, project_code):
 
 def select_url_by_zone(zone):
     if zone == "vrecore":
-        # url = "http://127.0.0.1:5079" + "/v1/files/jobs"
         url = ConfigClass.UPLOAD_VRE + "/v1/files/jobs"
     else:
         url = ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs"

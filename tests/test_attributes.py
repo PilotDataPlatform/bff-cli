@@ -34,7 +34,7 @@ class TestGetAttributes(unittest.TestCase):
             res = self.app.get(self.test_api, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
-            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
+            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 401")
             self.assertEqual(res_json.get('code'), 401)
             self.assertEqual(res_json.get('error_msg'), "Token required")
         except Exception as e:

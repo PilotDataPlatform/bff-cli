@@ -43,6 +43,7 @@ class ECustomizedError(enum.Enum):
     USER_NOT_IN_PROJECT = "USER_NOT_IN_PROJECT"
     MISSING_INFO = "MISSING_INFO"
     FILE_FOLDER_ONLY = "FILE_FOLDER_ONLY"
+    DATASET_NOT_FOUND = "DATASET_NOT_FOUND"
 
 
 def customized_error_template(customized_error: ECustomizedError):
@@ -64,7 +65,8 @@ def customized_error_template(customized_error: ECustomizedError):
         "PERMISSION_DENIED": "Permission Denied",
         "USER_NOT_IN_PROJECT": "User not in the project",
         "MISSING_INFO": "%s is required",
-        "FILE_FOLDER_ONLY": "Can only work on file or folder not in Trash Bin"
+        "FILE_FOLDER_ONLY": "Can only work on file or folder not in Trash Bin",
+        "DATASET_NOT_FOUND": "Cannot found given dataset code"
     }.get(
         customized_error.name, "Unknown Error"
     )
