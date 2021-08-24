@@ -71,7 +71,7 @@ class RDConnection:
             order_by(DatasetVersionModel.id.asc()).all()
         self._logger.info(f"Query result: {versions}")
         if not versions:
-            return None
+            return []
         for attr in versions:
             result = {"dataset_code": attr[0],
                     "dataset_geid": attr[1],
