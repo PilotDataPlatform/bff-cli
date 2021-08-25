@@ -192,16 +192,15 @@ def get_user_projects(user_role, username):
     if user_role == "admin":
         project_candidate = query__node_has_relation_with_admin()
     else:
-        project_candidate = query_node_has_relation_for_user(username)
-        projects = []
-        for p in project_candidate:
+        projects = query_node_has_relation_for_user(username)
+        project_candidate = []
+        for p in projects:
             _logger.info(f"Found project status: {p['r']}")
             if p['r'].get('status', 'hibernated') == 'active':
-                projects.append(p['end_node'])
+                project_candidate.append(p['end_node'])
             else:
                 _logger.info(f"Disabled project: {p['end_node']}")
-        _logger.info(f'Found projects: {projects}')
-        return projects
+        _logger.info(f'Found projects: {project_candidate}')
     _logger.info(f"Number of candidates: {len(project_candidate)}")
     for p in project_candidate:
         res_projects = {'name': p.get('name'),
