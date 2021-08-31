@@ -1793,3 +1793,292 @@ ModuleNotFoundError: No module named 'psycopg2'
 [2021-02-22 18:29:42 -0500] [39908] [INFO] Worker exiting (pid: 39908)
 [2021-02-22 18:29:42 -0500] [39905] [INFO] Worker exiting (pid: 39905)
 [2021-02-22 18:29:42 -0500] [39902] [INFO] Shutting down: Master
+[2021-08-31 16:56:53 -0400] [94026] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5080']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7f30b455fe60>
+  on_reload: <function OnReload.on_reload at 0x7f30b455ff80>
+  when_ready: <function WhenReady.when_ready at 0x7f30b44420e0>
+  pre_fork: <function Prefork.pre_fork at 0x7f30b4442200>
+  post_fork: <function Postfork.post_fork at 0x7f30b4442320>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f30b4442440>
+  worker_int: <function WorkerInt.worker_int at 0x7f30b4442560>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f30b4442680>
+  pre_exec: <function PreExec.pre_exec at 0x7f30b44427a0>
+  pre_request: <function PreRequest.pre_request at 0x7f30b44428c0>
+  post_request: <function PostRequest.post_request at 0x7f30b4442950>
+  child_exit: <function ChildExit.child_exit at 0x7f30b4442a70>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f30b4442b90>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f30b4442cb0>
+  on_exit: <function OnExit.on_exit at 0x7f30b4442dd0>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-08-31 16:56:53 -0400] [94026] [INFO] Starting gunicorn 20.0.4
+[2021-08-31 16:56:53 -0400] [94026] [DEBUG] Arbiter booted
+[2021-08-31 16:56:53 -0400] [94026] [INFO] Listening at: http://0.0.0.0:5080 (94026)
+[2021-08-31 16:56:53 -0400] [94026] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-08-31 16:56:53 -0400] [94040] [INFO] Booting worker with pid: 94040
+[2021-08-31 16:56:53 -0400] [94041] [INFO] Booting worker with pid: 94041
+[2021-08-31 16:56:53 -0400] [94042] [INFO] Booting worker with pid: 94042
+[2021-08-31 16:56:53 -0400] [94043] [INFO] Booting worker with pid: 94043
+[2021-08-31 16:56:53 -0400] [94026] [DEBUG] 4 workers
+[2021-08-31 16:56:55 -0400] [94041] [INFO] Started server process [94041]
+[2021-08-31 16:56:55 -0400] [94042] [INFO] Started server process [94042]
+[2021-08-31 16:56:55 -0400] [94041] [INFO] Waiting for application startup.
+[2021-08-31 16:56:55 -0400] [94042] [INFO] Waiting for application startup.
+[2021-08-31 16:56:55 -0400] [94042] [INFO] Application startup complete.
+[2021-08-31 16:56:55 -0400] [94041] [INFO] Application startup complete.
+[2021-08-31 16:56:55 -0400] [94043] [INFO] Started server process [94043]
+[2021-08-31 16:56:55 -0400] [94043] [INFO] Waiting for application startup.
+[2021-08-31 16:56:55 -0400] [94043] [INFO] Application startup complete.
+[2021-08-31 16:56:55 -0400] [94040] [INFO] Started server process [94040]
+[2021-08-31 16:56:55 -0400] [94040] [INFO] Waiting for application startup.
+[2021-08-31 16:56:55 -0400] [94040] [INFO] Application startup complete.
+[2021-08-31 16:57:40 -0400] [94026] [CRITICAL] WORKER TIMEOUT (pid:94040)
+[2021-08-31 16:57:40 -0400] [94200] [INFO] Booting worker with pid: 94200
+[2021-08-31 16:57:41 -0400] [94200] [INFO] Started server process [94200]
+[2021-08-31 16:57:41 -0400] [94200] [INFO] Waiting for application startup.
+[2021-08-31 16:57:41 -0400] [94200] [INFO] Application startup complete.
+[2021-08-31 16:57:52 -0400] [94026] [INFO] Handling signal: winch
+[2021-08-31 16:57:52 -0400] [94026] [DEBUG] SIGWINCH ignored. Not daemonized
+[2021-08-31 16:58:27 -0400] [94026] [CRITICAL] WORKER TIMEOUT (pid:94200)
+[2021-08-31 16:58:27 -0400] [94315] [INFO] Booting worker with pid: 94315
+[2021-08-31 16:58:28 -0400] [94315] [INFO] Started server process [94315]
+[2021-08-31 16:58:28 -0400] [94315] [INFO] Waiting for application startup.
+[2021-08-31 16:58:28 -0400] [94315] [INFO] Application startup complete.
+[2021-08-31 17:00:44 -0400] [94026] [CRITICAL] WORKER TIMEOUT (pid:94315)
+[2021-08-31 17:00:44 -0400] [94578] [INFO] Booting worker with pid: 94578
+[2021-08-31 17:00:45 -0400] [94578] [INFO] Started server process [94578]
+[2021-08-31 17:00:45 -0400] [94578] [INFO] Waiting for application startup.
+[2021-08-31 17:00:45 -0400] [94578] [INFO] Application startup complete.
+[2021-08-31 17:01:15 -0400] [94026] [CRITICAL] WORKER TIMEOUT (pid:94578)
+[2021-08-31 17:01:16 -0400] [94658] [INFO] Booting worker with pid: 94658
+[2021-08-31 17:01:16 -0400] [94658] [INFO] Started server process [94658]
+[2021-08-31 17:01:16 -0400] [94658] [INFO] Waiting for application startup.
+[2021-08-31 17:01:16 -0400] [94658] [INFO] Application startup complete.
+[2021-08-31 17:02:02 -0400] [94026] [CRITICAL] WORKER TIMEOUT (pid:94658)
+[2021-08-31 17:02:02 -0400] [94764] [INFO] Booting worker with pid: 94764
+[2021-08-31 17:02:03 -0400] [94764] [INFO] Started server process [94764]
+[2021-08-31 17:02:03 -0400] [94764] [INFO] Waiting for application startup.
+[2021-08-31 17:02:03 -0400] [94764] [INFO] Application startup complete.
+[2021-08-31 17:02:08 -0400] [94026] [INFO] Handling signal: int
+[2021-08-31 17:02:08 -0400] [94043] [INFO] Shutting down
+[2021-08-31 17:02:08 -0400] [94043] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:02:08 -0400] [94764] [INFO] Shutting down
+[2021-08-31 17:02:08 -0400] [94764] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:02:08 -0400] [94041] [INFO] Shutting down
+[2021-08-31 17:02:08 -0400] [94041] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:02:08 -0400] [94042] [INFO] Shutting down
+[2021-08-31 17:02:08 -0400] [94042] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:02:08 -0400] [94043] [INFO] Waiting for application shutdown.
+[2021-08-31 17:02:08 -0400] [94043] [INFO] Application shutdown complete.
+[2021-08-31 17:02:08 -0400] [94043] [INFO] Finished server process [94043]
+[2021-08-31 17:02:08 -0400] [94043] [INFO] Worker exiting (pid: 94043)
+[2021-08-31 17:02:08 -0400] [94764] [INFO] Waiting for application shutdown.
+[2021-08-31 17:02:08 -0400] [94764] [INFO] Application shutdown complete.
+[2021-08-31 17:02:08 -0400] [94764] [INFO] Finished server process [94764]
+[2021-08-31 17:02:08 -0400] [94764] [INFO] Worker exiting (pid: 94764)
+[2021-08-31 17:02:08 -0400] [94041] [INFO] Waiting for application shutdown.
+[2021-08-31 17:02:08 -0400] [94041] [INFO] Application shutdown complete.
+[2021-08-31 17:02:08 -0400] [94041] [INFO] Finished server process [94041]
+[2021-08-31 17:02:08 -0400] [94041] [INFO] Worker exiting (pid: 94041)
+[2021-08-31 17:02:08 -0400] [94042] [INFO] Waiting for application shutdown.
+[2021-08-31 17:02:08 -0400] [94042] [INFO] Application shutdown complete.
+[2021-08-31 17:02:08 -0400] [94042] [INFO] Finished server process [94042]
+[2021-08-31 17:02:08 -0400] [94042] [INFO] Worker exiting (pid: 94042)
+[2021-08-31 17:02:08 -0400] [94026] [INFO] Shutting down: Master
+[2021-08-31 17:02:12 -0400] [94819] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5080']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 600
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7fc2f2c9be60>
+  on_reload: <function OnReload.on_reload at 0x7fc2f2c9bf80>
+  when_ready: <function WhenReady.when_ready at 0x7fc2f2b7e0e0>
+  pre_fork: <function Prefork.pre_fork at 0x7fc2f2b7e200>
+  post_fork: <function Postfork.post_fork at 0x7fc2f2b7e320>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fc2f2b7e440>
+  worker_int: <function WorkerInt.worker_int at 0x7fc2f2b7e560>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7fc2f2b7e680>
+  pre_exec: <function PreExec.pre_exec at 0x7fc2f2b7e7a0>
+  pre_request: <function PreRequest.pre_request at 0x7fc2f2b7e8c0>
+  post_request: <function PostRequest.post_request at 0x7fc2f2b7e950>
+  child_exit: <function ChildExit.child_exit at 0x7fc2f2b7ea70>
+  worker_exit: <function WorkerExit.worker_exit at 0x7fc2f2b7eb90>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fc2f2b7ecb0>
+  on_exit: <function OnExit.on_exit at 0x7fc2f2b7edd0>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-08-31 17:02:12 -0400] [94819] [INFO] Starting gunicorn 20.0.4
+[2021-08-31 17:02:12 -0400] [94819] [DEBUG] Arbiter booted
+[2021-08-31 17:02:12 -0400] [94819] [INFO] Listening at: http://0.0.0.0:5080 (94819)
+[2021-08-31 17:02:12 -0400] [94819] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-08-31 17:02:12 -0400] [94822] [INFO] Booting worker with pid: 94822
+[2021-08-31 17:02:12 -0400] [94823] [INFO] Booting worker with pid: 94823
+[2021-08-31 17:02:12 -0400] [94824] [INFO] Booting worker with pid: 94824
+[2021-08-31 17:02:12 -0400] [94825] [INFO] Booting worker with pid: 94825
+[2021-08-31 17:02:12 -0400] [94819] [DEBUG] 4 workers
+[2021-08-31 17:02:12 -0400] [94822] [INFO] Started server process [94822]
+[2021-08-31 17:02:12 -0400] [94822] [INFO] Waiting for application startup.
+[2021-08-31 17:02:12 -0400] [94822] [INFO] Application startup complete.
+[2021-08-31 17:02:12 -0400] [94823] [INFO] Started server process [94823]
+[2021-08-31 17:02:12 -0400] [94823] [INFO] Waiting for application startup.
+[2021-08-31 17:02:12 -0400] [94823] [INFO] Application startup complete.
+[2021-08-31 17:02:12 -0400] [94824] [INFO] Started server process [94824]
+[2021-08-31 17:02:12 -0400] [94824] [INFO] Waiting for application startup.
+[2021-08-31 17:02:12 -0400] [94824] [INFO] Application startup complete.
+[2021-08-31 17:02:13 -0400] [94825] [INFO] Started server process [94825]
+[2021-08-31 17:02:13 -0400] [94825] [INFO] Waiting for application startup.
+[2021-08-31 17:02:13 -0400] [94825] [INFO] Application startup complete.
+[2021-08-31 17:03:46 -0400] [94819] [INFO] Handling signal: int
+[2021-08-31 17:03:46 -0400] [94825] [INFO] Shutting down
+[2021-08-31 17:03:46 -0400] [94825] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:03:46 -0400] [94822] [INFO] Shutting down
+[2021-08-31 17:03:46 -0400] [94822] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:03:46 -0400] [94823] [INFO] Shutting down
+[2021-08-31 17:03:46 -0400] [94823] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:03:46 -0400] [94824] [INFO] Shutting down
+[2021-08-31 17:03:46 -0400] [94824] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-08-31 17:03:46 -0400] [94825] [INFO] Waiting for application shutdown.
+[2021-08-31 17:03:46 -0400] [94825] [INFO] Application shutdown complete.
+[2021-08-31 17:03:46 -0400] [94825] [INFO] Finished server process [94825]
+[2021-08-31 17:03:46 -0400] [94825] [INFO] Worker exiting (pid: 94825)
+[2021-08-31 17:03:46 -0400] [94822] [INFO] Waiting for application shutdown.
+[2021-08-31 17:03:46 -0400] [94822] [INFO] Application shutdown complete.
+[2021-08-31 17:03:46 -0400] [94822] [INFO] Finished server process [94822]
+[2021-08-31 17:03:46 -0400] [94822] [INFO] Worker exiting (pid: 94822)
+[2021-08-31 17:03:46 -0400] [94823] [INFO] Waiting for application shutdown.
+[2021-08-31 17:03:46 -0400] [94823] [INFO] Application shutdown complete.
+[2021-08-31 17:03:46 -0400] [94823] [INFO] Finished server process [94823]
+[2021-08-31 17:03:46 -0400] [94823] [INFO] Worker exiting (pid: 94823)
+[2021-08-31 17:03:47 -0400] [94824] [INFO] Waiting for application shutdown.
+[2021-08-31 17:03:47 -0400] [94824] [INFO] Application shutdown complete.
+[2021-08-31 17:03:47 -0400] [94824] [INFO] Finished server process [94824]
+[2021-08-31 17:03:47 -0400] [94824] [INFO] Worker exiting (pid: 94824)
+[2021-08-31 17:03:47 -0400] [94819] [INFO] Shutting down: Master
