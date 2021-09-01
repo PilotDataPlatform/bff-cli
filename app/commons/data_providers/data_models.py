@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, DateTime
 from ...config import ConfigClass
 from .database import Base
 from sqlalchemy.types import Enum
@@ -50,6 +50,34 @@ class DataAttributeModel(Base):
     def to_dict(self):
         result = {}
         for field in ["id", "name", "type", "value", "project_code", "optional", "manifest_id"]:
+            result[field] = getattr(self, field)
+        result["type"] = result["type"].value
+        return result
+
+class DatasetVersionModel(Base):
+    __tablename__ = 'dataset_version'
+    __table_args__ = {"schema": ConfigClass.RDS_SCHEMA_DEFAULT}
+    id = Column(Integer, unique=True, primary_key=True)
+    dataset_code = Column(String())
+    dataset_geid = Column(String())
+    version = Column(String())
+    created_by = Column(String())
+    created_at = Column(DateTime())
+    location = Column(String())
+    notes = Column(String())
+
+    def __init__(self, dataset_code, dataset_geid, version, created_by, created_at, location, notes):
+        self.dataset_code = dataset_code
+        self.dataset_geid = dataset_geid
+        self.version = version
+        self.created_by = created_by
+        self.created_at = created_at
+        self.location = location
+        self.notes = notes
+
+    def to_dict(self):
+        result = {}
+        for field in ["dataset_code", "dataset_geid", "version", "created_by", "created_at", "location", "notes"]:
             result[field] = getattr(self, field)
         result["type"] = result["type"].value
         return result

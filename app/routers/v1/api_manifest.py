@@ -2,10 +2,11 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.manifest_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from ...commons.data_providers.database import DBConnection
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required, check_permission
 from ...resources.helpers import *
-from sqlalchemy.orm import Session
+from ...resources.database_service import RDConnection
 from ...resources. error_handler import customized_error_template, ECustomizedError
 from ...service_logger.logger_factory_service import SrvLoggerFactory
 
@@ -16,18 +17,16 @@ router = APIRouter()
 class APIManifest:
     _API_TAG = 'V1 Manifest'
     _API_NAMESPACE = "api_manifest"
-    db = DBConnection()
 
     def __init__(self):
         self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
+        self.db = RDConnection()
 
     @router.get("/manifest", tags=[_API_TAG],
                 response_model=ManifestListResponse,
                 summary="Get manifest list by project code (project_code required)")
     @catch_internal(_API_NAMESPACE)
-    async def list_manifest(self, project_code: str,
-                            db: Session = Depends(db.get_db),
-                            current_identity: dict = Depends(jwt_required)):
+    async def list_manifest(self, project_code: str, current_identity: dict = Depends(jwt_required)):
         api_response = ManifestListResponse()
         try:
             _username = current_identity['username']
@@ -48,15 +47,15 @@ class APIManifest:
                 api_response.error_msg = result
                 api_response.code = code
                 return api_response.json_response()
-            mani_project_event = {"project_code": project_code, 'session': db}
+            mani_project_event = {"project_code": project_code}
             self._logger.info("Getiting project manifests")
-            manifests = get_manifest_name_from_project_in_db(mani_project_event)
+            manifests = self.db.get_manifest_name_from_project_in_db(mani_project_event)
             self._logger.info(f"Manifest in project check result: {manifests}")
             manifest_list = []
             self._logger.info("Getting attributes for manifests")
             for manifest in manifests:
                 mani_project_event['manifest'] = manifest
-                attr = get_attributes_in_manifest_in_db(mani_project_event)
+                attr = self.db.get_attributes_in_manifest_in_db(mani_project_event)
                 single_manifest = {'manifest_name': manifest['name'],
                                    'id': manifest['id'],
                                    'attributes': attr}
@@ -76,7 +75,6 @@ class APIManifest:
                  summary="Attach manifest to file")
     @catch_internal(_API_NAMESPACE)
     async def attach_manifest(self, request_payload: ManifestAttachPost,
-                              db: Session = Depends(db.get_db),
                               current_identity: dict = Depends(jwt_required)):
         """CLI will call manifest validation API before attach manifest to file in uploading process"""
         api_response = ManifestAttachResponse()
@@ -142,9 +140,9 @@ class APIManifest:
             return api_response.json_response()
         project_code = manifests['project_code']
         attributes = manifests.get("attributes", {})
-        mani_project_event = {"project_code": project_code, "manifest_name": manifest_name, "session": db}
+        mani_project_event = {"project_code": project_code, "manifest_name": manifest_name}
         self._logger.info(f"Getting manifest from project event: {mani_project_event}")
-        manifest_info = get_manifest_name_from_project_in_db(mani_project_event)
+        manifest_info = self.db.get_manifest_name_from_project_in_db(mani_project_event)
         self._logger.info(f"Manifest information: {manifest_info}")
         if not manifest_info:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
@@ -173,7 +171,6 @@ class APIManifest:
                 summary="Export manifest from project")
     @catch_internal(_API_NAMESPACE)
     async def export_manifest(self, project_code, manifest_name,
-                              db: Session = Depends(db.get_db),
                               current_identity: dict = Depends(jwt_required)):
         """Export manifest from the project"""
         api_response = ManifestExportResponse()
@@ -196,9 +193,8 @@ class APIManifest:
             return api_response.json_response()
 
         manifest_event = {"project_code": project_code,
-                          "manifest_name": manifest_name,
-                          'session': db}
-        manifest = get_manifest_name_from_project_in_db(manifest_event)
+                          "manifest_name": manifest_name}
+        manifest = self.db.get_manifest_name_from_project_in_db(manifest_event)
         self._logger.info(f"Matched manifest in database: {manifest}")
         if not manifest:
             api_response.code = EAPIResponseCode.not_found
@@ -206,7 +202,7 @@ class APIManifest:
             return api_response.json_response()
         else:
             manifest_event['manifest'] = manifest
-            attributes = get_attributes_in_manifest_in_db(manifest_event)
+            attributes = self.db.get_attributes_in_manifest_in_db(manifest_event)
             result = {'manifest_name': manifest_name,
                       'project_code': project_code,
                       'attributes': attributes}

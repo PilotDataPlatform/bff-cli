@@ -4,7 +4,7 @@ from requests.models import HTTPError
 
 srv_namespace = "bff_vrecli"
 CONFIG_CENTER = "http://10.3.7.222:5062" \
-    if os.environ.get('env') == "test" \
+    if os.environ.get('env', 'test') == "test" \
     else "http://common.utility:5062"
 
 def vault_factory() -> dict:

@@ -6,3 +6,4 @@ worker_connections = 1200
 accesslog = 'gunicorn_access.log'
 errorlog = 'gunicorn_error.log'
 loglevel = 'debug'
+timeout = 600
