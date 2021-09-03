@@ -14,7 +14,6 @@ _API_NAMESPACE = "api_hpc"
 
 @cbv(router)
 class APIProject:
-    current_identity: dict = Depends(jwt_required)
 
     def __init__(self):
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
@@ -23,16 +22,12 @@ class APIProject:
                 response_model=HPCAuthResponse,
                 summary="Get HPC authorization")
     @catch_internal(_API_NAMESPACE)
-    async def hpc_auth(self, token_issuer, password):
+    async def hpc_auth(self, token_issuer, username, password):
         '''
         Get HPC token for authorization
         '''
         self._logger.info("API hpc_auth".center(80, '-'))
         api_response = HPCAuthResponse()
-        try:
-            username = self.current_identity['username']
-        except (AttributeError, TypeError):
-            return self.current_identity
         try:
             result = get_hpc_jwt_token(token_issuer, username, password)
             error = ""
@@ -41,9 +36,9 @@ class APIProject:
             result = []
             error_msg = str(e)
             if 'open_session' in error_msg:
-                error = f"Cannot authorized"
+                error = f"Cannot authorized HPC"
             else:
-                error = f"Cannot authorized: {error_msg}"
+                error = f"Cannot authorized HPC: {error_msg}"
             code = EAPIResponseCode.internal_error
         api_response.result = result
         api_response.error_msg = error
