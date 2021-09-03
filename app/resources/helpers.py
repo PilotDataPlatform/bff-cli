@@ -1,5 +1,7 @@
 import json
 import requests
+import paramiko
+import time
 from ..config import ConfigClass
 from ..resources. error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import APIResponse, EAPIResponseCode
@@ -308,3 +310,23 @@ def check_folder_exist(zone, project_code, folder):
         error_msg = 'Folder not exist'
         code = EAPIResponseCode.not_found
     return code, error_msg
+
+
+def get_hpc_jwt_token(token_issuer, username, password = None):
+    _logger.info("get_hpc_jwt_token".center(80, '-'))
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    try:
+        ssh_client.connect(token_issuer, username = username, password = password)
+    except Exception as e:
+        _logger.error(e)
+    stdin, stdout, stderr = ssh_client.exec_command("scontrol token")
+    time.sleep(1)
+    out = stdout.read().decode().strip()
+    error = stderr.read().decode().strip()
+    _logger.info(f"HPC stdout: {out}")
+    _logger.info(f"HPC stderr: {error}")
+    ssh_client.close()
+    token = out.split('=')[1]
+    _logger.info(f"HPC authorization: {token}")
+    return token
