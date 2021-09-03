@@ -33,7 +33,7 @@ class APIProject:
             user_role = self.current_identity['role']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info("API list_project".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         project_list = get_user_projects(user_role, username)
         self._logger.info(f"Getting user projects: {project_list}")
