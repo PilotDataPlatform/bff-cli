@@ -120,6 +120,7 @@ class APIFile:
             file_response.code = code
             return file_response.json_response()
         zone_type = get_zone(zone)
+        zone_label = [zone_type]
         permission_event = {'user_id': user_id,
                             'username': user_name,
                             'role': role,
@@ -153,7 +154,9 @@ class APIFile:
         self._logger.info(f"Getting folder_name: {folder_name}")
         if parent_type == 'Container':
             parent_attribute = {'code': project_code}
+            parent_label = [parent_type]
         else:
+            parent_label = [parent_type, zone_type]
             parent_attribute = {'project_code': project_code,
                                 'name': folder_name,
                                 'folder_relative_path': rel_path}
@@ -181,8 +184,6 @@ class APIFile:
                 self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
                 return file_response.json_response()
-        zone_label = [zone_type]
-        parent_label = [parent_type, zone_type]
         url = ConfigClass.NEO4J_SERVICE + "relations/query"
         payload = {"start_label": parent_label,
                    "start_params": parent_attribute,
