@@ -75,8 +75,8 @@ class APIDataset:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             return api_response.json_response()
         elif 'Dataset' not in node.get('labels'):
-            api_response.code = EAPIResponseCode.bad_request
-            api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+            api_response.code = EAPIResponseCode.not_found
+            api_response.error_msg = customized_error_template(ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
         node_geid = node.get('global_entity_id')
         dataset_query_event = {

@@ -146,12 +146,12 @@ class APIFile:
             child_attribute = {'project_code': project_code,
                                'archived': False}
         self._logger.info(f"Getting child node attribute: {child_attribute}")
-        parent_label = get_parent_label(source_type)
+        parent_type = get_parent_label(source_type)
         rel_path, folder_name = separate_rel_path(folder)
-        self._logger.info(f"Getting parent_label: {parent_label}")
+        self._logger.info(f"Getting parent_type: {parent_type}")
         self._logger.info(f"Getting relative_path: {rel_path}")
         self._logger.info(f"Getting folder_name: {folder_name}")
-        if parent_label == 'Container':
+        if parent_type == 'Container':
             parent_attribute = {'code': project_code}
         else:
             parent_attribute = {'project_code': project_code,
@@ -182,6 +182,7 @@ class APIFile:
                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
                 return file_response.json_response()
         zone_label = [zone_type]
+        parent_label = [parent_type, zone_type]
         url = ConfigClass.NEO4J_SERVICE + "relations/query"
         payload = {"start_label": parent_label,
                    "start_params": parent_attribute,
