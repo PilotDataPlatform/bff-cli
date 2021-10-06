@@ -30,7 +30,7 @@ def decryption(encrypted_message, secret):
         decrypted = f.decrypt(base64.b64decode(encrypted_message))
         return decrypted.decode()
     except Exception as e:
-        raise InvalidEncryptionError
+        raise InvalidEncryptionError("Invalid encryption, could not decrypt message")
 
 class ManifestValidator:
 

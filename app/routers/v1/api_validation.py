@@ -87,6 +87,7 @@ class APIValidation:
         action = request_payload.action
         self._logger.info(f'msg: {encrypted_msg}')
         if zone not in ['greenroom', 'vrecore']:
+            self._logger.debug(f"Invalid zone value: {zone}")
             api_response.code = EAPIResponseCode.bad_request
             api_response.error_msg = customized_error_template(ECustomizedError.INVALID_ZONE)
             api_response.result = "Invalid"
@@ -98,7 +99,8 @@ class APIValidation:
         if encrypted_msg:
             try:
                 current_zone = decryption(encrypted_msg, ConfigClass.CLI_SECRET)
-            except InvalidEncryptionError:
+            except InvalidEncryptionError as e:
+                self._logger.debug(e)
                 api_response.code = EAPIResponseCode.bad_request
                 api_response.error_msg = customized_error_template(ECustomizedError.INVALID_VARIABLE)
                 api_response.result = "Invalid"
