@@ -89,7 +89,7 @@ class APIValidation:
         if zone not in ['greenroom', 'vrecore']:
             api_response.code = EAPIResponseCode.bad_request
             api_response.error_msg = customized_error_template(ECustomizedError.INVALID_ZONE)
-            api_response.result = ""
+            api_response.result = "Invalid"
             return api_response.json_response()
         restrict_zone = {
         'greenroom': {'upload': ['greenroom'], 'download': ['greenroom']},
@@ -101,7 +101,7 @@ class APIValidation:
             except InvalidEncryptionError:
                 api_response.code = EAPIResponseCode.bad_request
                 api_response.error_msg = customized_error_template(ECustomizedError.INVALID_VARIABLE)
-                api_response.result = ""
+                api_response.result = "Invalid"
                 return api_response.json_response()
         else:
             current_zone = 'vrecore'

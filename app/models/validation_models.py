@@ -63,11 +63,8 @@ class EnvValidateResponse(APIResponse):
     Validate Manifest Response class
     """
     result: dict = Field({}, example={
-                    "code": 200,
-                    "error_msg": "",
-                    "page": 0,
-                    "total": 1,
-                    "num_of_pages": 1,
-                    "result": "Valid"
-                }
-            )
+        "code":200,
+        "error_msg":"",
+        "result":"valid"
+        }
+    )
