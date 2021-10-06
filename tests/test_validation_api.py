@@ -1,9 +1,17 @@
 import unittest
+
+from app.config import ConfigClass
 from .prepare_test import SetupTest
 from .logger import Logger
 import os
 
+"""
+cases: generate, attribute, environment
+"""
+case = "all"
+zone_env=""
 
+@unittest.skipUnless(case == 'generate' or case == 'all' or case=='', 'Run specific test')
 class TestGenerateIDValidation(unittest.TestCase):
     log = Logger(name='test_gid_validation.log')
     test = SetupTest(log)
@@ -139,6 +147,7 @@ class TestGenerateIDValidation(unittest.TestCase):
             raise e
 
 
+@unittest.skipUnless(case == 'attribute' or case == 'all' or case=='', 'Run specific test')
 class TestAttributeValidation(unittest.TestCase):
     log = Logger(name='test_attribute_validation.log')
     test = SetupTest(log)
@@ -350,4 +359,238 @@ class TestAttributeValidation(unittest.TestCase):
             self.assertEqual(res_json.get('result'), 'Manifest Not Exist Manifest1')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
+            raise e
+
+
+@unittest.skipUnless(case == 'environment' or case == 'all' or case=='', 'Run specific test')
+class TestEnvironmentValidation(unittest.TestCase):
+    log = Logger(name='test_environment_validation.log')
+    test = SetupTest(log)
+    app = test.client
+    test_api = "/v1/validate/env"
+    """
+    VRE CLI Workbench VM Validation rules:
+
+    Greenroom VM:
+                Greenroom       VRECore
+    Upload         Yes            No
+    Download       Yes            No
+
+    VRECore VM:
+                Greenroom       VRECore
+    Upload         Yes            Yes
+    Download       No             Yes
+    """
+    def test_01_upload_from_vrecore_to_greenroom(self):
+        self.log.info('\n')
+        self.log.info("test_01_upload_from_greenroom_to_greenroom".center(80, '-'))
+        payload = {"action": 'upload', "environ": "", 'zone': 'greenroom'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'valid'")
+            self.assertEqual(result, 'valid')
+            self.log.info(F"COMPARING: {error} VS ''")
+            self.assertEqual(error, '')
+            self.log.info(F"COMPARING: {code} VS 200")
+            self.assertEqual(code, 200)
+        except Exception as e:
+            self.log.error(f"01 ERROR: {e}")
+            raise e
+
+    def test_02_upload_from_vrecore_to_vrecore(self):
+        self.log.info('\n')
+        self.log.info("test_02_upload_from_vrecore_to_vrecore".center(80, '-'))
+        payload = {"action": 'upload', "environ": "", 'zone': 'vrecore'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'valid'")
+            self.assertEqual(result, 'valid')
+            self.log.info(F"COMPARING: {error} VS ''")
+            self.assertEqual(error, '')
+            self.log.info(F"COMPARING: {code} VS 200")
+            self.assertEqual(code, 200)
+        except Exception as e:
+            self.log.error(f"02 ERROR: {e}")
+            raise e
+
+    def test_03_download_from_vrecore_in_vrecore(self):
+        self.log.info('\n')
+        self.log.info("test_03_download_from_vrecore_in_vrecore".center(80, '-'))
+        payload = {"action": 'download', "environ": "", 'zone': 'vrecore'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'valid'")
+            self.assertEqual(result, 'valid')
+            self.log.info(F"COMPARING: {error} VS ''")
+            self.assertEqual(error, '')
+            self.log.info(F"COMPARING: {code} VS 200")
+            self.assertEqual(code, 200)
+        except Exception as e:
+            self.log.error(f"03 ERROR: {e}")
+            raise e
+
+    def test_04_download_from_greenroom_in_vrecore(self):
+        self.log.info('\n')
+        self.log.info("test_03_download_from_vrecore_in_vrecore".center(80, '-'))
+        payload = {"action": 'download', "environ": "", 'zone': 'greenroom'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'Invalid'")
+            self.assertEqual(result, 'Invalid')
+            self.log.info(F"COMPARING: {error} VS 'Invalid action: download from greenroom in vrecore'")
+            self.assertEqual(error, 'Invalid action: download from greenroom in vrecore')
+            self.log.info(F"COMPARING: {code} VS 403")
+            self.assertEqual(code, 403)
+        except Exception as e:
+            self.log.error(f"04 ERROR: {e}")
+            raise e
+
+    def test_05_download_with_invalid_env(self):
+        self.log.info('\n')
+        self.log.info("test_05_download_with_invalid_env".center(80, '-'))
+        payload = {"action": 'download', "environ": "asdf", 'zone': 'greenroom'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'Invalid'")
+            self.assertEqual(result, 'Invalid')
+            self.log.info(F"COMPARING: {error} VS 'Invalid variable'")
+            self.assertEqual(error, 'Invalid variable')
+            self.log.info(F"COMPARING: {code} VS 400")
+            self.assertEqual(code, 400)
+        except Exception as e:
+            self.log.error(f"05 ERROR: {e}")
+            raise e
+
+    def test_06_upload_with_invalid_zone(self):
+        self.log.info('\n')
+        self.log.info("test_06_upload_with_invalid_zone".center(80, '-'))
+        payload = {"action": 'upload', "environ": "", 'zone': 'green'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'Invalid'")
+            self.assertEqual(result, 'Invalid')
+            self.log.info(F"COMPARING: {error} VS 'Invalid zone'")
+            self.assertEqual(error, 'Invalid zone')
+            self.log.info(F"COMPARING: {code} VS 400")
+            self.assertEqual(code, 400)
+        except Exception as e:
+            self.log.error(f"06 ERROR: {e}")
+            raise e
+
+    @unittest.skipIf(zone_env=="", "Missing essential information")
+    def test_07_upload_from_greenroom_to_greenroom(self):
+        self.log.info('\n')
+        self.log.info("test_07_upload_from_greenroom_to_greenroom".center(80, '-'))
+        payload = {"action": 'upload', "environ": zone_env, 'zone': 'greenroom'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'valid'")
+            self.assertEqual(result, 'valid')
+            self.log.info(F"COMPARING: {error} VS ''")
+            self.assertEqual(error, '')
+            self.log.info(F"COMPARING: {code} VS 200")
+            self.assertEqual(code, 200)
+        except Exception as e:
+            self.log.error(f"07 ERROR: {e}")
+            raise e
+
+    @unittest.skipIf(zone_env=="", "Missing essential information")
+    def test_08_upload_from_greenroom_to_vrecore(self):
+        self.log.info('\n')
+        self.log.info("test_08_upload_from_greenroom_to_vrecore".center(80, '-'))
+        payload = {"action": 'upload', "environ": zone_env, 'zone': 'vrecore'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'Invalid'")
+            self.assertEqual(result, 'Invalid')
+            self.log.info(F"COMPARING: {error} VS 'Invalid action: upload to vrecore in greenroom'")
+            self.assertEqual(error, 'Invalid action: upload to vrecore in greenroom')
+            self.log.info(F"COMPARING: {code} VS 403")
+            self.assertEqual(code, 403)
+        except Exception as e:
+            self.log.error(f"08 ERROR: {e}")
+            raise e
+
+    @unittest.skipIf(zone_env=="", "Missing essential information")
+    def test_09_download_from_vrecore_in_greenroom(self):
+        self.log.info('\n')
+        self.log.info("test_09_download_from_vrecore_in_greenroom".center(80, '-'))
+        payload = {"action": 'download', "environ": zone_env, 'zone': 'vrecore'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'Invalid'")
+            self.assertEqual(result, 'Invalid')
+            self.log.info(F"COMPARING: {error} VS 'Invalid action: download from vrecore in greenroom'")
+            self.assertEqual(error, 'Invalid action: download from vrecore in greenroom')
+            self.log.info(F"COMPARING: {code} VS 403")
+            self.assertEqual(code, 403)
+        except Exception as e:
+            self.log.error(f"09 ERROR: {e}")
+            raise e
+
+    @unittest.skipIf(zone_env=="", "Missing essential information")
+    def test_10_download_from_greenroom_in_greenroom(self):
+        self.log.info('\n')
+        self.log.info("test_10_download_from_greenroom_in_greenroom".center(80, '-'))
+        payload = {"action": 'download', "environ": zone_env, 'zone': 'greenroom'}
+        try:
+            res = self.app.post(self.test_api, json=payload)
+            self.log.info(f"RESPONSE: {res.text}")
+            response = res.json()
+            result = response.get('result')
+            code = response.get('code')
+            error = response.get('error_msg')
+            self.log.info(F"COMPARING: {result} VS 'valid'")
+            self.assertEqual(result, 'valid')
+            self.log.info(F"COMPARING: {error} VS ''")
+            self.assertEqual(error, '')
+            self.log.info(F"COMPARING: {code} VS 200")
+            self.assertEqual(code, 200)
+        except Exception as e:
+            self.log.error(f"10 ERROR: {e}")
             raise e

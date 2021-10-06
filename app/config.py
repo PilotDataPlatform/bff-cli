@@ -47,3 +47,4 @@ class ConfigClass(object):
     RDS_SCHEMA_DEFAULT = vault['RDS_SCHEMA_DEFAULT']
     SQLALCHEMY_DATABASE_URI = f"postgresql://{RDS_USER}:{RDS_PWD}@{RDS_HOST}/{RDS_DBNAME}"
 
+    CLI_SECRET = vault['CLI_SECRET']

@@ -1,7 +1,36 @@
 from ..resources. error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import APIResponse, EAPIResponseCode
+from ..models.error_model import InvalidEncryptionError
 from .database_service import RDConnection
 from .helpers import *
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.fernet import Fernet
+import base64
+
+def decryption(encrypted_message, secret):
+    """
+    decrypt byte that encrypted by encryption function
+    encrypted_message: the string that need to decrypt to string
+    secret: the string type secret key used to encrypt message
+    return: string of the message
+    """
+    try:
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=base64.b64decode(secret),
+            iterations=100000,
+            backend=default_backend()
+        )
+        # use the key from current device information
+        key = base64.urlsafe_b64encode(kdf.derive('SECRETKEYPASSWORD'.encode()))
+        f = Fernet(key)
+        decrypted = f.decrypt(base64.b64decode(encrypted_message))
+        return decrypted.decode()
+    except Exception as e:
+        raise InvalidEncryptionError("Invalid encryption, could not decrypt message")
 
 class ManifestValidator:
 
