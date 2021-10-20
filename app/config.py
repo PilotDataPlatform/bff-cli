@@ -47,6 +47,7 @@ class Settings(BaseSettings):
         RDS_USER: str 
         RDS_PWD: str 
         RDS_SCHEMA_DEFAULT:str
+        CLI_SECRET: str = ""
     else:
         settings = vault_factory(CONFIG_CENTER_BASE_URL)
         NEO4J_SERVICE: str = settings.get('NEO4J_SERVICE') 
@@ -64,6 +65,7 @@ class Settings(BaseSettings):
         RDS_USER: str  = settings.get('RDS_USER')
         RDS_PWD: str  = settings.get('RDS_PWD')
         RDS_SCHEMA_DEFAULT:str = settings.get('RDS_SCHEMA_DEFAULT')
+        CLI_SECRET: str = settings.get('CLI_SECRET')
 
 
     class Config:
@@ -109,3 +111,4 @@ class ConfigClass(object):
     RDS_PWD = settings.RDS_PWD
     RDS_SCHEMA_DEFAULT = settings.RDS_SCHEMA_DEFAULT
     SQLALCHEMY_DATABASE_URI = f"postgres://{RDS_USER}:{RDS_PWD}@{RDS_HOST}/{RDS_DBNAME}"
+    CLI_SECRET = settings.CLI_SECRET

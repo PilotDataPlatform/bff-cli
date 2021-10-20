@@ -48,3 +48,23 @@ class ValidateGenerateIDResponse(APIResponse):
             "result": "VALID"
         }
     )
+
+class EnvValidatePost(BaseModel):
+    """
+    Validate Environment post model
+    """
+    action: str
+    environ: str
+    zone: str
+
+
+class EnvValidateResponse(APIResponse):
+    """
+    Validate Manifest Response class
+    """
+    result: dict = Field({}, example={
+        "code":200,
+        "error_msg":"",
+        "result":"valid"
+        }
+    )
