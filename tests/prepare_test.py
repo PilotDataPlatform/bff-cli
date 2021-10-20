@@ -115,7 +115,7 @@ class SetupTest:
 
     def generate_entity_id(self):
         self.log.info("Generating global entity ID".ljust(80, '-'))
-        testing_api = ConfigClass.COMMON_SERVICE + "/v1/utility/id"
+        testing_api = ConfigClass.UTILITY_SERVICE + "/v1/utility/id"
         self.log.info(f"Request API: {testing_api}")
         res = requests.get(testing_api)
         self.log.info(f"Request response: {res.text}")
