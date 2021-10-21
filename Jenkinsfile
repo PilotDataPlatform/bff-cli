@@ -25,7 +25,7 @@ pipeline {
       steps{
         sh "pip3 install virtualenv"
         sh "/home/indoc/.local/bin/virtualenv -p python3 venv"
-        sh "source venv/bin/activate"
+        sh ". venv/bin/activate"
         sh "pip3 install -r requirements.txt -r tests/test_requirements.txt"
         sh "pytest -c tests/pytest.ini"
       }
