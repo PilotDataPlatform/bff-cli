@@ -23,11 +23,13 @@ pipeline {
     stage('DEV unit test') {
       when {branch "k8s-dev"}
       steps{
-        sh "pip3 install virtualenv"
-        sh "/home/indoc/.local/bin/virtualenv -p python3 venv"
-        sh ". venv/bin/activate"
-        sh "pip3 install -r requirements.txt -r tests/test_requirements.txt"
-        sh "pytest -c tests/pytest.ini"
+        sh """
+        pip3 install virtualenv
+        /home/indoc/.local/bin/virtualenv -p python3 venv
+        . venv/bin/activate
+        pip3 install -r requirements.txt -r tests/test_requirements.txt
+        pytest -c tests/pytest.ini
+        """
       }
     }
 
