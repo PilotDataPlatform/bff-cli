@@ -1,6 +1,10 @@
-version: "3"
+version: '3'
 services:
-  app:
-    build: "."
+  web:
+    build: .
     ports:
-      - "5077:5077"
+      - "5080:8000"
+    environment:
+      CONFIG_CENTER_ENABLED: "true"
+      CONFIG_CENTER_BASE_URL: http://10.3.7.222:5062/
+

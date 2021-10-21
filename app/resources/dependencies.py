@@ -46,7 +46,7 @@ async def jwt_required(request: Request):
         api_response.error_msg = "Token expired"
         return api_response.json_response()
     # check if user is existed in neo4j
-    url = ConfigClass.NEO4J_SERVICE + "nodes/User/query"
+    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query"
     res = requests.post(
         url=url,
         json={"name": username}
@@ -141,9 +141,9 @@ def void_check_file_in_zone(data, file, project_code):
 
 def select_url_by_zone(zone):
     if zone == "vrecore":
-        url = ConfigClass.UPLOAD_VRE + "/v1/files/jobs"
+        url = ConfigClass.DATA_UPLOAD_SERVICE_VRE + "/v1/files/jobs"
     else:
-        url = ConfigClass.UPLOAD_GREENROOM + "/v1/files/jobs"
+        url = ConfigClass.DATA_UPLOAD_SERVICE_GREENROOM + "/v1/files/jobs"
     return url
 
 

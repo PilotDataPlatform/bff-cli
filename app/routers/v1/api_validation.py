@@ -48,6 +48,7 @@ class APIValidation:
     async def validate_manifest(self, request_payload: ManifestValidatePost):
         """Validate the manifest based on the project"""
         self._logger.info("API validate_manifest".center(80, '-'))
+        self._logger.info(f"DB URI: {ConfigClass.SQLALCHEMY_DATABASE_URI}")
         api_response = ManifestValidateResponse()
         manifests = request_payload.manifest_json
         manifest_name = manifests["manifest_name"]
@@ -58,6 +59,7 @@ class APIValidation:
                             "attributes": attributes}
         self._logger.info(f"Validation event: {validation_event}")                    
         manifest_info = self.db.get_manifest_name_from_project_in_db(validation_event)
+        self._logger.info(f"manifest_info: {manifest_info}")  
         if not manifest_info:
             api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             api_response.code = EAPIResponseCode.not_found
