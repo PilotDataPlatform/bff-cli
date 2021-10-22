@@ -11,28 +11,36 @@ class RDConnection:
         self.db_session = db.session
 
     def get_manifest_name_from_project_in_db(self, event):
+        self._logger.info("get_manifest_name_from_project_in_db".center(80, '-'))
+        self._logger.info(f"Received event: {event}")
         project_code = event.get('project_code')
         manifest_name = event.get('manifest_name', None)
-        if manifest_name:
-            m = self.db_session.query(DataManifestModel.name,
-                                DataManifestModel.id)\
-                .filter_by(project_code=project_code, name=manifest_name)\
-                .first()
-            if not m:
-                return None
+        try:
+            if manifest_name:
+                m = self.db_session.query(DataManifestModel.name,
+                                    DataManifestModel.id)\
+                    .filter_by(project_code=project_code, name=manifest_name)\
+                    .first()
+                self._logger.info(f"QUERY RESULT: {m}")
+                if not m:
+                    return None
+                else:
+                    manifest = {'name': m[0], 'id': m[1]}
+                    return manifest
             else:
-                manifest = {'name': m[0], 'id': m[1]}
-                return manifest
-        else:
-            manifests = self. db_session.query(DataManifestModel.name,
-                                        DataManifestModel.id)\
-                .filter_by(project_code=project_code)\
-                .all()
-            manifest_in_project = []
-            for m in manifests:
-                manifest = {'name': m[0], 'id': m[1]}
-                manifest_in_project.append(manifest)
-            return manifest_in_project
+                manifests = self.db_session.query(DataManifestModel.name,
+                                            DataManifestModel.id)\
+                    .filter_by(project_code=project_code)\
+                    .all()
+                self._logger.info(f"QUERY RESULT: {manifests}")
+                manifest_in_project = []
+                for m in manifests:
+                    manifest = {'name': m[0], 'id': m[1]}
+                    manifest_in_project.append(manifest)
+                return manifest_in_project
+        except Exception as e:
+            self._logger.error(f"ERROR get_manifest_name_from_project_in_db: {e}")
+            raise e
 
 
     def get_attributes_in_manifest_in_db(self, event):

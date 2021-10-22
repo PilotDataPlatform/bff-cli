@@ -20,9 +20,9 @@ def mocked_requests_post(*args, **kwargs):
         def json(self):
             return self.json_data
 
-    if args[0] == ConfigClass.UPLOAD_VRE + '/v1/files/jobs':
+    if args[0] == ConfigClass.DATA_UPLOAD_SERVICE_VRE + '/v1/files/jobs':
         return MockResponse({"key1": "value1"}, 200)
-    elif args[0] == ConfigClass.UPLOAD_GREENROOM + '/v1/files/jobs':
+    elif args[0] == ConfigClass.DATA_UPLOAD_SERVICE_GREENROOM + '/v1/files/jobs':
         return MockResponse({"key2": "value2"}, 200)
     return requests.post(*args, **kwargs)
 

@@ -1,6 +1,5 @@
 import json
 import requests
-import paramiko
 import time
 from ..config import ConfigClass
 from ..resources. error_handler import customized_error_template, ECustomizedError
@@ -23,7 +22,7 @@ def get_path_by_zone(namespace, project_code):
             
 
 def get_user_role(user_id, project_id):
-    url = ConfigClass.NEO4J_SERVICE + "/relations"
+    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations"
     try:
         res = requests.get(
             url=url,
@@ -36,7 +35,7 @@ def get_user_role(user_id, project_id):
 
 
 def query__node_has_relation_with_admin(label='Container'):
-    url = ConfigClass.NEO4J_SERVICE + f"nodes/{label}/query"
+    url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query"
     data = {'is_all': 'true'}
     try:
         res = requests.post(url=url, json=data)
@@ -47,7 +46,7 @@ def query__node_has_relation_with_admin(label='Container'):
 
 def query_node_has_relation_for_user(username, label='Container'):
     _logger.info("query_node_has_relation_for_user".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE + "relations/query"
+    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/query"
     data = {
         'start_label': 'User',
         'start_params': {'name': username},
@@ -64,7 +63,7 @@ def query_node_has_relation_for_user(username, label='Container'):
     
 def get_node_by_geid(geid):
     _logger.info("get_node_by_geid".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE + f"nodes/geid/{geid}"
+    url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/geid/{geid}"
     _logger.info(f'Getting node: {url}')
     try:
         res = requests.get(url)
@@ -77,7 +76,7 @@ def get_node_by_geid(geid):
 
 
 def batch_query_node_by_geid(geid_list):
-    url = ConfigClass.NEO4J_SERVICE + "nodes/query/geids"
+    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/query/geids"
     payload = {
         "geids": geid_list
     }
@@ -96,7 +95,7 @@ def batch_query_node_by_geid(geid_list):
 
 def query_file_in_project(project_code, filename, zone='Greenroom'):
     _logger.info("query_file_in_project".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+    url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
     path = get_path_by_zone(zone, project_code) + filename
     data = {"query": {
         "name": filename.split('/')[-1],
@@ -153,7 +152,7 @@ def get_file_entity_id(project_code, file_name, zone='Greenroom'):
 def get_file_by_id(file_id):
     post_data = {"global_entity_id": file_id}
     try:
-        response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/File/query", json=post_data)
+        response = requests.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
@@ -164,7 +163,7 @@ def get_file_by_id(file_id):
 def get_node_by_code(code, label):
     post_data = {"code": code}
     try:
-        response = requests.post(ConfigClass.NEO4J_SERVICE + f"nodes/{label}/query", json=post_data)
+        response = requests.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
@@ -254,7 +253,7 @@ def http_query_node_zone(folder_event):
             "project_code": project_code,
             "labels": ['Folder', zone_label]}
     }
-    node_query_url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+    node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
     response = requests.post(node_query_url, json=payload)
     return response
 
@@ -312,21 +311,22 @@ def check_folder_exist(zone, project_code, folder):
     return code, error_msg
 
 
-def get_hpc_jwt_token(token_issuer, username, password = None):
+def get_hpc_jwt_token(token_issuer, token, password = None):
     _logger.info("get_hpc_jwt_token".center(80, '-'))
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh_client.connect(token_issuer, username = username, password = password)
+        payload = {
+            "token_issuer": token_issuer,
+            "password": password
+            }
+        headers = {"Authorization": "Bearer " + token}
+        url = ConfigClass.HPC_SERVICE + "/v1/hpc/auth"
+        _logger.info(f"Request url: {url}")
+        res = requests.get(url, headers = headers, params=payload)
+        _logger.info(f"Response: {res.text}")
+        result = res.json().get('result')
+        token = result.get('result').get('token')
     except Exception as e:
         _logger.error(e)
-    stdin, stdout, stderr = ssh_client.exec_command("scontrol token")
-    time.sleep(1)
-    out = stdout.read().decode().strip()
-    error = stderr.read().decode().strip()
-    _logger.info(f"HPC stdout: {out}")
-    _logger.info(f"HPC stderr: {error}")
-    ssh_client.close()
-    token = out.split('=')[1]
-    _logger.info(f"HPC authorization: {token}")
-    return token
+        token = ''
+    finally:
+        return token

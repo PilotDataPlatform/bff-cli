@@ -1,14 +1,15 @@
+from logging import info
 from app.config import ConfigClass
 import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from app.main import create_app
 import time
-
+import os
 unittest_folder_id = 6498
 
-
 class SetupTest:
+
     def __init__(self, log):
         self.log = log
         app = create_app()
@@ -20,7 +21,9 @@ class SetupTest:
                 "username": "jzhang10",
                 "password": "CMDvrecli2021!"
             }
-        response = requests.post(ConfigClass.AUTH_SERVICE + "/v1/users/auth", json=payload)
+        url = ConfigClass.AUTH_SERVICE + "/v1/users/auth"
+        self.log.info(url)
+        response = requests.post(url, json=payload)
         data = response.json()
         self.log.info(data)
         return data["result"].get("access_token")
@@ -35,14 +38,14 @@ class SetupTest:
         payload = {
             "name": "jzhang10",
         }
-        response = requests.post(ConfigClass.NEO4J_SERVICE + "nodes/User/query", json=payload)
+        response = requests.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query", json=payload)
         self.log.info(response.json())
         return response.json()[0]
 
     def create_project(self, code, discoverable='true'):
         self.log.info("\n")
         self.log.info("Preparing testing project".ljust(80, '-'))
-        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/Container"
+        testing_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container"
         params = {"name": "BFFCLIUnitTest",
                   "path": code,
                   "code": code,
@@ -66,7 +69,7 @@ class SetupTest:
     def delete_project(self, node_id):
         self.log.info("\n")
         self.log.info("Preparing delete project".ljust(80, '-'))
-        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/Container/node/%s" % str(node_id)
+        delete_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container/node/%s" % str(node_id)
         try:
             delete_res = requests.delete(delete_api)
             self.log.info(f"DELETE STATUS: {delete_res.status_code}")
@@ -81,7 +84,7 @@ class SetupTest:
             "start_id": user_id,
             "end_id": project_id,
         }
-        response = requests.post(ConfigClass.NEO4J_SERVICE + "relations/{role}", json=payload)
+        response = requests.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/{role}", json=payload)
         if response.status_code != 200:
             raise Exception(f"Error adding user to project: {response.json()}")
 
@@ -90,13 +93,13 @@ class SetupTest:
             "start_id": user_id,
             "end_id": project_id,
         }
-        response = requests.delete(ConfigClass.NEO4J_SERVICE + "relations", params=payload)
+        response = requests.delete(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations", params=payload)
         self.log.info(f'User removed from project: {response.text}')
         if response.status_code != 200:
             raise Exception(f"Error removing user from project: {response.json()}")
 
     def get_projects(self):
-        all_project_url = ConfigClass.NEO4J_SERVICE + 'nodes/Container/properties'
+        all_project_url = ConfigClass.NEO4J_SERVICE + '/v1/neo4j/nodes/Container/properties'
         try:
             response = requests.get(all_project_url)
             if response.status_code == 200:
@@ -111,17 +114,20 @@ class SetupTest:
             raise e
 
     def generate_entity_id(self):
-        self.log.info("Generating global entity ID")
-        testing_api = ConfigClass.COMMON_SERVICE
+        self.log.info("Generating global entity ID".ljust(80, '-'))
+        testing_api = ConfigClass.UTILITY_SERVICE + "/v1/utility/id"
+        self.log.info(f"Request API: {testing_api}")
         res = requests.get(testing_api)
+        self.log.info(f"Request response: {res.text}")
         if not res.json():
             return None
         else:
             return res.json()['result']
 
     def get_folder(self, folder, project_code, zone):
+        self.log.info("get_folder".ljust(80, '-'))
         try:
-            url = ConfigClass.NEO4J_SERVICE_v2 + "nodes/query"
+            url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
             layers = folder.split('/')
             self.log.info(f"Folder layers: {layers}")
             if len(layers) == 1:
@@ -139,6 +145,7 @@ class SetupTest:
                     ]
                 }
             }
+            self.log.info(f"Request url: {url}")
             self.log.info(f"Getting folder payload: {payload}")
             res = requests.post(url, json=payload)
             self.log.info(f"Getting folder response: {res.text}")
@@ -153,8 +160,8 @@ class SetupTest:
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         self.log.info(f"File will be created in {zone} under {folder}")
-        testing_api = ConfigClass.NEO4J_SERVICE + "nodes/File"
-        relation_api = ConfigClass.NEO4J_SERVICE + "relations/own"
+        testing_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/File"
+        relation_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/own"
         global_entity_id = self.generate_entity_id()
         if zone.lower() == 'vrecore':
             root_path = "/vre-data"
@@ -255,7 +262,7 @@ class SetupTest:
     def delete_file(self, node_id):
         self.log.info("\n")
         self.log.info("Delete testing file".ljust(80, '-'))
-        delete_api = ConfigClass.NEO4J_SERVICE + "nodes/File/node/%s" % node_id
+        delete_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/File/node/%s" % node_id
         payload = {
                     "id": node_id,
                     "label": "File"

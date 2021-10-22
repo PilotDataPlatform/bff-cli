@@ -184,7 +184,7 @@ class APIFile:
                 self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
                 return file_response.json_response()
-        url = ConfigClass.NEO4J_SERVICE + "relations/query"
+        url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/query"
         payload = {"start_label": parent_label,
                    "start_params": parent_attribute,
                    "end_label": zone_label,
@@ -257,8 +257,8 @@ class APIDownload:
                 }
                 }
                 self._logger.info(f"File query payload: {payload}")
-                self._logger.info(f"File query API: {ConfigClass.NEO4J_SERVICE_v2 + 'nodes/query'}")
-                file_res = requests.post(ConfigClass.NEO4J_SERVICE_v2 + 'nodes/query', json=payload)
+                self._logger.info(f"File query API: {ConfigClass.NEO4J_SERVICE + '/v2/neo4j/nodes/query'}")
+                file_res = requests.post(ConfigClass.NEO4J_SERVICE + '/v2/neo4j/nodes/query', json=payload)
                 self._logger.info(f"File query result: {file_res.text}")
                 file_info = file_res.json().get('result')[0]
                 owner = file_info.get('uploader')
