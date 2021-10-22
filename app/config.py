@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     RDS_USER: str 
     RDS_PWD: str 
     RDS_SCHEMA_DEFAULT:str
+    KG_SERVICE: str
 
 
     class Config:
@@ -98,3 +99,4 @@ class ConfigClass(object):
     RDS_USER = settings.RDS_USER
     RDS_PWD = settings.RDS_PWD
     RDS_SCHEMA_DEFAULT = settings.RDS_SCHEMA_DEFAULT
+    KG_SERVICE = settings.KG_SERVICE
