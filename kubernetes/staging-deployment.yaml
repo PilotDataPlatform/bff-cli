@@ -28,6 +28,10 @@ spec:
           env:
           - name: env
             value: "staging"
+          - name: CONFIG_CENTER_ENABLED
+            value: "true"
+          - name: CONFIG_CENTER_BASE_URL
+            value: "http://common.utility:5062/"
       nodeSelector:
         namespace: utility
 ---

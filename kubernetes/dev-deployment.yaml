@@ -31,7 +31,7 @@ spec:
           - name: CONFIG_CENTER_ENABLED
             value: "true"
           - name: CONFIG_CENTER_BASE_URL
-            value: "http://10.3.7.222:5062/"
+            value: "http://common.utility:5062/"
       nodeSelector:
         namespace: utility
 ---
