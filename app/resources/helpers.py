@@ -319,7 +319,7 @@ def get_hpc_jwt_token(token_issuer, token, password = None):
             "password": password
             }
         headers = {"Authorization": "Bearer " + token}
-        url = ConfigClass.HPC_SERVICE + "/hpc/auth"
+        url = ConfigClass.HPC_SERVICE + "/v1/hpc/auth"
         _logger.info(f"Request url: {url}")
         res = requests.get(url, headers = headers, params=payload)
         _logger.info(f"Response: {res.text}")
