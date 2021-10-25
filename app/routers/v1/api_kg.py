@@ -30,7 +30,7 @@ class APIProject:
         Import kg_resource
         '''
         self._logger.info("API KG IMPORT".center(80, '-'))
-        url = ConfigClass.KG_SERVICE + "v1/resources"
+        url = ConfigClass.KG_SERVICE + "/v1/resources"
         self._logger.info(f'Requesting url: {url}')
         payload = {
                 "data": request_payload.data
