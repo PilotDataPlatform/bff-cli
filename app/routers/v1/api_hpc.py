@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.hpc_models import *
+from ...models.error_model import HPCError
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
@@ -60,6 +61,7 @@ class APIProject:
         '''
         self._logger.info("API hpc_job".center(80, '-'))
         api_response = HPCJobResponse()
+        result = {}
         try:
             self._logger.info(f"SUBMITTING JOB: {request_payload}")
             self._logger.info(f"SUBMITTING JOB: {type(request_payload)}")
@@ -69,10 +71,13 @@ class APIProject:
                 result = response
                 code = EAPIResponseCode.success
         except HPCError as e:
-            result = []
-            error_msg = str(e)
+            code = e.code
+            error_msg = e.message
             self._logger.info(f"ERROR SUBMITTING HPC JOB: {error_msg}")
+        except Exception as e:
             code = EAPIResponseCode.internal_error
+            error_msg = str(e)
+            self._logger.error(f"ERROR SUBMITTING HPC JOB: {error_msg}")
         api_response.result = result
         api_response.error_msg = error_msg
         api_response.code = code
@@ -88,24 +93,26 @@ class APIProject:
         '''
         self._logger.info("API hpc_get_job".center(80, '-'))
         api_response = HPCJobInfoResponse()
+        result = {}
         try:
         
-            token = get_hpc_job_info(job_id, host, username, token)
-            if token:
+            information = get_hpc_job_info(job_id, host, username, token)
+            if information:
                 error = ""
                 code = EAPIResponseCode.success
-                result = token
+                result = information
             else:
-                raise AttributeError('Cannot authorized HPC')
-        except AttributeError as e:
-            result = []
-            error_msg = str(e)
-            self._logger.info(f"ERROR GETTING HPC TOKEN: {error_msg}")
-            if 'open_session' in error_msg:
-                error = f"Cannot authorized HPC"
-            else:
-                error = f"Cannot authorized HPC: {error_msg}"
+                self._logger.info(f"ERROR GETTING HPC job: {information}")
+                raise HPCError('Cannot get HPC job information')
+        except HPCError as job_error:
+            self._logger.info(f"ERROR GETTING HPC job: {job_error}")
+            code = job_error.code
+            error = job_error.message
+        except Exception as e:
+            self._logger.info(f"ERROR GETTING HPC job: {e}")
             code = EAPIResponseCode.internal_error
+            error = e
+        self._logger.info(f"RESPONSE: 'code': {code}, 'result': {result}, 'error_msg': {error}")
         api_response.result = result
         api_response.error_msg = error
         api_response.code = code

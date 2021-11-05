@@ -331,7 +331,7 @@ def get_hpc_jwt_token(token_issuer, username, password = None):
     finally:
         return token
     
-def submit_hpc_job(job_submission_event):
+def submit_hpc_job(job_submission_event) -> dict:
     _logger.info("submit_hpc_job".center(80, '-'))
     try:
         _logger.info(f"Received event: {job_submission_event}")
@@ -339,6 +339,12 @@ def submit_hpc_job(job_submission_event):
         host = job_submission_event.host
         username = job_submission_event.username
         job_info = job_submission_event.job_info
+        job_script = job_info.get('script', '')
+        _logger.info(f"Request job script: {job_script}")
+        if not job_script:
+            status_code = EAPIResponseCode.bad_request
+            error_msg = 'Missing script'
+            raise HPCError(status_code, error_msg)
         url = ConfigClass.HPC_SERVICE + "/v1/hpc/job"
         headers = {
             "Authorization": token
@@ -355,7 +361,7 @@ def submit_hpc_job(job_submission_event):
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
-        if status_code == EAPIResponseCode.success:
+        if status_code == EAPIResponseCode.success.value:
             result = response.get('result')
             return result
         else:
@@ -365,7 +371,7 @@ def submit_hpc_job(job_submission_event):
         _logger.error(e)
         raise e
 
-def get_hpc_job_info(job_id, host, username, token):
+def get_hpc_job_info(job_id, host, username, token) -> dict:
     _logger.info("get_hpc_job_info".center(80, '-'))
     try:
         _logger.info(f"Received job_id: {job_id}")
@@ -384,12 +390,17 @@ def get_hpc_job_info(job_id, host, username, token):
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
-        if status_code == EAPIResponseCode.success:
+        if status_code == EAPIResponseCode.success.value:
             result = response.get('result')
             return result
         else:
             error_msg = response.get('error_msg')
-            raise HPCError(status_code, error_msg)
+            if 'unknown job' in error_msg:
+                error_msg = 'Job ID not found'
+                status_code = EAPIResponseCode.not_found
+                raise HPCError(status_code, error_msg)
+            else:
+                raise Exception(status_code, error_msg)
     except Exception as e:
         _logger.error(e)
         raise e
