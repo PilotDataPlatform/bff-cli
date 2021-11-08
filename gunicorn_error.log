@@ -2082,7 +2082,11 @@ ModuleNotFoundError: No module named 'psycopg2'
 [2021-08-31 17:03:47 -0400] [94824] [INFO] Finished server process [94824]
 [2021-08-31 17:03:47 -0400] [94824] [INFO] Worker exiting (pid: 94824)
 [2021-08-31 17:03:47 -0400] [94819] [INFO] Shutting down: Master
+<<<<<<< HEAD
 [2021-11-02 15:25:13 -0400] [776143] [DEBUG] Current configuration:
+=======
+[2021-10-25 14:47:15 -0400] [309098] [DEBUG] Current configuration:
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   config: gunicorn_config.py
   bind: ['0.0.0.0:5080']
   backlog: 2048
@@ -2106,7 +2110,11 @@ ModuleNotFoundError: No module named 'psycopg2'
   preload_app: False
   sendfile: None
   reuse_port: False
+<<<<<<< HEAD
   chdir: /home/jzhang/Desktop/bff_vrecli
+=======
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   daemon: False
   raw_env: []
   pidfile: None
@@ -2139,6 +2147,7 @@ ModuleNotFoundError: No module named 'psycopg2'
   default_proc_name: run:app
   pythonpath: None
   paste: None
+<<<<<<< HEAD
   on_starting: <function OnStarting.on_starting at 0x7f98dba44dd0>
   on_reload: <function OnReload.on_reload at 0x7f98dba44ef0>
   when_ready: <function WhenReady.when_ready at 0x7f98dba5b050>
@@ -2154,6 +2163,23 @@ ModuleNotFoundError: No module named 'psycopg2'
   worker_exit: <function WorkerExit.worker_exit at 0x7f98dba5bb00>
   nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f98dba5bc20>
   on_exit: <function OnExit.on_exit at 0x7f98dba5bd40>
+=======
+  on_starting: <function OnStarting.on_starting at 0x7fa4f7298dd0>
+  on_reload: <function OnReload.on_reload at 0x7fa4f7298ef0>
+  when_ready: <function WhenReady.when_ready at 0x7fa4f72ae050>
+  pre_fork: <function Prefork.pre_fork at 0x7fa4f72ae170>
+  post_fork: <function Postfork.post_fork at 0x7fa4f72ae290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fa4f72ae3b0>
+  worker_int: <function WorkerInt.worker_int at 0x7fa4f72ae4d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7fa4f72ae5f0>
+  pre_exec: <function PreExec.pre_exec at 0x7fa4f72ae710>
+  pre_request: <function PreRequest.pre_request at 0x7fa4f72ae830>
+  post_request: <function PostRequest.post_request at 0x7fa4f72ae8c0>
+  child_exit: <function ChildExit.child_exit at 0x7fa4f72ae9e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7fa4f72aeb00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fa4f72aec20>
+  on_exit: <function OnExit.on_exit at 0x7fa4f72aed40>
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   proxy_protocol: False
   proxy_allow_ips: ['127.0.0.1']
   keyfile: None
@@ -2166,6 +2192,7 @@ ModuleNotFoundError: No module named 'psycopg2'
   ciphers: None
   raw_paste_global_conf: []
   strip_header_spaces: False
+<<<<<<< HEAD
 [2021-11-02 15:25:13 -0400] [776143] [INFO] Starting gunicorn 20.0.4
 [2021-11-02 15:25:13 -0400] [776143] [DEBUG] Arbiter booted
 [2021-11-02 15:25:13 -0400] [776143] [INFO] Listening at: http://0.0.0.0:5080 (776143)
@@ -2173,6 +2200,17 @@ ModuleNotFoundError: No module named 'psycopg2'
 [2021-11-02 15:25:13 -0400] [776146] [INFO] Booting worker with pid: 776146
 [2021-11-02 15:25:13 -0400] [776151] [INFO] Booting worker with pid: 776151
 [2021-11-02 15:25:13 -0400] [776146] [ERROR] Exception in worker process
+=======
+[2021-10-25 14:47:15 -0400] [309098] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:47:15 -0400] [309098] [DEBUG] Arbiter booted
+[2021-10-25 14:47:15 -0400] [309098] [INFO] Listening at: http://0.0.0.0:5080 (309098)
+[2021-10-25 14:47:15 -0400] [309098] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:47:15 -0400] [309101] [INFO] Booting worker with pid: 309101
+[2021-10-25 14:47:15 -0400] [309102] [INFO] Booting worker with pid: 309102
+[2021-10-25 14:47:15 -0400] [309103] [INFO] Booting worker with pid: 309103
+[2021-10-25 14:47:15 -0400] [309104] [INFO] Booting worker with pid: 309104
+[2021-10-25 14:47:15 -0400] [309103] [ERROR] Exception in worker process
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 Traceback (most recent call last):
   File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
     worker.init_process()
@@ -2198,6 +2236,7 @@ Traceback (most recent call last):
   File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
   File "<frozen importlib._bootstrap_external>", line 728, in exec_module
   File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+<<<<<<< HEAD
   File "/home/jzhang/Desktop/bff_vrecli/run.py", line 2, in <module>
     from app.config import ConfigClass
   File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 76, in <module>
@@ -2209,6 +2248,19 @@ Traceback (most recent call last):
   File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
   File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
 pydantic.error_wrappers.ValidationError: 13 validation errors for Settings
+=======
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 RDS_HOST
   field required (type=value_error.missing)
 RDS_PORT
@@ -2235,8 +2287,14 @@ PROVENANCE_SERVICE
   field required (type=value_error.missing)
 HPC_SERVICE
   field required (type=value_error.missing)
+<<<<<<< HEAD
 [2021-11-02 15:25:13 -0400] [776146] [INFO] Worker exiting (pid: 776146)
 [2021-11-02 15:25:13 -0400] [776151] [ERROR] Exception in worker process
+=======
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:47:15 -0400] [309102] [ERROR] Exception in worker process
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 Traceback (most recent call last):
   File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
     worker.init_process()
@@ -2262,6 +2320,7 @@ Traceback (most recent call last):
   File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
   File "<frozen importlib._bootstrap_external>", line 728, in exec_module
   File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+<<<<<<< HEAD
   File "/home/jzhang/Desktop/bff_vrecli/run.py", line 2, in <module>
     from app.config import ConfigClass
   File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 76, in <module>
@@ -2273,6 +2332,19 @@ Traceback (most recent call last):
   File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
   File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
 pydantic.error_wrappers.ValidationError: 13 validation errors for Settings
+=======
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 RDS_HOST
   field required (type=value_error.missing)
 RDS_PORT
@@ -2299,6 +2371,7 @@ PROVENANCE_SERVICE
   field required (type=value_error.missing)
 HPC_SERVICE
   field required (type=value_error.missing)
+<<<<<<< HEAD
 [2021-11-02 15:25:13 -0400] [776151] [INFO] Worker exiting (pid: 776151)
 [2021-11-02 15:25:44 -0400] [776319] [DEBUG] Current configuration:
   config: gunicorn_config.py
@@ -2390,6 +2463,10 @@ HPC_SERVICE
 [2021-11-02 15:25:44 -0400] [776319] [INFO] Using worker: uvicorn.workers.UvicornWorker
 [2021-11-02 15:25:44 -0400] [776322] [INFO] Booting worker with pid: 776322
 [2021-11-02 15:25:44 -0400] [776322] [ERROR] Exception in worker process
+=======
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:47:15 -0400] [309101] [ERROR] Exception in worker process
 Traceback (most recent call last):
   File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
     worker.init_process()
@@ -2415,17 +2492,17 @@ Traceback (most recent call last):
   File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
   File "<frozen importlib._bootstrap_external>", line 728, in exec_module
   File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
-  File "/home/jzhang/Desktop/bff_vrecli/run.py", line 2, in <module>
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
     from app.config import ConfigClass
-  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 76, in <module>
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
     class ConfigClass(object):
-  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 77, in ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
     settings = get_settings()
-  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 73, in get_settings
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
     settings =  Settings()
   File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
   File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
-pydantic.error_wrappers.ValidationError: 13 validation errors for Settings
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
 RDS_HOST
   field required (type=value_error.missing)
 RDS_PORT
@@ -2452,10 +2529,101 @@ PROVENANCE_SERVICE
   field required (type=value_error.missing)
 HPC_SERVICE
   field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:47:15 -0400] [309103] [INFO] Worker exiting (pid: 309103)
+[2021-10-25 14:47:15 -0400] [309102] [INFO] Worker exiting (pid: 309102)
+[2021-10-25 14:47:15 -0400] [309101] [INFO] Worker exiting (pid: 309101)
+[2021-10-25 14:47:15 -0400] [309098] [DEBUG] 4 workers
+[2021-10-25 14:47:15 -0400] [309104] [ERROR] Exception in worker process
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+<<<<<<< HEAD
+  File "/home/jzhang/Desktop/bff_vrecli/run.py", line 2, in <module>
+    from app.config import ConfigClass
+  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 76, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 77, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 73, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 13 validation errors for Settings
+=======
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+<<<<<<< HEAD
 [2021-11-02 15:25:44 -0400] [776322] [INFO] Worker exiting (pid: 776322)
 [2021-11-02 15:25:44 -0400] [776319] [INFO] Shutting down: Master
 [2021-11-02 15:25:44 -0400] [776319] [INFO] Reason: Worker failed to boot.
 [2021-11-02 15:25:46 -0400] [776354] [DEBUG] Current configuration:
+=======
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:47:15 -0400] [309104] [INFO] Worker exiting (pid: 309104)
+[2021-10-25 14:48:22 -0400] [309212] [DEBUG] Current configuration:
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   config: gunicorn_config.py
   bind: ['0.0.0.0:5080']
   backlog: 2048
@@ -2479,7 +2647,11 @@ HPC_SERVICE
   preload_app: False
   sendfile: None
   reuse_port: False
+<<<<<<< HEAD
   chdir: /home/jzhang/Desktop/bff_vrecli
+=======
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   daemon: False
   raw_env: []
   pidfile: None
@@ -2512,6 +2684,7 @@ HPC_SERVICE
   default_proc_name: run:app
   pythonpath: None
   paste: None
+<<<<<<< HEAD
   on_starting: <function OnStarting.on_starting at 0x7f9928673dd0>
   on_reload: <function OnReload.on_reload at 0x7f9928673ef0>
   when_ready: <function WhenReady.when_ready at 0x7f9928689050>
@@ -2527,6 +2700,23 @@ HPC_SERVICE
   worker_exit: <function WorkerExit.worker_exit at 0x7f9928689b00>
   nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f9928689c20>
   on_exit: <function OnExit.on_exit at 0x7f9928689d40>
+=======
+  on_starting: <function OnStarting.on_starting at 0x7f451308fdd0>
+  on_reload: <function OnReload.on_reload at 0x7f451308fef0>
+  when_ready: <function WhenReady.when_ready at 0x7f45130a5050>
+  pre_fork: <function Prefork.pre_fork at 0x7f45130a5170>
+  post_fork: <function Postfork.post_fork at 0x7f45130a5290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f45130a53b0>
+  worker_int: <function WorkerInt.worker_int at 0x7f45130a54d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f45130a55f0>
+  pre_exec: <function PreExec.pre_exec at 0x7f45130a5710>
+  pre_request: <function PreRequest.pre_request at 0x7f45130a5830>
+  post_request: <function PostRequest.post_request at 0x7f45130a58c0>
+  child_exit: <function ChildExit.child_exit at 0x7f45130a59e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f45130a5b00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f45130a5c20>
+  on_exit: <function OnExit.on_exit at 0x7f45130a5d40>
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   proxy_protocol: False
   proxy_allow_ips: ['127.0.0.1']
   keyfile: None
@@ -2539,6 +2729,7 @@ HPC_SERVICE
   ciphers: None
   raw_paste_global_conf: []
   strip_header_spaces: False
+<<<<<<< HEAD
 [2021-11-02 15:25:46 -0400] [776354] [INFO] Starting gunicorn 20.0.4
 [2021-11-02 15:25:46 -0400] [776354] [DEBUG] Arbiter booted
 [2021-11-02 15:25:46 -0400] [776354] [INFO] Listening at: http://0.0.0.0:5080 (776354)
@@ -2546,6 +2737,17 @@ HPC_SERVICE
 [2021-11-02 15:25:46 -0400] [776357] [INFO] Booting worker with pid: 776357
 [2021-11-02 15:25:46 -0400] [776358] [INFO] Booting worker with pid: 776358
 [2021-11-02 15:25:46 -0400] [776357] [ERROR] Exception in worker process
+=======
+[2021-10-25 14:48:22 -0400] [309212] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:48:22 -0400] [309212] [DEBUG] Arbiter booted
+[2021-10-25 14:48:22 -0400] [309212] [INFO] Listening at: http://0.0.0.0:5080 (309212)
+[2021-10-25 14:48:22 -0400] [309212] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:48:22 -0400] [309215] [INFO] Booting worker with pid: 309215
+[2021-10-25 14:48:22 -0400] [309216] [INFO] Booting worker with pid: 309216
+[2021-10-25 14:48:22 -0400] [309217] [INFO] Booting worker with pid: 309217
+[2021-10-25 14:48:22 -0400] [309221] [INFO] Booting worker with pid: 309221
+[2021-10-25 14:48:22 -0400] [309215] [ERROR] Exception in worker process
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 Traceback (most recent call last):
   File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
     worker.init_process()
@@ -2571,17 +2773,20 @@ Traceback (most recent call last):
   File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
   File "<frozen importlib._bootstrap_external>", line 728, in exec_module
   File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
-  File "/home/jzhang/Desktop/bff_vrecli/run.py", line 2, in <module>
-    from app.config import ConfigClass
-  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 76, in <module>
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
     class ConfigClass(object):
-  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 77, in ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
     settings = get_settings()
-  File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 73, in get_settings
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
     settings =  Settings()
   File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
   File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
-pydantic.error_wrappers.ValidationError: 13 validation errors for Settings
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 RDS_HOST
   field required (type=value_error.missing)
 RDS_PORT
@@ -2608,8 +2813,15 @@ PROVENANCE_SERVICE
   field required (type=value_error.missing)
 HPC_SERVICE
   field required (type=value_error.missing)
+<<<<<<< HEAD
 [2021-11-02 15:25:46 -0400] [776357] [INFO] Worker exiting (pid: 776357)
 [2021-11-02 15:25:46 -0400] [776358] [ERROR] Exception in worker process
+=======
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:48:22 -0400] [309215] [INFO] Worker exiting (pid: 309215)
+[2021-10-25 14:48:22 -0400] [309216] [ERROR] Exception in worker process
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
 Traceback (most recent call last):
   File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
     worker.init_process()
@@ -2635,6 +2847,7 @@ Traceback (most recent call last):
   File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
   File "<frozen importlib._bootstrap_external>", line 728, in exec_module
   File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+<<<<<<< HEAD
   File "/home/jzhang/Desktop/bff_vrecli/run.py", line 2, in <module>
     from app.config import ConfigClass
   File "/home/jzhang/Desktop/bff_vrecli/app/config.py", line 76, in <module>
@@ -2646,6 +2859,20 @@ Traceback (most recent call last):
   File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
   File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
 pydantic.error_wrappers.ValidationError: 13 validation errors for Settings
+=======
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
 RDS_HOST
   field required (type=value_error.missing)
 RDS_PORT
@@ -2672,10 +2899,154 @@ PROVENANCE_SERVICE
   field required (type=value_error.missing)
 HPC_SERVICE
   field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:48:22 -0400] [309216] [INFO] Worker exiting (pid: 309216)
+[2021-10-25 14:48:22 -0400] [309212] [DEBUG] 4 workers
+[2021-10-25 14:48:22 -0400] [309217] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:48:22 -0400] [309217] [INFO] Worker exiting (pid: 309217)
+[2021-10-25 14:48:23 -0400] [309221] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+<<<<<<< HEAD
 [2021-11-02 15:25:46 -0400] [776358] [INFO] Worker exiting (pid: 776358)
 [2021-11-02 15:25:46 -0400] [776354] [INFO] Shutting down: Master
 [2021-11-02 15:25:46 -0400] [776354] [INFO] Reason: Worker failed to boot.
 [2021-11-02 15:26:04 -0400] [776473] [DEBUG] Current configuration:
+=======
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:48:23 -0400] [309221] [INFO] Worker exiting (pid: 309221)
+[2021-10-25 14:50:26 -0400] [309393] [DEBUG] Current configuration:
   config: gunicorn_config.py
   bind: ['0.0.0.0:5080']
   backlog: 2048
@@ -2699,7 +3070,7 @@ HPC_SERVICE
   preload_app: False
   sendfile: None
   reuse_port: False
-  chdir: /home/jzhang/Desktop/bff_vrecli
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
   daemon: False
   raw_env: []
   pidfile: None
@@ -2732,6 +3103,1401 @@ HPC_SERVICE
   default_proc_name: run:app
   pythonpath: None
   paste: None
+  on_starting: <function OnStarting.on_starting at 0x7f056ed6bdd0>
+  on_reload: <function OnReload.on_reload at 0x7f056ed6bef0>
+  when_ready: <function WhenReady.when_ready at 0x7f056ed81050>
+  pre_fork: <function Prefork.pre_fork at 0x7f056ed81170>
+  post_fork: <function Postfork.post_fork at 0x7f056ed81290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f056ed813b0>
+  worker_int: <function WorkerInt.worker_int at 0x7f056ed814d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f056ed815f0>
+  pre_exec: <function PreExec.pre_exec at 0x7f056ed81710>
+  pre_request: <function PreRequest.pre_request at 0x7f056ed81830>
+  post_request: <function PostRequest.post_request at 0x7f056ed818c0>
+  child_exit: <function ChildExit.child_exit at 0x7f056ed819e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f056ed81b00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f056ed81c20>
+  on_exit: <function OnExit.on_exit at 0x7f056ed81d40>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-10-25 14:50:26 -0400] [309393] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:50:26 -0400] [309393] [DEBUG] Arbiter booted
+[2021-10-25 14:50:26 -0400] [309393] [INFO] Listening at: http://0.0.0.0:5080 (309393)
+[2021-10-25 14:50:26 -0400] [309393] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:50:26 -0400] [309396] [INFO] Booting worker with pid: 309396
+[2021-10-25 14:50:26 -0400] [309397] [INFO] Booting worker with pid: 309397
+[2021-10-25 14:50:26 -0400] [309398] [INFO] Booting worker with pid: 309398
+[2021-10-25 14:50:26 -0400] [309396] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:26 -0400] [309396] [INFO] Worker exiting (pid: 309396)
+[2021-10-25 14:50:26 -0400] [309397] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:26 -0400] [309397] [INFO] Worker exiting (pid: 309397)
+[2021-10-25 14:50:26 -0400] [309399] [INFO] Booting worker with pid: 309399
+[2021-10-25 14:50:26 -0400] [309398] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:26 -0400] [309398] [INFO] Worker exiting (pid: 309398)
+[2021-10-25 14:50:26 -0400] [309399] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:26 -0400] [309399] [INFO] Worker exiting (pid: 309399)
+[2021-10-25 14:50:30 -0400] [309416] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5080']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 600
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7f6fc6f65dd0>
+  on_reload: <function OnReload.on_reload at 0x7f6fc6f65ef0>
+  when_ready: <function WhenReady.when_ready at 0x7f6fc6f7b050>
+  pre_fork: <function Prefork.pre_fork at 0x7f6fc6f7b170>
+  post_fork: <function Postfork.post_fork at 0x7f6fc6f7b290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f6fc6f7b3b0>
+  worker_int: <function WorkerInt.worker_int at 0x7f6fc6f7b4d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f6fc6f7b5f0>
+  pre_exec: <function PreExec.pre_exec at 0x7f6fc6f7b710>
+  pre_request: <function PreRequest.pre_request at 0x7f6fc6f7b830>
+  post_request: <function PostRequest.post_request at 0x7f6fc6f7b8c0>
+  child_exit: <function ChildExit.child_exit at 0x7f6fc6f7b9e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f6fc6f7bb00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f6fc6f7bc20>
+  on_exit: <function OnExit.on_exit at 0x7f6fc6f7bd40>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-10-25 14:50:30 -0400] [309416] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:50:30 -0400] [309416] [DEBUG] Arbiter booted
+[2021-10-25 14:50:30 -0400] [309416] [INFO] Listening at: http://0.0.0.0:5080 (309416)
+[2021-10-25 14:50:30 -0400] [309416] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:50:30 -0400] [309419] [INFO] Booting worker with pid: 309419
+[2021-10-25 14:50:30 -0400] [309420] [INFO] Booting worker with pid: 309420
+[2021-10-25 14:50:30 -0400] [309419] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:30 -0400] [309419] [INFO] Worker exiting (pid: 309419)
+[2021-10-25 14:50:30 -0400] [309421] [INFO] Booting worker with pid: 309421
+[2021-10-25 14:50:30 -0400] [309420] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:30 -0400] [309420] [INFO] Worker exiting (pid: 309420)
+[2021-10-25 14:50:30 -0400] [309421] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:50:30 -0400] [309421] [INFO] Worker exiting (pid: 309421)
+[2021-10-25 14:52:19 -0400] [309599] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5080']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 600
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7fa2d67f7dd0>
+  on_reload: <function OnReload.on_reload at 0x7fa2d67f7ef0>
+  when_ready: <function WhenReady.when_ready at 0x7fa2d680d050>
+  pre_fork: <function Prefork.pre_fork at 0x7fa2d680d170>
+  post_fork: <function Postfork.post_fork at 0x7fa2d680d290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fa2d680d3b0>
+  worker_int: <function WorkerInt.worker_int at 0x7fa2d680d4d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7fa2d680d5f0>
+  pre_exec: <function PreExec.pre_exec at 0x7fa2d680d710>
+  pre_request: <function PreRequest.pre_request at 0x7fa2d680d830>
+  post_request: <function PostRequest.post_request at 0x7fa2d680d8c0>
+  child_exit: <function ChildExit.child_exit at 0x7fa2d680d9e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7fa2d680db00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fa2d680dc20>
+  on_exit: <function OnExit.on_exit at 0x7fa2d680dd40>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-10-25 14:52:19 -0400] [309599] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:52:19 -0400] [309599] [DEBUG] Arbiter booted
+[2021-10-25 14:52:19 -0400] [309599] [INFO] Listening at: http://0.0.0.0:5080 (309599)
+[2021-10-25 14:52:19 -0400] [309599] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:52:19 -0400] [309602] [INFO] Booting worker with pid: 309602
+[2021-10-25 14:52:19 -0400] [309603] [INFO] Booting worker with pid: 309603
+[2021-10-25 14:52:19 -0400] [309604] [INFO] Booting worker with pid: 309604
+[2021-10-25 14:52:19 -0400] [309605] [INFO] Booting worker with pid: 309605
+[2021-10-25 14:52:19 -0400] [309599] [DEBUG] 4 workers
+[2021-10-25 14:52:19 -0400] [309602] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:52:19 -0400] [309602] [INFO] Worker exiting (pid: 309602)
+[2021-10-25 14:52:19 -0400] [309603] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:52:19 -0400] [309603] [INFO] Worker exiting (pid: 309603)
+[2021-10-25 14:52:19 -0400] [309604] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:52:19 -0400] [309604] [INFO] Worker exiting (pid: 309604)
+[2021-10-25 14:52:19 -0400] [309605] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:52:19 -0400] [309605] [INFO] Worker exiting (pid: 309605)
+[2021-10-25 14:54:54 -0400] [309832] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5080']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 600
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x7f7bd7f2fdd0>
+  on_reload: <function OnReload.on_reload at 0x7f7bd7f2fef0>
+  when_ready: <function WhenReady.when_ready at 0x7f7bd7f46050>
+  pre_fork: <function Prefork.pre_fork at 0x7f7bd7f46170>
+  post_fork: <function Postfork.post_fork at 0x7f7bd7f46290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f7bd7f463b0>
+  worker_int: <function WorkerInt.worker_int at 0x7f7bd7f464d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f7bd7f465f0>
+  pre_exec: <function PreExec.pre_exec at 0x7f7bd7f46710>
+  pre_request: <function PreRequest.pre_request at 0x7f7bd7f46830>
+  post_request: <function PostRequest.post_request at 0x7f7bd7f468c0>
+  child_exit: <function ChildExit.child_exit at 0x7f7bd7f469e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f7bd7f46b00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f7bd7f46c20>
+  on_exit: <function OnExit.on_exit at 0x7f7bd7f46d40>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  strip_header_spaces: False
+[2021-10-25 14:54:54 -0400] [309832] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:54:54 -0400] [309832] [DEBUG] Arbiter booted
+[2021-10-25 14:54:54 -0400] [309832] [INFO] Listening at: http://0.0.0.0:5080 (309832)
+[2021-10-25 14:54:54 -0400] [309832] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:54:54 -0400] [309835] [INFO] Booting worker with pid: 309835
+[2021-10-25 14:54:54 -0400] [309836] [INFO] Booting worker with pid: 309836
+[2021-10-25 14:54:54 -0400] [309837] [INFO] Booting worker with pid: 309837
+[2021-10-25 14:54:54 -0400] [309835] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:54:54 -0400] [309835] [INFO] Worker exiting (pid: 309835)
+[2021-10-25 14:54:54 -0400] [309838] [INFO] Booting worker with pid: 309838
+[2021-10-25 14:54:54 -0400] [309832] [DEBUG] 4 workers
+[2021-10-25 14:54:54 -0400] [309836] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:54:54 -0400] [309836] [INFO] Worker exiting (pid: 309836)
+[2021-10-25 14:54:54 -0400] [309837] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:54:54 -0400] [309837] [INFO] Worker exiting (pid: 309837)
+[2021-10-25 14:54:54 -0400] [309838] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/uvicorn/workers.py", line 62, in init_process
+    super(UvicornWorker, self).init_process()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 119, in init_process
+    self.load_wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/workers/base.py", line 144, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 49, in load
+    return self.load_wsgiapp()
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/app/wsgiapp.py", line 39, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/site-packages/gunicorn/util.py", line 358, in import_app
+    mod = importlib.import_module(module)
+  File "/home/jzhang/anaconda3/envs/bff_vrecli/lib/python3.7/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1006, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 967, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 677, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 728, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/run.py", line 2, in <module>
+    from app.main import create_app
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/main.py", line 4, in <module>
+    from .config import ConfigClass
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 78, in <module>
+    class ConfigClass(object):
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 79, in ConfigClass
+    settings = get_settings()
+  File "/home/jzhang/Desktop/Indoc/bff_vrecli/app/config.py", line 74, in get_settings
+    settings =  Settings()
+  File "pydantic/env_settings.py", line 36, in pydantic.env_settings.BaseSettings.__init__
+  File "pydantic/main.py", line 406, in pydantic.main.BaseModel.__init__
+pydantic.error_wrappers.ValidationError: 14 validation errors for Settings
+RDS_HOST
+  field required (type=value_error.missing)
+RDS_PORT
+  field required (type=value_error.missing)
+RDS_USER
+  field required (type=value_error.missing)
+RDS_PWD
+  field required (type=value_error.missing)
+RDS_SCHEMA_DEFAULT
+  field required (type=value_error.missing)
+NEO4J_SERVICE
+  field required (type=value_error.missing)
+FILEINFO_HOST
+  field required (type=value_error.missing)
+AUTH_SERVICE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_VRE
+  field required (type=value_error.missing)
+DATA_UPLOAD_SERVICE_GREENROOM
+  field required (type=value_error.missing)
+UTILITY_SERVICE
+  field required (type=value_error.missing)
+PROVENANCE_SERVICE
+  field required (type=value_error.missing)
+HPC_SERVICE
+  field required (type=value_error.missing)
+KG_SERVICE
+  field required (type=value_error.missing)
+[2021-10-25 14:54:54 -0400] [309838] [INFO] Worker exiting (pid: 309838)
+[2021-10-25 14:55:10 -0400] [309894] [DEBUG] Current configuration:
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
+  config: gunicorn_config.py
+  bind: ['0.0.0.0:5080']
+  backlog: 2048
+  workers: 4
+  worker_class: uvicorn.workers.UvicornWorker
+  threads: 2
+  worker_connections: 1200
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 600
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+<<<<<<< HEAD
+  chdir: /home/jzhang/Desktop/bff_vrecli
+=======
+  chdir: /home/jzhang/Desktop/Indoc/bff_vrecli
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 1000
+  group: 1000
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: run:app
+  pythonpath: None
+  paste: None
+<<<<<<< HEAD
   on_starting: <function OnStarting.on_starting at 0x7f836dd44dd0>
   on_reload: <function OnReload.on_reload at 0x7f836dd44ef0>
   when_ready: <function WhenReady.when_ready at 0x7f836dd5a050>
@@ -2747,6 +4513,23 @@ HPC_SERVICE
   worker_exit: <function WorkerExit.worker_exit at 0x7f836dd5ab00>
   nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f836dd5ac20>
   on_exit: <function OnExit.on_exit at 0x7f836dd5ad40>
+=======
+  on_starting: <function OnStarting.on_starting at 0x7f9044238dd0>
+  on_reload: <function OnReload.on_reload at 0x7f9044238ef0>
+  when_ready: <function WhenReady.when_ready at 0x7f904424e050>
+  pre_fork: <function Prefork.pre_fork at 0x7f904424e170>
+  post_fork: <function Postfork.post_fork at 0x7f904424e290>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f904424e3b0>
+  worker_int: <function WorkerInt.worker_int at 0x7f904424e4d0>
+  worker_abort: <function WorkerAbort.worker_abort at 0x7f904424e5f0>
+  pre_exec: <function PreExec.pre_exec at 0x7f904424e710>
+  pre_request: <function PreRequest.pre_request at 0x7f904424e830>
+  post_request: <function PostRequest.post_request at 0x7f904424e8c0>
+  child_exit: <function ChildExit.child_exit at 0x7f904424e9e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x7f904424eb00>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f904424ec20>
+  on_exit: <function OnExit.on_exit at 0x7f904424ed40>
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba
   proxy_protocol: False
   proxy_allow_ips: ['127.0.0.1']
   keyfile: None
@@ -2759,6 +4542,7 @@ HPC_SERVICE
   ciphers: None
   raw_paste_global_conf: []
   strip_header_spaces: False
+<<<<<<< HEAD
 [2021-11-02 15:26:04 -0400] [776473] [INFO] Starting gunicorn 20.0.4
 [2021-11-02 15:26:04 -0400] [776473] [DEBUG] Arbiter booted
 [2021-11-02 15:26:04 -0400] [776473] [INFO] Listening at: http://0.0.0.0:5080 (776473)
@@ -2806,3 +4590,52 @@ HPC_SERVICE
 [2021-11-02 15:26:13 -0400] [776478] [INFO] Worker exiting (pid: 776478)
 [2021-11-02 15:26:13 -0400] [776479] [INFO] Worker exiting (pid: 776479)
 [2021-11-02 15:26:13 -0400] [776473] [INFO] Shutting down: Master
+=======
+[2021-10-25 14:55:10 -0400] [309894] [INFO] Starting gunicorn 20.0.4
+[2021-10-25 14:55:10 -0400] [309894] [DEBUG] Arbiter booted
+[2021-10-25 14:55:10 -0400] [309894] [INFO] Listening at: http://0.0.0.0:5080 (309894)
+[2021-10-25 14:55:10 -0400] [309894] [INFO] Using worker: uvicorn.workers.UvicornWorker
+[2021-10-25 14:55:10 -0400] [309897] [INFO] Booting worker with pid: 309897
+[2021-10-25 14:55:10 -0400] [309898] [INFO] Booting worker with pid: 309898
+[2021-10-25 14:55:10 -0400] [309899] [INFO] Booting worker with pid: 309899
+[2021-10-25 14:55:10 -0400] [309900] [INFO] Booting worker with pid: 309900
+[2021-10-25 14:55:11 -0400] [309894] [DEBUG] 4 workers
+[2021-10-25 14:55:11 -0400] [309897] [INFO] Started server process [309897]
+[2021-10-25 14:55:11 -0400] [309897] [INFO] Waiting for application startup.
+[2021-10-25 14:55:11 -0400] [309897] [INFO] Application startup complete.
+[2021-10-25 14:55:11 -0400] [309898] [INFO] Started server process [309898]
+[2021-10-25 14:55:11 -0400] [309898] [INFO] Waiting for application startup.
+[2021-10-25 14:55:11 -0400] [309898] [INFO] Application startup complete.
+[2021-10-25 14:55:11 -0400] [309899] [INFO] Started server process [309899]
+[2021-10-25 14:55:11 -0400] [309899] [INFO] Waiting for application startup.
+[2021-10-25 14:55:11 -0400] [309899] [INFO] Application startup complete.
+[2021-10-25 14:55:11 -0400] [309900] [INFO] Started server process [309900]
+[2021-10-25 14:55:11 -0400] [309900] [INFO] Waiting for application startup.
+[2021-10-25 14:55:11 -0400] [309900] [INFO] Application startup complete.
+[2021-10-25 14:55:54 -0400] [309894] [INFO] Handling signal: int
+[2021-10-25 14:55:54 -0400] [309897] [INFO] Shutting down
+[2021-10-25 14:55:54 -0400] [309899] [INFO] Shutting down
+[2021-10-25 14:55:54 -0400] [309897] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-10-25 14:55:54 -0400] [309899] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-10-25 14:55:54 -0400] [309900] [INFO] Shutting down
+[2021-10-25 14:55:54 -0400] [309900] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-10-25 14:55:54 -0400] [309898] [INFO] Shutting down
+[2021-10-25 14:55:54 -0400] [309898] [INFO] Error while closing socket [Errno 9] Bad file descriptor
+[2021-10-25 14:55:54 -0400] [309899] [INFO] Waiting for application shutdown.
+[2021-10-25 14:55:54 -0400] [309897] [INFO] Waiting for application shutdown.
+[2021-10-25 14:55:54 -0400] [309897] [INFO] Application shutdown complete.
+[2021-10-25 14:55:54 -0400] [309899] [INFO] Application shutdown complete.
+[2021-10-25 14:55:54 -0400] [309897] [INFO] Finished server process [309897]
+[2021-10-25 14:55:54 -0400] [309899] [INFO] Finished server process [309899]
+[2021-10-25 14:55:54 -0400] [309897] [INFO] Worker exiting (pid: 309897)
+[2021-10-25 14:55:54 -0400] [309899] [INFO] Worker exiting (pid: 309899)
+[2021-10-25 14:55:54 -0400] [309900] [INFO] Waiting for application shutdown.
+[2021-10-25 14:55:54 -0400] [309900] [INFO] Application shutdown complete.
+[2021-10-25 14:55:54 -0400] [309900] [INFO] Finished server process [309900]
+[2021-10-25 14:55:54 -0400] [309900] [INFO] Worker exiting (pid: 309900)
+[2021-10-25 14:55:54 -0400] [309898] [INFO] Waiting for application shutdown.
+[2021-10-25 14:55:54 -0400] [309898] [INFO] Application shutdown complete.
+[2021-10-25 14:55:54 -0400] [309898] [INFO] Finished server process [309898]
+[2021-10-25 14:55:54 -0400] [309898] [INFO] Worker exiting (pid: 309898)
+[2021-10-25 14:55:54 -0400] [309894] [INFO] Shutting down: Master
+>>>>>>> e88cbc30b37cff383faa9dc7372f6d4976f5b6ba

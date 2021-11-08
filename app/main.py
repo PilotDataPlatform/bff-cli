@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
-# os.environ['env'] = 'test'
 from .config import ConfigClass
 from .api_registry import api_registry
 
@@ -26,3 +25,5 @@ def create_app():
     )
     api_registry(app)
     return app
+
+app = create_app()

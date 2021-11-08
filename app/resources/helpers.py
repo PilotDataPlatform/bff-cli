@@ -361,7 +361,7 @@ def submit_hpc_job(job_submission_event) -> dict:
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
-        if status_code == EAPIResponseCode.success.value:
+        if status_code == 200:
             result = response.get('result')
             return result
         else:
@@ -390,7 +390,7 @@ def get_hpc_job_info(job_id, host, username, token) -> dict:
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
-        if status_code == EAPIResponseCode.success.value:
+        if status_code == 200:
             result = response.get('result')
             return result
         else:
