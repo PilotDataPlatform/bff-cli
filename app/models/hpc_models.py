@@ -33,9 +33,8 @@ class HPCJobResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "result": 
-                {
-                    "t": "e",
+            "result": {
+                "job_id":15178
                 }
         }
     )
@@ -57,9 +56,12 @@ class HPCJobInfoResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "result": 
-                {
-                    "t": "e",
+            "result": {
+                "job_id":"12345",
+                "job_state":"COMPLETED",
+                "standard_error":"",
+                "standard_input":"",
+                "standard_output":""
                 }
         }
     )
