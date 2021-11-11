@@ -15,3 +15,53 @@ class HPCAuthResponse(APIResponse):
                 }
         }
     )
+
+class HPCJobSubmitPost(BaseModel):
+    """
+    Submit HPC Job post model
+    """
+    host: str
+    username: str
+    token: str
+    job_info: dict
+
+
+class HPCJobResponse(APIResponse):
+    """
+    HPC Job Response Class
+    """
+    result: dict = Field({}, example={
+            "code": 200,
+            "error_msg": "",
+            "result": {
+                "job_id":15178
+                }
+        }
+    )
+
+class HPCJobInfoGet(BaseModel):
+    """
+    Get HPC Job info model
+    """
+    job_id: str
+    host: str
+    username: str
+    token: str
+
+
+class HPCJobInfoResponse(APIResponse):
+    """
+    HPC Job Response Class
+    """
+    result: dict = Field({}, example={
+            "code": 200,
+            "error_msg": "",
+            "result": {
+                "job_id":"12345",
+                "job_state":"COMPLETED",
+                "standard_error":"",
+                "standard_input":"",
+                "standard_output":""
+                }
+        }
+    )

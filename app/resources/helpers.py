@@ -4,7 +4,7 @@ import time
 from ..config import ConfigClass
 from ..resources. error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import APIResponse, EAPIResponseCode
-from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel, DatasetVersionModel
+from ..models.error_model import HPCError
 from ..service_logger.logger_factory_service import SrvLoggerFactory
 
 _logger = SrvLoggerFactory("Helpers").get_logger()
@@ -311,17 +311,17 @@ def check_folder_exist(zone, project_code, folder):
     return code, error_msg
 
 
-def get_hpc_jwt_token(token_issuer, token, password = None):
+def get_hpc_jwt_token(token_issuer, username, password = None):
     _logger.info("get_hpc_jwt_token".center(80, '-'))
     try:
         payload = {
             "token_issuer": token_issuer,
+            "username": username,
             "password": password
             }
-        headers = {"Authorization": "Bearer " + token}
         url = ConfigClass.HPC_SERVICE + "/v1/hpc/auth"
         _logger.info(f"Request url: {url}")
-        res = requests.get(url, headers = headers, params=payload)
+        res = requests.get(url, params=payload)
         _logger.info(f"Response: {res.text}")
         result = res.json().get('result')
         token = result.get('result').get('token')
@@ -330,3 +330,77 @@ def get_hpc_jwt_token(token_issuer, token, password = None):
         token = ''
     finally:
         return token
+    
+def submit_hpc_job(job_submission_event) -> dict:
+    _logger.info("submit_hpc_job".center(80, '-'))
+    try:
+        _logger.info(f"Received event: {job_submission_event}")
+        token = job_submission_event.token
+        host = job_submission_event.host
+        username = job_submission_event.username
+        job_info = job_submission_event.job_info
+        job_script = job_info.get('script', '')
+        _logger.info(f"Request job script: {job_script}")
+        if not job_script:
+            status_code = EAPIResponseCode.bad_request
+            error_msg = 'Missing script'
+            raise HPCError(status_code, error_msg)
+        url = ConfigClass.HPC_SERVICE + "/v1/hpc/job"
+        headers = {
+            "Authorization": token
+        }
+        payload = {
+            "slurm_host": host,
+            "username": username,
+            "job_info": job_info
+        }
+        _logger.info(f"Request url: {url}")
+        _logger.info(f"Request headers: {headers}")
+        _logger.info(f"Request payload: {payload}")
+        res = requests.post(url, headers=headers, json=payload)
+        _logger.info(f"Response: {res.text}")
+        response = res.json()
+        status_code = response.get('code')
+        if status_code == 200:
+            result = response.get('result')
+            return result
+        else:
+            error_msg = response.get('error_msg')
+            raise HPCError(status_code, error_msg)
+    except Exception as e:
+        _logger.error(e)
+        raise e
+
+def get_hpc_job_info(job_id, host, username, token) -> dict:
+    _logger.info("get_hpc_job_info".center(80, '-'))
+    try:
+        _logger.info(f"Received job_id: {job_id}")
+        url = ConfigClass.HPC_SERVICE + f"/v1/hpc/job/{job_id}"
+        headers = {
+            "Authorization": token
+        }
+        params = {
+            "slurm_host": host,
+            "username": username
+        }
+        _logger.info(f"Request url: {url}")
+        _logger.info(f"Request headers: {headers}")
+        _logger.info(f"Request params: {params}")
+        res = requests.get(url, headers=headers, params=params)
+        _logger.info(f"Response: {res.text}")
+        response = res.json()
+        status_code = response.get('code')
+        if status_code == 200:
+            result = response.get('result')
+            return result
+        else:
+            error_msg = response.get('error_msg')
+            if 'unknown job' in error_msg:
+                error_msg = 'Job ID not found'
+                status_code = EAPIResponseCode.not_found
+                raise HPCError(status_code, error_msg)
+            else:
+                raise Exception(status_code, error_msg)
+    except Exception as e:
+        _logger.error(e)
+        raise e

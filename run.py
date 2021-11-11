@@ -1,6 +1,6 @@
 import uvicorn
-from app.main import create_app
 from app.config import ConfigClass
+from app.main import create_app
 
 app = create_app()
 
