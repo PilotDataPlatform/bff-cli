@@ -3,8 +3,6 @@ from app.config import ConfigClass
 from app.main import create_app
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-# from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
-# from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.resources import SERVICE_NAME
@@ -23,7 +21,6 @@ trace.set_tracer_provider(
 )
 jaeger_exporter = JaegerExporter(
     agent_host_name=ConfigClass.OPEN_TELEMETRY_HOST, agent_port=ConfigClass.OPEN_TELEMETRY_PORT
-    # agent_host_name='0.0.0.0', agent_port=6831
     )
 trace.get_tracer_provider().add_span_processor(
     BatchSpanProcessor(jaeger_exporter)
