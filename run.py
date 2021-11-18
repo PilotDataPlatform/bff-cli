@@ -10,7 +10,9 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from app.namespace import namespace
 from app.config import ConfigClass
-from trace import get_additional_instrument
+from app.commons.data_providers.database import engine
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 app = create_app()
 
@@ -25,9 +27,17 @@ jaeger_exporter = JaegerExporter(
 trace.get_tracer_provider().add_span_processor(
     BatchSpanProcessor(jaeger_exporter)
 )
-FastAPIInstrumentor.instrument_app(app)
-get_additional_instrument()
+"""
+opentelemetry instrument for additional packages could be found here:
 
+https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation
+
+In each folder of above link, open folder src/opentelemetry/instrumentation/{package}, 
+in __init__.py there suppose be a Instrumentor, such as Psycopg2Instrumentor
+"""
+FastAPIInstrumentor.instrument_app(app)
+SQLAlchemyInstrumentor().instrument(engine=engine, service=namespace)
+RequestsInstrumentor().instrument()
 
 if __name__ == "__main__":
     uvicorn.run("run:app", host=ConfigClass.settings.host, port=ConfigClass.settings.port, log_level="info", reload=True)

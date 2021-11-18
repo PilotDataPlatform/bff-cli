@@ -24,7 +24,7 @@ def vault_factory(config_center) -> dict:
     return config_center_respon.json()['result']
 
 class Settings(BaseSettings):
-    port: int = 5062
+    port: int = 5080
     host: str = "0.0.0.0"
     RDS_HOST: str
     RDS_PORT: str
