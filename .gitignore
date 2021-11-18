@@ -137,3 +137,5 @@ vrecli.egg-info
 *.__pycache__
 *.logs
 logs
+gunicorn_error.log
+gunicorn_access.log
