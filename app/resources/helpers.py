@@ -35,7 +35,9 @@ def get_user_role(user_id, project_id):
 
 
 def query__node_has_relation_with_admin(label='Container'):
+    _logger.info("query__node_has_relation_with_admin".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query"
+    _logger.info(f"Requesting API: {url}")
     data = {'is_all': 'true'}
     try:
         res = requests.post(url=url, json=data)
@@ -52,6 +54,7 @@ def query_node_has_relation_for_user(username, label='Container'):
         'start_params': {'name': username},
         'end_label': label
     }
+    _logger.info(f"Requesting API: {url}")
     _logger.info(f'Query payload: {data}')
     try:
         res = requests.post(url=url, json=data)
@@ -172,17 +175,23 @@ def get_node_by_code(code, label):
 
 
 def has_permission(event):
+    _logger.info("has_permission".center(80, '-'))
     user_role = event.get('user_role')
     username = event.get('username')
     project_code = event.get('project_code')
-    _projects = get_user_projects(user_role, username)
-    _projects = [p.get('code') for p in _projects]
-    if project_code not in _projects:
-        result = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-        code = EAPIResponseCode.forbidden
-    else:
+    _logger.info(f"user role: {user_role}, user name: {username}, project code: {project_code}")
+    if user_role == 'admin':
         result = 'permit'
         code = EAPIResponseCode.success
+    else:
+        _projects = get_user_projects(user_role, username)
+        _projects = [p.get('code') for p in _projects]
+        if project_code not in _projects:
+            result = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+            code = EAPIResponseCode.forbidden
+        else:
+            result = 'permit'
+            code = EAPIResponseCode.success
     return code, result
 
 

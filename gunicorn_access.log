@@ -10,3 +10,17 @@
 127.0.0.1:55140 - "GET /v1/api-doc HTTP/1.1" 200
 127.0.0.1:55140 - "GET /openapi.json HTTP/1.1" 200
 127.0.0.1:41168 - "POST /v1/lineage HTTP/1.1" 200
+127.0.0.1:43904 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:43912 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200
+127.0.0.1:49790 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:49816 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200
+127.0.0.1:50268 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:50300 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200
+127.0.0.1:51404 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:51420 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200
+127.0.0.1:52202 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:52236 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200
+127.0.0.1:52638 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:52662 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200
+127.0.0.1:53930 - "GET /v1/projects HTTP/1.1" 200
+127.0.0.1:53962 - "GET /v1/manifest?project_code=cli HTTP/1.1" 200

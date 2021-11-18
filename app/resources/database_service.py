@@ -44,6 +44,8 @@ class RDConnection:
 
 
     def get_attributes_in_manifest_in_db(self, event):
+        self._logger.info("get_attributes_in_manifest_in_db".center(80, '-'))
+        self._logger.info(f"Received event: {event}")
         manifest = event.get('manifest')
         attr_list = []
         attributes = self.db_session.query(DataAttributeModel.name,
