@@ -260,6 +260,7 @@ def http_query_node_zone(folder_event):
             "display_path": display_path,
             "name": folder_name,
             "project_code": project_code,
+            "archived": False,
             "labels": ['Folder', zone_label]}
     }
     node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
