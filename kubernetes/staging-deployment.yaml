@@ -4,9 +4,9 @@ metadata:
   name: bff-vrecli
   namespace: utility
   labels:
-    app: bff-
-  annotations:
-    "sidecar.jaegertracing.io/inject": "true"
+    app: bff-vrecli
+    annotations:
+      "sidecar.jaegertracing.io/inject": "true"
 spec:
   replicas: 1
   selector:
