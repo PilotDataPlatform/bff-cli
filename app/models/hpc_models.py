@@ -66,14 +66,6 @@ class HPCJobInfoResponse(APIResponse):
         }
     )
 
-# class HPCNodesGet(BaseModel):
-#     """
-#     Get HPC Nodes
-#     """
-#     host: str
-#     username: str
-#     token: str
-
 class HPCNodesResponse(APIResponse):
     """
     HPC Nodes Response Class
