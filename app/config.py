@@ -48,8 +48,8 @@ class Settings(BaseSettings):
     RDS_PWD: str 
     RDS_SCHEMA_DEFAULT:str
     KG_SERVICE: str
-    OPEN_TELEMETRY_HOST: str='0.0.0.0'
-    OPEN_TELEMETRY_PORT: int=6831
+    OPEN_TELEMETRY_HOST: str = '0.0.0.0'
+    OPEN_TELEMETRY_PORT: int = 6831
 
 
     class Config:
