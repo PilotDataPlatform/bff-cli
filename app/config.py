@@ -13,6 +13,7 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
     if CONFIG_CENTER_ENABLED == "false":
         return {}
     else:
+        # print(vault_factory(CONFIG_CENTER_BASE_URL))
         return vault_factory(CONFIG_CENTER_BASE_URL)
 
 def vault_factory(config_center) -> dict:
