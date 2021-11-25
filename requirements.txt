@@ -16,4 +16,5 @@ opentelemetry-instrumentation-fastapi==0.26b1
 opentelemetry-instrumentation-sqlalchemy==0.26b1
 opentelemetry-instrumentation-psycopg2==0.26b1
 opentelemetry-instrumentation-requests==0.26b1
+opentelemetry-instrumentation-asyncpg==0.26b1
 
