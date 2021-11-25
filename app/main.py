@@ -32,6 +32,7 @@ trace.set_tracer_provider(
 jaeger_exporter = JaegerExporter(
     agent_host_name=ConfigClass.OPEN_TELEMETRY_HOST, agent_port=ConfigClass.OPEN_TELEMETRY_PORT
     )
+
 trace.get_tracer_provider().add_span_processor(
     BatchSpanProcessor(jaeger_exporter)
 )

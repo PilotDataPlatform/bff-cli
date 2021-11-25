@@ -1,3 +1,4 @@
+from app.config import ConfigClass
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.project_models import *
@@ -38,6 +39,7 @@ class APIProject:
         project_list = get_user_projects(user_role, username)
         self._logger.info(f"Getting user projects: {project_list}")
         self._logger.info(f"Number of projects: {len(project_list)}")
+        self._logger.info(f"DEBUG CONFIG: {ConfigClass.OPEN_TELEMETRY_HOST}")
         api_response.result = project_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
