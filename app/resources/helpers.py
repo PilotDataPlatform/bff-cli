@@ -319,24 +319,3 @@ def check_folder_exist(zone, project_code, folder):
         error_msg = 'Folder not exist'
         code = EAPIResponseCode.not_found
     return code, error_msg
-
-
-def get_hpc_jwt_token(token_issuer, username, password = None):
-    _logger.info("get_hpc_jwt_token".center(80, '-'))
-    try:
-        payload = {
-            "token_issuer": token_issuer,
-            "username": username,
-            "password": password
-            }
-        url = ConfigClass.HPC_SERVICE + "/v1/hpc/auth"
-        _logger.info(f"Request url: {url}")
-        res = requests.get(url, params=payload)
-        _logger.info(f"Response: {res.text}")
-        result = res.json().get('result')
-        token = result.get('result').get('token')
-    except Exception as e:
-        _logger.error(e)
-        token = ''
-    finally:
-        return token
