@@ -1,6 +1,13 @@
 from pydantic import Field, BaseModel
 from .base_models import APIResponse
 
+class HPCAuthPost(BaseModel):
+    """
+    Auth HPC post model
+    """
+    token_issuer: str
+    username: str
+    password: str
 
 class HPCAuthResponse(APIResponse):
     """

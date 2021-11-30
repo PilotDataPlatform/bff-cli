@@ -7,7 +7,7 @@ from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
 from ...resources.helpers import *
 from ...resources.hpc import submit_hpc_job, get_hpc_job_info
-from ...resources.hpc import get_hpc_nodes, get_hpc_node_by_name
+from ...resources.hpc import get_hpc_nodes, get_hpc_node_by_name, get_hpc_jwt_token
 from ...resources.hpc import get_hpc_partitions, get_hpc_partition_by_name
 
 router = APIRouter()
@@ -21,18 +21,20 @@ class APIProject:
     def __init__(self):
         self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.get("/hpc/auth", tags=[_API_TAG],
+    @router.post("/hpc/auth", tags=[_API_TAG],
                 response_model=HPCAuthResponse,
                 summary="HPC authentication")
     @catch_internal(_API_NAMESPACE)
-    async def hpc_auth(self, token_issuer, username, password):
+    async def hpc_auth(self, request_payload: HPCAuthPost):
         '''
-        Get HPC token for authorization
+        post HPC token for authorization
         '''
         self._logger.info("API hpc_auth".center(80, '-'))
         api_response = HPCAuthResponse()
         try:
-        
+            token_issuer = request_payload.token_issuer
+            username = request_payload.username
+            password = request_payload.password
             token = get_hpc_jwt_token(token_issuer, username, password)
             if token:
                 error = ""
@@ -74,6 +76,7 @@ class APIProject:
                 result = response
                 code = EAPIResponseCode.success
         except HPCError as e:
+            self._logger.error(f"HPC ERROR: {e}")
             code = e.code
             error_msg = e.message
             self._logger.info(f"ERROR SUBMITTING HPC JOB: {error_msg}")
