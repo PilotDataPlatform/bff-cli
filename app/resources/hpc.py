@@ -37,8 +37,11 @@ def submit_hpc_job(job_submission_event) -> dict:
         username = job_submission_event.username
         job_info = job_submission_event.job_info
         job_script = job_info.get('script', '')
-        slurm_host = host.split('://')[1]
-        protocol_type = host.split('://')[0]
+        hpc_host = host.split('://')
+        if len(hpc_host) < 2:
+            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+        slurm_host = hpc_host[1]
+        protocol_type = hpc_host[0]
         _logger.info(f"Request job script: {job_script}")
         if not job_script:
             status_code = EAPIResponseCode.bad_request
@@ -82,8 +85,11 @@ def submit_hpc_job(job_submission_event) -> dict:
 def get_hpc_job_info(job_id, host, username, token) -> dict:
     _logger.info("get_hpc_job_info".center(80, '-'))
     try:
-        slurm_host = host.split('://')[1]
-        protocol_type = host.split('://')[0]
+        hpc_host = host.split('://')
+        if len(hpc_host) < 2:
+            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+        slurm_host = hpc_host[1]
+        protocol_type = hpc_host[0]
         _logger.info(f"Received job_id: {job_id}")
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/job/{job_id}"
         headers = {
@@ -125,8 +131,11 @@ def get_hpc_nodes(host, username, hpc_token) -> dict:
     try:
         _logger.info(f"Received host: {host}")
         _logger.info(f"Received username: {username}")
-        slurm_host = host.split('://')[1]
-        protocol_type = host.split('://')[0]
+        hpc_host = host.split('://')
+        if len(hpc_host) < 2:
+            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+        slurm_host = hpc_host[1]
+        protocol_type = hpc_host[0]
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/nodes"
         headers = {
             "Authorization": hpc_token
@@ -159,8 +168,11 @@ def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
         _logger.info(f"Received host: {host}")
         _logger.info(f"Received username: {username}")
         _logger.info(f"Received nodename: {node_name}")
-        slurm_host = host.split('://')[1]
-        protocol_type = host.split('://')[0]
+        hpc_host = host.split('://')
+        if len(hpc_host) < 2:
+            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+        slurm_host = hpc_host[1]
+        protocol_type = hpc_host[0]
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/nodes/{node_name}"
         headers = {
             "Authorization": hpc_token
@@ -196,8 +208,11 @@ def get_hpc_partitions(host, username, hpc_token) -> dict:
     try:
         _logger.info(f"Received host: {host}")
         _logger.info(f"Received username: {username}")
-        slurm_host = host.split('://')[1]
-        protocol_type = host.split('://')[0]
+        hpc_host = host.split('://')
+        if len(hpc_host) < 2:
+            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+        slurm_host = hpc_host[1]
+        protocol_type = hpc_host[0]
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/partitions"
         headers = {
             "Authorization": hpc_token
@@ -234,8 +249,11 @@ def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict
         _logger.info(f"Received host: {host}")
         _logger.info(f"Received username: {username}")
         _logger.info(f"Received partition_name: {partition_name}")
-        slurm_host = host.split('://')[1]
-        protocol_type = host.split('://')[0]
+        hpc_host = host.split('://')
+        if len(hpc_host) < 2:
+            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+        slurm_host = hpc_host[1]
+        protocol_type = hpc_host[0]
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/partitions/{partition_name}"
         headers = {
             "Authorization": hpc_token
