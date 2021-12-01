@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     RDS_PWD: str 
     RDS_SCHEMA_DEFAULT:str
     KG_SERVICE: str
+    OPEN_TELEMETRY_HOST: str = '0.0.0.0'
+    OPEN_TELEMETRY_PORT: int = 6831
 
 
     class Config:
@@ -76,7 +78,7 @@ def get_settings():
 
 class ConfigClass(object):
     settings = get_settings()
-    version = "1.1.0"
+    version = "1.7.0"
     RDS_HOST = settings.RDS_HOST
     RDS_PORT = settings.RDS_PORT
     RDS_DBNAME = settings.RDS_DBNAME
@@ -100,3 +102,5 @@ class ConfigClass(object):
     RDS_PWD = settings.RDS_PWD
     RDS_SCHEMA_DEFAULT = settings.RDS_SCHEMA_DEFAULT
     KG_SERVICE = settings.KG_SERVICE
+    OPEN_TELEMETRY_HOST = settings.OPEN_TELEMETRY_HOST
+    OPEN_TELEMETRY_PORT = settings.OPEN_TELEMETRY_PORT

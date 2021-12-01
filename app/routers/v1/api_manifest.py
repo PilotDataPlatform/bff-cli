@@ -54,6 +54,7 @@ class APIManifest:
             manifest_list = []
             self._logger.info("Getting attributes for manifests")
             for manifest in manifests:
+                self._logger.info(f"Getting attributes for manifest: {manifest}")
                 mani_project_event['manifest'] = manifest
                 attr = self.db.get_attributes_in_manifest_in_db(mani_project_event)
                 single_manifest = {'manifest_name': manifest['name'],
