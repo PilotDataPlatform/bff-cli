@@ -11,6 +11,7 @@ cases: generate, attribute, environment
 case = "all"
 zone_env=""
 
+
 @unittest.skipUnless(case == 'generate' or case == 'all' or case=='', 'Run specific test')
 class TestGenerateIDValidation(unittest.TestCase):
     log = Logger(name='test_gid_validation.log')
