@@ -13,9 +13,6 @@ class GetProjectFileListResponse(APIResponse):
     result: dict = Field({}, example={
         "code": 200,
         "error_msg": "",
-        "page": 0,
-        "total": 1,
-        "num_of_pages": 1,
         "result": [
             {
                 "id": 6127,
@@ -75,9 +72,6 @@ class POSTDownloadFileResponse(APIResponse):
     result: dict = Field({}, example={
         "code": 200,
         "error_msg": "",
-        "page": 0,
-        "total": 1,
-        "num_of_pages": 1,
         "result": {
             "session_id": "downloadtest",
             "job_id": "data-download-1621521355",

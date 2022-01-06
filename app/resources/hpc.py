@@ -157,6 +157,7 @@ def get_hpc_nodes(host, username, hpc_token) -> dict:
             return result
         else:
             error_msg = response.get('error_msg')
+            status_code = EAPIResponseCode.internal_error
             raise HPCError(status_code, error_msg)
     except Exception as e:
         _logger.error(e)
@@ -198,7 +199,9 @@ def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
                 error_msg = 'Node name not found'
                 status_code = EAPIResponseCode.not_found
                 raise HPCError(status_code, error_msg)
-            raise HPCError(status_code, error_msg)
+            else:
+                status_code = EAPIResponseCode.internal_error
+                raise HPCError(status_code, error_msg)
     except Exception as e:
         _logger.error(e)
         raise e
@@ -234,11 +237,13 @@ def get_hpc_partitions(host, username, hpc_token) -> dict:
             return result
         else:
             error_msg = response.get('error_msg')
-            if 'Invalid node name specified' in error_msg:
-                error_msg = 'Node name not found'
-                status_code = EAPIResponseCode.not_found
+            if 'Retrieval of HPC partitions info failed' in error_msg:
+                error_msg = 'Cannot list partitions, please check if hpc token valid'
+                status_code = EAPIResponseCode.bad_request
                 raise HPCError(status_code, error_msg)
-            raise HPCError(status_code, error_msg)
+            else:
+                status_code = EAPIResponseCode.internal_error
+                raise HPCError(status_code, error_msg)
     except Exception as e:
         _logger.error(e)
         raise e
@@ -279,7 +284,9 @@ def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict
                 error_msg = 'Partition name not found'
                 status_code = EAPIResponseCode.not_found
                 raise HPCError(status_code, error_msg)
-            raise HPCError(status_code, error_msg)
+            else:
+                status_code = EAPIResponseCode.internal_error
+                raise HPCError(status_code, error_msg)
     except Exception as e:
         _logger.error(e)
         raise e
