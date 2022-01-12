@@ -9,9 +9,6 @@ class ProjectListResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1,
             "result": [
                 {
                     "name": "GENERATE TEST",
@@ -30,9 +27,6 @@ class POSTProjectFileResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1,
             "result": {}
         }
     )
@@ -54,9 +48,6 @@ class GetProjectRoleResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1,
             "result": "role"
         }
     )
@@ -73,9 +64,6 @@ class GetProjectFolderResponse(APIResponse):
     result: dict = Field({}, example={
         "code": 200,
         "error_msg": "",
-        "page": 0,
-        "total": 1,
-        "num_of_pages": 1,
         "result": {
             "id": 1552,
             "labels": [

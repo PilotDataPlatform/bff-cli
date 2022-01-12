@@ -10,7 +10,7 @@ class RDConnection:
         db = DBConnection()
         self.db_session = db.session
 
-    def get_manifest_name_from_project_in_db(self, event):
+    def get_manifest_name_from_project_in_db(self, event: dict)-> list:
         self._logger.info("get_manifest_name_from_project_in_db".center(80, '-'))
         self._logger.info(f"Received event: {event}")
         project_code = event.get('project_code')
@@ -23,9 +23,9 @@ class RDConnection:
                     .first()
                 self._logger.info(f"QUERY RESULT: {m}")
                 if not m:
-                    return None
+                    return []
                 else:
-                    manifest = {'name': m[0], 'id': m[1]}
+                    manifest = [{'name': m[0], 'id': m[1]}]
                     return manifest
             else:
                 manifests = self.db_session.query(DataManifestModel.name,
@@ -41,28 +41,32 @@ class RDConnection:
         except Exception as e:
             self._logger.error(f"ERROR get_manifest_name_from_project_in_db: {e}")
             raise e
-
-
-    def get_attributes_in_manifest_in_db(self, event):
+    
+    def get_attributes_in_manifest_in_db(self, manifests: list) -> dict:
         self._logger.info("get_attributes_in_manifest_in_db".center(80, '-'))
-        self._logger.info(f"Received event: {event}")
-        manifest = event.get('manifest')
-        attr_list = []
+        self._logger.info(f"Received event: {manifests}")
+        manifest_list = []
+        for manifest in manifests:
+                manifest_id = manifest.get('id')
+                manifest_list.append(manifest_id)
+        id_list = set(manifest_list)
         attributes = self.db_session.query(DataAttributeModel.name,
                                     DataAttributeModel.type,
                                     DataAttributeModel.optional,
-                                    DataAttributeModel.value). \
-            filter_by(manifest_id=manifest.get('id')). \
+                                    DataAttributeModel.value,
+                                    DataAttributeModel.manifest_id). \
+            filter(DataAttributeModel.manifest_id.in_(id_list)). \
             order_by(DataAttributeModel.id.asc()).all()
+        self._logger.info(attributes)
         if not attributes:
-            return None
-        for attr in attributes:
-            result = {"name": attr[0],
-                    "type": attr[1],
-                    "optional": attr[2],
-                    "value": attr[3]}
-            attr_list.append(result)
-        return attr_list
+            return {}
+        manifest_attributes = manifests
+        for m in manifest_attributes:
+            m['manifest_name'] = m.get('name')
+            m.pop('name')
+            m['attributes'] = [{"name": attr[0], "type": attr[1], "optional": attr[2],
+                                "value": attr[3]} for attr in attributes if attr[4] == m.get('id')]
+        return manifest_attributes
 
 
     def get_dataset_versions(self, event):
