@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.manifest_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
-from ...commons.data_providers.database import DBConnection
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required, check_permission
 from ...resources.helpers import *

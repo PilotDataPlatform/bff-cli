@@ -2,7 +2,8 @@ import unittest
 from .prepare_test import SetupTest
 from .logger import Logger
 import time
-
+from unittest import IsolatedAsyncioTestCase
+from httpx import AsyncClient
 case_to_run = ''
 no_access_user_name = "jzhang53"
 no_access_user_password = "Indoc1234567!"
@@ -15,7 +16,7 @@ pre_defined_folder = "admin_folder"
 
 
 @unittest.skipIf(case_to_run == 'vrecore', 'Run specific test')
-class TestGetFilesFoldersGR(unittest.TestCase):
+class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
     log = Logger(name='test_list_files_folders.log')
     test = SetupTest(log)
     app = test.client
@@ -72,7 +73,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
         for file_id in cls.to_delete:
             cls.test.delete_file(file_id)
 
-    def test_01_admin_get_name_folders(self):
+    async def test_01_admin_get_name_folders(self):
         self.log.info('\n')
         self.log.info("test_01_get_name_folder".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -81,8 +82,9 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "zone": self.zone,
                      "folder": '',
                      "source_type": 'Container'}
-            headers = {"Authorization": 'Bearer ' + self.token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + self.token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -107,7 +109,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_01 error: {e}")
             raise e
 
-    def test_02_collaborator_get_name_folders(self):
+    async def test_02_collaborator_get_name_folders(self):
         self.log.info('\n')
         self.log.info("test_02_collaborator_get_name_folder".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -117,8 +119,9 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "folder": '',
                      "source_type": 'Container'}
             token = self.test.auth(self.test.login_collaborator())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -143,7 +146,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_02 error: {e}")
             raise e
 
-    def test_03_contributor_get_name_folders(self):
+    async def test_03_contributor_get_name_folders(self):
         self.log.info('\n')
         self.log.info("test_03_contributor_get_name_folders".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -153,8 +156,9 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "folder": '',
                      "source_type": 'Container'}
             token = self.test.auth(self.test.login_contributor())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -179,7 +183,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_03 error: {e}")
             raise e
 
-    def test_04_admin_get_files_contributor_folder_gr(self):
+    async def test_04_admin_get_files_contributor_folder_gr(self):
         self.log.info('\n')
         self.log.info("test_04_admin_get_files_contributor_folder_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -188,9 +192,10 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "zone": self.zone,
                      "folder": contributor_user,
                      "source_type": 'Folder'}
-            headers = {"Authorization": 'Bearer ' + self.token}
-            self.log.info(f"GET PARAM {param}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + self.token}
+                self.log.info(f"GET PARAM {param}")
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -206,7 +211,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_04 error: {e}")
             raise e
 
-    def test_05_collaborator_get_files_contributor_folder_gr(self):
+    async def test_05_collaborator_get_files_contributor_folder_gr(self):
         self.log.info('\n')
         self.log.info("test_05_collaborator_get_files_contributor_folder_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -216,8 +221,9 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "folder": contributor_user,
                      "source_type": 'Folder'}
             token = self.test.auth(self.test.login_collaborator())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 403)
@@ -233,7 +239,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_05 error: {e}")
             raise e
 
-    def test_06_contributor_get_files_admin_folder_gr(self):
+    async def test_06_contributor_get_files_admin_folder_gr(self):
         self.log.info('\n')
         self.log.info("test_06_contributor_get_files_admin_folder_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -243,8 +249,9 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "folder": admin_user,
                      "source_type": 'Folder'}
             token = self.test.auth(self.test.login_contributor())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 403)
@@ -260,7 +267,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_06 error: {e}")
             raise e
 
-    def test_07_contributor_get_folder_file_gr(self):
+    async def test_07_contributor_get_folder_file_gr(self):
         self.log.info('\n')
         self.log.info("test_07_contributor_get_folder_file_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -270,9 +277,10 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "folder": f"{contributor_user}/{pre_defined_folder}",
                      "source_type": 'Folder'}
             token = self.test.auth(self.test.login_contributor())
-            headers = {"Authorization": 'Bearer ' + token}
-            self.log.info(f'Get params: {param}')
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                self.log.info(f'Get params: {param}')
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -288,7 +296,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
             self.log.error(f"test_07 error: {e}")
             raise e
 
-    def test_08_collaborator_get_folder_file_gr(self):
+    async def test_08_collaborator_get_folder_file_gr(self):
         self.log.info('\n')
         self.log.info("test_08_collaborator_get_folder_file_gr".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -299,8 +307,9 @@ class TestGetFilesFoldersGR(unittest.TestCase):
                      "source_type": 'Folder'}
             self.log.info(f'Get params: {param}')
             token = self.test.auth(self.test.login_collaborator())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -318,7 +327,7 @@ class TestGetFilesFoldersGR(unittest.TestCase):
 
 
 @unittest.skipIf(case_to_run == 'greenroom', 'Run specific test')
-class TestGetFilesFoldersCore(unittest.TestCase):
+class TestGetFilesFoldersCore(IsolatedAsyncioTestCase):
     log = Logger(name='test_list_files_folders.log')
     test = SetupTest(log)
     app = test.client
@@ -371,7 +380,7 @@ class TestGetFilesFoldersCore(unittest.TestCase):
         for file_id in cls.to_delete:
             cls.test.delete_file(file_id)
 
-    def test_01_admin_get_name_folders_core(self):
+    async def test_01_admin_get_name_folders_core(self):
         self.log.info('\n')
         self.log.info("test_01_get_name_folder_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -380,8 +389,9 @@ class TestGetFilesFoldersCore(unittest.TestCase):
                      "zone": self.zone,
                      "folder": '',
                      "source_type": 'Container'}
-            headers = {"Authorization": 'Bearer ' + self.token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + self.token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -406,7 +416,7 @@ class TestGetFilesFoldersCore(unittest.TestCase):
             self.log.error(f"test_01 error: {e}")
             raise e
 
-    def test_02_collaborator_get_name_folders(self):
+    async def test_02_collaborator_get_name_folders(self):
         self.log.info('\n')
         self.log.info("test_02_collaborator_get_name_folder".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -416,8 +426,9 @@ class TestGetFilesFoldersCore(unittest.TestCase):
                      "folder": '',
                      "source_type": 'Container'}
             token = self.test.auth(self.test.login_collaborator())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -442,7 +453,7 @@ class TestGetFilesFoldersCore(unittest.TestCase):
             self.log.error(f"test_02 error: {e}")
             raise e
 
-    def test_03_contributor_get_name_folders_core(self):
+    async def test_03_contributor_get_name_folders_core(self):
         self.log.info('\n')
         self.log.info("test_03_contributor_get_name_folders_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -452,8 +463,9 @@ class TestGetFilesFoldersCore(unittest.TestCase):
                      "folder": '',
                      "source_type": 'Container'}
             token = self.test.auth(self.test.login_contributor())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 403)
@@ -465,7 +477,7 @@ class TestGetFilesFoldersCore(unittest.TestCase):
             self.log.error(f"test_03 error: {e}")
             raise e
 
-    def test_04_admin_get_files_contributor_folder_core(self):
+    async def test_04_admin_get_files_contributor_folder_core(self):
         self.log.info('\n')
         self.log.info("test_04_admin_get_files_contributor_folder_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -474,8 +486,9 @@ class TestGetFilesFoldersCore(unittest.TestCase):
                      "zone": self.zone,
                      "folder": contributor_user,
                      "source_type": 'Folder'}
-            headers = {"Authorization": 'Bearer ' + self.token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + self.token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -491,7 +504,7 @@ class TestGetFilesFoldersCore(unittest.TestCase):
             self.log.error(f"test_04 error: {e}")
             raise e
 
-    def test_05_collaborator_get_files_contributor_folder_core(self):
+    async def test_05_collaborator_get_files_contributor_folder_core(self):
         self.log.info('\n')
         self.log.info("test_05_collaborator_get_files_contributor_folder_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -501,8 +514,9 @@ class TestGetFilesFoldersCore(unittest.TestCase):
                      "folder": contributor_user,
                      "source_type": 'Folder'}
             token = self.test.auth(self.test.login_collaborator())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 200)
@@ -518,7 +532,7 @@ class TestGetFilesFoldersCore(unittest.TestCase):
             self.log.error(f"test_05 error: {e}")
             raise e
 
-    def test_06_contributor_get_files_admin_folder_core(self):
+    async def test_06_contributor_get_files_admin_folder_core(self):
         self.log.info('\n')
         self.log.info("test_06_contributor_get_files_admin_folder_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
@@ -528,8 +542,9 @@ class TestGetFilesFoldersCore(unittest.TestCase):
                      "folder": admin_user,
                      "source_type": 'Folder'}
             token = self.test.auth(self.test.login_contributor())
-            headers = {"Authorization": 'Bearer ' + token}
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {"Authorization": 'Bearer ' + token}
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(res.text)
             res_json = res.json()
             self.assertEqual(res.status_code, 403)

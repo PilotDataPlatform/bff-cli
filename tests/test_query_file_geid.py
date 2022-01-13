@@ -3,9 +3,10 @@ import time
 import os
 from .prepare_test import SetupTest
 from .logger import Logger
+from unittest import IsolatedAsyncioTestCase
+from httpx import AsyncClient
 
-
-class TestQueryFileGeid(unittest.TestCase):
+class TestQueryFileGeid(IsolatedAsyncioTestCase):
     log = Logger(name='test_query_file_geid.log')
     test = SetupTest(log)
     app = test.client
@@ -54,18 +55,17 @@ class TestQueryFileGeid(unittest.TestCase):
         delete_folder_file_core_res = cls.test.delete_file(cls.folder_file_core_id)
         cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_core_res}")
 
-    def test_01_query_file_by_geid(self):
+    async def test_01_query_file_by_geid(self):
         self.log.info('\n')
         self.log.info("test_01_query_file_by_geid".center(80, '-'))
         payload = {'geid': [self.file_geid, self.folder_file_geid, self.folder_file_core_geid]}
         _token = self.test.auth()
-        headers = {
-            'Authorization': 'Bearer ' + _token
-        }
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {'Authorization': 'Bearer ' + _token}
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             result = res_json.get('result')
@@ -115,19 +115,18 @@ class TestQueryFileGeid(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_02_query_file_by_non_exist_geid(self):
+    async def test_02_query_file_by_non_exist_geid(self):
         self.log.info('\n')
         self.log.info("test_02_query_file_by_non_exist_geid".center(80, '-'))
         fake_geid = 'abcdefg-1234567'
         payload = {'geid': [fake_geid]}
         _token = self.test.auth()
-        headers = {
-            'Authorization': 'Bearer ' + _token
-        }
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {'Authorization': 'Bearer ' + _token}
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             result = res_json.get('result')
@@ -144,7 +143,7 @@ class TestQueryFileGeid(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_03_query_file_by_no_access_user(self):
+    async def test_03_query_file_by_no_access_user(self):
         self.log.info('\n')
         self.log.info("test_03_query_file_by_no_access_user".center(80, '-'))
         file_geid_list = [self.file_geid, self.folder_file_geid, self.folder_file_core_geid]
@@ -154,13 +153,12 @@ class TestQueryFileGeid(unittest.TestCase):
             "password": "Indoc1234567!"
         }
         _token = self.test.auth(login_user)
-        headers = {
-            'Authorization': 'Bearer ' + _token
-        }
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {'Authorization': 'Bearer ' + _token}
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             result = res_json.get('result')
@@ -177,18 +175,17 @@ class TestQueryFileGeid(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_04_query_file_by_no_access_user(self):
+    async def test_04_query_file_by_no_access_user(self):
         self.log.info('\n')
         self.log.info("test_04_query_file_by_no_access_user".center(80, '-'))
         payload = {'geid': [self.trash_geid]}
         _token = self.test.auth()
-        headers = {
-            'Authorization': 'Bearer ' + _token
-        }
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                headers = {'Authorization': 'Bearer ' + _token}
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             result = res_json.get('result')

@@ -1,7 +1,6 @@
 import unittest
-import time
-import os
-from unittest import mock
+from unittest import IsolatedAsyncioTestCase
+from httpx import AsyncClient
 from .prepare_test import SetupTest
 from .logger import Logger
 from unittest.mock import patch
@@ -18,15 +17,15 @@ def create_resposne(code, content):
         return the_response
 
 @unittest.skipUnless(case == 'all' or case == 'auth', 'specified cases')
-class TestHPCAuth(unittest.TestCase):
+class TestHPCAuth(IsolatedAsyncioTestCase):
     log = Logger(name='test_hpc_auth.log')
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/hpc/auth"
     token = test.auth()
 
-    @patch('app.resources.hpc.requests.post')
-    def test_01_hpc_auth(self, mock_post):
+    @patch('app.resources.hpc.httpx.Client.post')
+    async def test_01_hpc_auth(self, mock_post):
         self.log.info('\n')
         self.log.info("test_01_hpc_auth".center(80, '-'))
         payload = {
@@ -38,7 +37,8 @@ class TestHPCAuth(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -55,14 +55,13 @@ class TestHPCAuth(unittest.TestCase):
             raise e
 
 @unittest.skipUnless(case == 'all' or case == 'job', 'specified cases')
-class TestHPCJob(unittest.TestCase):
+class TestHPCJob(IsolatedAsyncioTestCase):
     log = Logger(name='test_hpc_job.log')
     test = SetupTest(log)
     app = test.client
     token = test.auth()
 
-
-    def test_01_hpc_submit_without_script(self):
+    async def test_01_hpc_submit_without_script(self):
         self.log.info('\n')
         self.log.info("test_01_hpc_submit_without_script".center(80, '-'))
         payload = {
@@ -75,7 +74,8 @@ class TestHPCJob(unittest.TestCase):
             test_api = "/v1/hpc/job"
             self.log.info(f"POST API: {test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.post(test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -91,8 +91,8 @@ class TestHPCJob(unittest.TestCase):
             self.log.error(f"ERROR test_01_hpc_submit_without_script: {e}")
             raise e
     
-    @patch('app.resources.hpc.requests.post')
-    def test_02_hpc_submit_success(self, mock_post):
+    @patch('app.resources.hpc.httpx.Client.post')
+    async def test_02_hpc_submit_success(self, mock_post):
         self.log.info('\n')
         self.log.info("test_02_hpc_submit_success".center(80, '-'))
         payload = {
@@ -109,7 +109,8 @@ class TestHPCJob(unittest.TestCase):
             test_api = "/v1/hpc/job"
             self.log.info(f"POST API: {test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.post(test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -125,8 +126,8 @@ class TestHPCJob(unittest.TestCase):
             self.log.error(f"ERROR test_02_hpc_submit_success: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_03_hpc_get_job_success(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_03_hpc_get_job_success(self, mock_get):
         self.log.info('\n')
         self.log.info("test_03_hpc_get_job_success".center(80, '-'))
         params = {
@@ -141,7 +142,8 @@ class TestHPCJob(unittest.TestCase):
         try:
             self.log.info(f"POST API: {test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -161,8 +163,8 @@ class TestHPCJob(unittest.TestCase):
             self.log.error(f"ERROR test_03_hpc_get_job_success: {e}")
             raise e        
 
-    @patch('app.resources.hpc.requests.get')
-    def test_04_hpc_get_job_wrong_id(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_04_hpc_get_job_wrong_id(self, mock_get):
         self.log.info('\n')
         self.log.info("test_04_hpc_get_job_wrong_id".center(80, '-'))
         try:
@@ -178,7 +180,8 @@ class TestHPCJob(unittest.TestCase):
             mock_get.return_value = create_resposne(code=200, content=mock_content)
             self.log.info(f"POST API: {test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -191,8 +194,8 @@ class TestHPCJob(unittest.TestCase):
             self.log.error(f"ERROR test_04_hpc_get_job_wrong_id: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.post')
-    def test_05_hpc_submit_without_protocol(self, mock_post):
+    @patch('app.resources.hpc.httpx.Client.post')
+    async def test_05_hpc_submit_without_protocol(self, mock_post):
         self.log.info('\n')
         self.log.info("test_05_hpc_submit_without_protocol".center(80, '-'))
         payload = {
@@ -209,7 +212,8 @@ class TestHPCJob(unittest.TestCase):
             test_api = "/v1/hpc/job"
             self.log.info(f"POST API: {test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.post(test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -223,8 +227,8 @@ class TestHPCJob(unittest.TestCase):
             self.log.error(f"ERROR test_05_hpc_submit_without_protocol: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_06_hpc_get_job_without_protocol(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_06_hpc_get_job_without_protocol(self, mock_get):
         self.log.info('\n')
         self.log.info("test_06_hpc_get_job_without_protocol".center(80, '-'))
         try:
@@ -240,7 +244,8 @@ class TestHPCJob(unittest.TestCase):
             mock_get.return_value = create_resposne(code=200, content=mock_content)
             self.log.info(f"POST API: {test_api}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -254,14 +259,14 @@ class TestHPCJob(unittest.TestCase):
             raise e
 
 @unittest.skipUnless(case == 'all' or case == 'node', 'specified cases')
-class TestHPCNode(unittest.TestCase):
+class TestHPCNode(IsolatedAsyncioTestCase):
     log = Logger(name='test_hpc_node.log')
     test = SetupTest(log)
     app = test.client
     token = test.auth()
 
-    @patch('app.resources.hpc.requests.get')
-    def test_01_hpc_list_nodes(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_01_hpc_list_nodes(self, mock_get):
         self.log.info('\n')
         self.log.info("test_01_hpc_list_nodes".center(80, '-'))
         params = {
@@ -275,7 +280,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -293,8 +299,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.error(f"ERROR test_01_hpc_list_nodes: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_02_hpc_get_node(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_02_hpc_get_node(self, mock_get):
         self.log.info('\n')
         self.log.info("test_02_hpc_get_node".center(80, '-'))
         params = {
@@ -309,7 +315,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -324,8 +331,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.error(f"ERROR test_02_hpc_get_node: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_03_hpc_get_node_wrong_name(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_03_hpc_get_node_wrong_name(self, mock_get):
         self.log.info('\n')
         self.log.info("test_03_hpc_get_node_wrong_name".center(80, '-'))
         params = {
@@ -340,7 +347,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -353,8 +361,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.error(f"ERROR test_03_hpc_get_node_wrong_name: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_04_hpc_list_nodes_without_protocol(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_04_hpc_list_nodes_without_protocol(self, mock_get):
         self.log.info('\n')
         self.log.info("test_04_hpc_list_nodes_without_protocol".center(80, '-'))
         params = {
@@ -368,7 +376,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -381,8 +390,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.error(f"ERROR test_04_hpc_list_nodes_without_protocol: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_05_hpc_get_node_without_protocol(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_05_hpc_get_node_without_protocol(self, mock_get):
         self.log.info('\n')
         self.log.info("test_05_hpc_get_node_without_protocol".center(80, '-'))
         params = {
@@ -397,7 +406,8 @@ class TestHPCNode(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -411,14 +421,14 @@ class TestHPCNode(unittest.TestCase):
             raise e
 
 @unittest.skipUnless(case == 'all' or case == 'partition', 'specified cases')
-class TestHPCPartition(unittest.TestCase):
+class TestHPCPartition(IsolatedAsyncioTestCase):
     log = Logger(name='test_hpc_partition.log')
     test = SetupTest(log)
     app = test.client
     token = test.auth()
 
-    @patch('app.resources.hpc.requests.get')
-    def test_01_hpc_list_partitions(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_01_hpc_list_partitions(self, mock_get):
         self.log.info('\n')
         self.log.info("test_01_hpc_list_partitions".center(80, '-'))
         params = {
@@ -433,7 +443,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -451,8 +462,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.error(f"ERROR test_01_hpc_list_partitions: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_02_hpc_get_partition(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_02_hpc_get_partition(self, mock_get):
         self.log.info('\n')
         self.log.info("test_02_hpc_get_partition".center(80, '-'))
         params = {
@@ -467,7 +478,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -482,8 +494,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.error(f"ERROR test_02_hpc_get_partition: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_03_hpc_get_partition_wrong_name(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_03_hpc_get_partition_wrong_name(self, mock_get):
         self.log.info('\n')
         self.log.info("test_03_hpc_get_partition_wrong_name".center(80, '-'))
         params = {
@@ -498,7 +510,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -511,8 +524,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.error(f"ERROR test_03_hpc_get_partition_wrong_name: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_04_hpc_list_partitions_without_protocol(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_04_hpc_list_partitions_without_protocol(self, mock_get):
         self.log.info('\n')
         self.log.info("test_04_hpc_list_partitions_without_protocol".center(80, '-'))
         params = {
@@ -527,7 +540,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')
@@ -540,8 +554,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.error(f"ERROR test_04_hpc_list_partitions_without_protocol: {e}")
             raise e
 
-    @patch('app.resources.hpc.requests.get')
-    def test_05_hpc_get_partition_without_protocol(self, mock_get):
+    @patch('app.resources.hpc.httpx.Client.get')
+    async def test_05_hpc_get_partition_without_protocol(self, mock_get):
         self.log.info('\n')
         self.log.info("test_05_hpc_get_partition_without_protocol".center(80, '-'))
         params = {
@@ -556,7 +570,8 @@ class TestHPCPartition(unittest.TestCase):
             self.log.info(f"GET API: {test_api}")
             self.log.info(f"GET PARAMS: {params}")
             headers = {'Authorization': 'Bearer ' + self.token}
-            res = self.app.get(test_api, headers=headers, params=params)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(test_api, headers=headers, params=params)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             code = response.get('code')

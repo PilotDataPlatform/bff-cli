@@ -3,12 +3,11 @@ from fastapi import Request
 import time
 import json
 import jwt as pyjwt
-import requests
 from ..config import ConfigClass
+import httpx
 from ..models.base_models import APIResponse, EAPIResponseCode
 
 api_response = APIResponse()
-
 
 def get_project_role(user_id, project_code):
     project = get_node_by_code(project_code, 'Container')
@@ -47,10 +46,11 @@ async def jwt_required(request: Request):
         return api_response.json_response()
     # check if user is existed in neo4j
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query"
-    res = requests.post(
-        url=url,
-        json={"name": username}
-    )
+    with httpx.Client() as requests:
+        res = requests.post(
+            url=url,
+            json={"name": username}
+        )
     if res.status_code != 200:
         api_response.code = EAPIResponseCode.forbidden
         api_response.error_msg = "Neo4j service: " + json.loads(res.text)
@@ -121,7 +121,8 @@ def void_check_file_in_zone(data, file, project_code):
                "project_code": project_code
                }
     try:
-        result = requests.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
+        with httpx.Client() as requests:
+            result = requests.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
         result = result.json()
     except Exception as e:
         api_response.error_msg = f"EntityInfo service  error: {e}"
@@ -170,7 +171,8 @@ def transfer_to_pre(data, project_code, session_id):
             "Session-ID": session_id
         }
         url = select_url_by_zone(data.zone)
-        result = requests.post(url, headers=headers, json=payload)
+        with httpx.Client() as requests:
+            result = requests.post(url, headers=headers, json=payload)
         return result
     except Exception as e:
         api_response.error_msg = f"Upload service  error: {e}"

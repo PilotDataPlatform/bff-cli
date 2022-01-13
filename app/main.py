@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
 from .config import ConfigClass
 from .api_registry import api_registry
 from opentelemetry import trace
@@ -11,7 +10,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 from app.namespace import namespace
 from app.config import ConfigClass
@@ -57,6 +56,6 @@ def create_app():
     api_registry(app)
     FastAPIInstrumentor.instrument_app(app)
     SQLAlchemyInstrumentor().instrument(engine=engine, service=namespace)
-    RequestsInstrumentor().instrument()
+    HTTPXClientInstrumentor().instrument()
     AsyncPGInstrumentor().instrument()
     return app
