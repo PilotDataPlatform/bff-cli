@@ -17,8 +17,8 @@ class SetupTest:
             }
         url = ConfigClass.AUTH_SERVICE + "/v1/users/auth"
         self.log.info(url)
-        with httpx.Client() as requests:
-            response = requests.post(url, json=payload)
+        with httpx.Client() as client:
+            response = client.post(url, json=payload)
         data = response.json()
         self.log.info(data)
         return data["result"].get("access_token")
@@ -33,8 +33,8 @@ class SetupTest:
         payload = {
             "name": "jzhang10",
         }
-        with httpx.Client() as requests:
-            response = requests.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query", json=payload)
+        with httpx.Client() as client:
+            response = client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query", json=payload)
         self.log.info(response.json())
         return response.json()[0]
 
@@ -53,8 +53,8 @@ class SetupTest:
         self.log.info(f"POST API: {testing_api}")
         self.log.info(f"POST params: {params}")
         try:
-            with httpx.Client() as requests:
-                res = requests.post(testing_api, json=params)
+            with httpx.Client() as client:
+                res = client.post(testing_api, json=params)
             self.log.info(f"RESPONSE DATA: {res.text}")
             self.log.info(f"RESPONSE STATUS: {res.status_code}")
             assert res.status_code == 200
@@ -68,8 +68,8 @@ class SetupTest:
         self.log.info("Preparing delete project".ljust(80, '-'))
         delete_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container/node/%s" % str(node_id)
         try:
-            with httpx.Client() as requests:
-                delete_res = requests.delete(delete_api)
+            with httpx.Client() as client:
+                delete_res = client.delete(delete_api)
             self.log.info(f"DELETE STATUS: {delete_res.status_code}")
             self.log.info(f"DELETE RESPONSE: {delete_res.text}")
         except Exception as e:
@@ -82,8 +82,8 @@ class SetupTest:
             "start_id": user_id,
             "end_id": project_id,
         }
-        with httpx.Client() as requests:
-            response = requests.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/{role}", json=payload)
+        with httpx.Client() as client:
+            response = client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/{role}", json=payload)
         if response.status_code != 200:
             raise Exception(f"Error adding user to project: {response.json()}")
 
@@ -92,8 +92,8 @@ class SetupTest:
             "start_id": user_id,
             "end_id": project_id,
         }
-        with httpx.Client() as requests:
-            response = requests.delete(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations", params=payload)
+        with httpx.Client() as client:
+            response = client.delete(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations", params=payload)
         self.log.info(f'User removed from project: {response.text}')
         if response.status_code != 200:
             raise Exception(f"Error removing user from project: {response.json()}")
@@ -101,8 +101,8 @@ class SetupTest:
     def get_projects(self):
         all_project_url = ConfigClass.NEO4J_SERVICE + '/v1/neo4j/nodes/Container/properties'
         try:
-            with httpx.Client() as requests:
-                response = requests.get(all_project_url)
+            with httpx.Client() as client:
+                response = client.get(all_project_url)
             if response.status_code == 200:
                 res = response.json()
                 projects = res.get('code')
@@ -118,8 +118,8 @@ class SetupTest:
         self.log.info("Generating global entity ID".ljust(80, '-'))
         testing_api = ConfigClass.UTILITY_SERVICE + "/v1/utility/id"
         self.log.info(f"Request API: {testing_api}")
-        with httpx.Client() as requests:
-            res = requests.get(testing_api)
+        with httpx.Client() as client:
+            res = client.get(testing_api)
         self.log.info(f"Request response: {res.text}")
         if not res.json():
             return None
@@ -149,8 +149,8 @@ class SetupTest:
             }
             self.log.info(f"Request url: {url}")
             self.log.info(f"Getting folder payload: {payload}")
-            with httpx.Client() as requests:
-                res = requests.post(url, json=payload)
+            with httpx.Client() as client:
+                res = client.post(url, json=payload)
             self.log.info(f"Getting folder response: {res.text}")
             result = res.json().get("result")[0]
             self.log.info(f'Getting folder result: {result}')
@@ -217,8 +217,8 @@ class SetupTest:
         self.log.info(f"POST API: {testing_api}")
         self.log.info(f"POST params: {payload}")
         try:
-            with httpx.Client() as requests:
-                res = requests.post(testing_api, json=payload)
+            with httpx.Client() as client:
+                res = client.post(testing_api, json=payload)
                 self.log.info(f"RESPONSE DATA: {res.text}")
                 self.log.info(f"RESPONSE STATUS: {res.status_code}")
                 assert res.status_code == 200
@@ -226,7 +226,7 @@ class SetupTest:
                 relation_payload['end_id'] = res.get('id')
                 self.log.info(f"CREATING RELATION WITH start_id: {relation_payload.get('start_id')}")
                 
-                relation_res = requests.post(relation_api, json=relation_payload)
+                relation_res = client.post(relation_api, json=relation_payload)
             self.log.info(f"Relation response: {relation_res.text}")
             assert relation_res.status_code == 200
             es_record = self.create_es_record(payload)
@@ -258,8 +258,8 @@ class SetupTest:
             payload['file_name'] = payload.get('name')
             self.log.info(f"ES URL: {url}")
             self.log.info(f"ES PAYLOAD: {payload}")
-            with httpx.Client() as requests:
-                res = requests.post(url, json=payload)
+            with httpx.Client() as client:
+                res = client.post(url, json=payload)
             self.log.info(f"ES RESPONSE: {res.text}")
             return res
         except Exception as e:
@@ -276,8 +276,8 @@ class SetupTest:
         self.log.info(f"POST API: {delete_api}")
         self.log.info(f"POST params: {payload}")
         try:
-            with httpx.Client() as requests:
-                res = requests.delete(delete_api, params=payload)
+            with httpx.Client() as client:
+                res = client.delete(delete_api, params=payload)
             self.log.info(f"RESPONSE DATA: {res.text}")
             self.log.info(f"RESPONSE STATUS: {res.status_code}")
             assert res.status_code == 200

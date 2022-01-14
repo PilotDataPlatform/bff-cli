@@ -39,8 +39,8 @@ class APIProject:
         headers = {"Authorization": "Bearer " + token}
         self._logger.info(f'Request payload: {payload}')
         self._logger.info(f'Request headers: {headers}')
-        with httpx.Client() as requests:
-            response = requests.post(url, json=payload, headers=headers)
+        with httpx.Client() as client:
+            response = client.post(url, json=payload, headers=headers)
         self._logger.info(f'Response: {response.text}')
         content=response.json()
         self._logger.info(f'Response content: {content}')

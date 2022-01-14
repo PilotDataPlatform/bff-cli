@@ -21,8 +21,8 @@ def get_path_by_zone(namespace, project_code):
 def get_user_role(user_id, project_id):
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations"
     try:
-        with httpx.Client() as requests:
-            res = requests.get(
+        with httpx.Client() as client:
+            res = client.get(
             url=url,
             params={"start_id": user_id,
                     "end_id": project_id})
@@ -38,8 +38,8 @@ def query__node_has_relation_with_admin(label='Container'):
     _logger.info(f"Requesting API: {url}")
     data = {'is_all': 'true'}
     try:
-        with httpx.Client() as requests:
-            res = requests.post(url=url, json=data)
+        with httpx.Client() as client:
+            res = client.post(url=url, json=data)
         project = res.json()
         return project
     except Exception:
@@ -56,8 +56,8 @@ def query_node_has_relation_for_user(username, label='Container'):
     _logger.info(f"Requesting API: {url}")
     _logger.info(f'Query payload: {data}')
     try:
-        with httpx.Client() as requests:
-            res = requests.post(url=url, json=data)
+        with httpx.Client() as client:
+            res = client.post(url=url, json=data)
         _logger.info(f'Query response: {res.text}')
         res = res.json()
         return res
@@ -69,8 +69,8 @@ def get_node_by_geid(geid):
     url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/geid/{geid}"
     _logger.info(f'Getting node: {url}')
     try:
-        with httpx.Client() as requests:
-            res = requests.get(url)
+        with httpx.Client() as client:
+            res = client.get(url)
         _logger.info(f'Getting node info: {res.text}')
         result = res.json()
     except Exception as e:
@@ -84,8 +84,8 @@ def batch_query_node_by_geid(geid_list):
     payload = {
         "geids": geid_list
     }
-    with httpx.Client() as requests:
-        res = requests.post(url, json=payload)
+    with httpx.Client() as client:
+        res = client.post(url, json=payload)
     res_json = res.json()
     result = res_json.get('result')
     located_geid = []
@@ -111,8 +111,8 @@ def query_file_in_project(project_code, filename, zone='Greenroom'):
     _logger.info(f"Query url: {url}")
     try:
         _logger.info(f"Get file info payload: {data}")
-        with httpx.Client() as requests:
-            res = requests.post(url=url, json=data)
+        with httpx.Client() as client:
+            res = client.post(url=url, json=data)
         _logger.info(f"Query file response: {res.text}")
         file_res = res.json()
         _logger.info(f"file response: {file_res}")
@@ -133,7 +133,7 @@ def query_file_in_project(project_code, filename, zone='Greenroom'):
                 "project_code": project_code,
                 "labels": ["Folder", zone]}}
             _logger.info(f"Query folder payload: {folder}")
-            _res = requests.post(url=url, json=folder)
+            _res = client.post(url=url, json=folder)
             _logger.info(f"Query folder response: {_res.text}")
             _res = _res.json()
             if _res.get('code') == 200 and _res.get('result'):
@@ -158,8 +158,8 @@ def get_file_entity_id(project_code, file_name, zone='Greenroom'):
 def get_file_by_id(file_id):
     post_data = {"global_entity_id": file_id}
     try:
-        with httpx.Client() as requests:
-            response = requests.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
+        with httpx.Client() as client:
+            response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
@@ -170,8 +170,8 @@ def get_file_by_id(file_id):
 def get_node_by_code(code, label):
     post_data = {"code": code}
     try:
-        with httpx.Client() as requests:
-            response = requests.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
+        with httpx.Client() as client:
+            response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
@@ -245,8 +245,8 @@ def attach_manifest_to_file(event):
                "username": username}
     _logger.info(f"POSTING: {url}")
     _logger.info(f"PAYLOAD: {payload}")
-    with httpx.Client() as requests:
-        response = requests.post(url=url, json=payload)
+    with httpx.Client() as client:
+        response = client.post(url=url, json=payload)
     _logger.info(f"RESPONSE: {response.text}")
     if not response.json():
         return None
@@ -270,8 +270,8 @@ def http_query_node_zone(folder_event):
             "labels": ['Folder', zone_label]}
     }
     node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    with httpx.Client() as requests:
-        response = requests.post(node_query_url, json=payload)
+    with httpx.Client() as client:
+        response = client.post(node_query_url, json=payload)
     return response
 
 

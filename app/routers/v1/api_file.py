@@ -192,8 +192,8 @@ class APIFile:
         self._logger.info(f"Query file/folder payload: {payload}")
         self._logger.info(f"Query file/folder API: {url}")
         try:
-            with httpx.Client() as requests:
-                res = requests.post(url, json=payload)
+            with httpx.Client() as client:
+                res = client.post(url, json=payload)
             res = res.json()
             query_result = []
             for f in res:

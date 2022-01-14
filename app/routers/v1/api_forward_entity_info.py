@@ -36,6 +36,6 @@ class APIEntityInfo:
             "zone": zone,
             "file_relative_path": file_relative_path
         }
-        with httpx.Client() as requests:
-            fw_response = requests.get(ConfigClass.FILEINFO_HOST + "/v1/project/{}/file/exist".format(project_code), params=query)
+        with httpx.Client() as client:
+            fw_response = client.get(ConfigClass.FILEINFO_HOST + "/v1/project/{}/file/exist".format(project_code), params=query)
         return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)

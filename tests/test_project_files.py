@@ -5,7 +5,8 @@ import unittest
 from app.config import ConfigClass
 from .prepare_test import SetupTest
 from .logger import Logger
-import requests
+# import requests
+import httpx
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 
@@ -23,7 +24,8 @@ def mocked_requests_post(*args, **kwargs):
         return MockResponse({"key1": "value1"}, 200)
     elif args[0] == ConfigClass.DATA_UPLOAD_SERVICE_GREENROOM + '/v1/files/jobs':
         return MockResponse({"key2": "value2"}, 200)
-    return requests.post(*args, **kwargs)
+    with httpx.Client() as client:
+        return client.post(*args, **kwargs)
 
 
 class TestFiles(IsolatedAsyncioTestCase):

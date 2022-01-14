@@ -17,8 +17,8 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
 def vault_factory(config_center) -> dict:
     url = config_center + \
         "/v1/utility/config/{}".format(SRV_NAMESPACE)
-    with httpx.Client() as requests:
-        config_center_respon = requests.get(url)
+    with httpx.Client() as client:
+        config_center_respon = client.get(url)
     if config_center_respon.status_code != 200:
         raise Exception(config_center_respon.text)
     return config_center_respon.json()['result']
