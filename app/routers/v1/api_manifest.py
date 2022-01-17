@@ -51,17 +51,8 @@ class APIManifest:
             self._logger.info("Getiting project manifests")
             manifests = self.db.get_manifest_name_from_project_in_db(mani_project_event)
             self._logger.info(f"Manifest in project check result: {manifests}")
-            manifest_list = []
             self._logger.info("Getting attributes for manifests")
-            for manifest in manifests:
-                self._logger.info(f"Getting attributes for manifest: {manifest}")
-                mani_project_event['manifest'] = manifest
-                attr = self.db.get_attributes_in_manifest_in_db(mani_project_event)
-                single_manifest = {'manifest_name': manifest['name'],
-                                   'id': manifest['id'],
-                                   'attributes': attr}
-                manifest_list.append(single_manifest)
-            self._logger.info(f"Returning manifest list: {manifest_list}")
+            manifest_list = self.db.get_attributes_in_manifest_in_db(manifests)
             api_response.result = manifest_list
             api_response.code = EAPIResponseCode.success
             return api_response.json_response()
@@ -149,6 +140,8 @@ class APIManifest:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
+        else:
+            manifest_info = manifest_info[0]
         manifest_id = manifest_info.get('id')
         annotation_event = {"project_code": project_code,
                             "global_entity_id": global_entity_id,
@@ -202,12 +195,7 @@ class APIManifest:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             return api_response.json_response()
         else:
-            manifest_event['manifest'] = manifest
-            attributes = self.db.get_attributes_in_manifest_in_db(manifest_event)
-            result = {'manifest_name': manifest_name,
-                      'project_code': project_code,
-                      'attributes': attributes}
-            self._logger.info(f"Returning result: {result}")
+            result = self.db.get_attributes_in_manifest_in_db(manifest)[0]
             api_response.code = EAPIResponseCode.success
             api_response.result = result
             return api_response.json_response()
