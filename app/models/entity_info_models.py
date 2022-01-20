@@ -7,7 +7,7 @@ class CheckFileResponse(APIResponse):
         "id": 2077,
         "labels": [
             "File",
-            "Greenroom",
+            "Greenroom"
             "Raw"
         ],
         "global_entity_id": "file_data-2a7ea1d8-7dea-11eb-8428-be498ca98c54-1614973025",

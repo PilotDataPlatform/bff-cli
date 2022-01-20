@@ -1,6 +1,8 @@
 import unittest
 import time
 import os
+
+from app.config import ConfigClass
 from .prepare_test import SetupTest
 from .logger import Logger
 from unittest import IsolatedAsyncioTestCase
@@ -103,10 +105,10 @@ class TestGetAttributes(IsolatedAsyncioTestCase):
                 res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
-            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
-            self.assertEqual(res_json.get('code'), 403)
-            self.log.info(f"COMPARING: {res_json.get('error_msg')} VS 'Permission Denied'")
-            self.assertEqual(res_json.get('error_msg'), "Permission Denied")
+            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
+            self.assertEqual(res_json.get('code'), 404)
+            self.log.info(f"COMPARING: {res_json.get('error_msg')} VS 'Project not found'")
+            self.assertEqual(res_json.get('error_msg'), "Project not found")
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -256,10 +258,10 @@ class TestExportAttributes(IsolatedAsyncioTestCase):
                 res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
-            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
-            self.assertEqual(res_json.get('code'), 403)
-            self.log.info(f"COMPARING: {res_json.get('error_msg')} VS 'Permission Denied'")
-            self.assertEqual(res_json.get('error_msg'), "Permission Denied")
+            self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
+            self.assertEqual(res_json.get('code'), 404)
+            self.log.info(f"COMPARING: {res_json.get('error_msg')} VS 'Project not found'")
+            self.assertEqual(res_json.get('error_msg'), "Project not found")
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -288,7 +290,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
         create_folder_file_res = cls.test.create_file(cls.project_code, cls.file_name,
                                                       folder=cls.folder, uploader=cls.uploader)
         folder_file_core_res = cls.test.create_file(cls.project_code, cls.file_name,
-                                                    folder=cls.folder_core, zone='VRECore',
+                                                    folder=cls.folder_core, zone=ConfigClass.CORE_ZONE_LABEL,
                                                     uploader=cls.uploader)
         cls.log.info(f"CREATE FILE: {create_res}")
         cls.file_id = create_res.get('id')
@@ -315,7 +317,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
                   "file_name": self.file_name,
-                  "zone": "Greenroom"
+                  "zone": ConfigClass.GREEN_ZONE_LABEL
                   }
                   }
         try:
@@ -341,7 +343,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
                   "file_name": f"{self.uploader}/{self.file_name}",
-                  "zone": "Greenroom"
+                  "zone": ConfigClass.GREEN_ZONE_LABEL
                   }
                   }
         headers = {
@@ -371,7 +373,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
                    "manifest_name": "Manifest1",
                    "project_code": self.project_code,
                    "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                   "zone": "Greenroom",
+                   "zone": ConfigClass.GREEN_ZONE_LABEL,
                    "file_name": wrong_file
                    }
                    }
@@ -401,7 +403,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
                   "manifest_name": "Manifest1000",
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-                  "zone": "Greenroom",
+                  "zone": ConfigClass.GREEN_ZONE_LABEL,
                   "file_name": f"{self.uploader}/{self.file_name}"
                   }
                   }
@@ -431,7 +433,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
             "manifest_name": "Manifest1",
             "project_code": self.project_code,
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
-            "zone": "Greenroom",
+            "zone": ConfigClass.GREEN_ZONE_LABEL,
             "file_name": f"{self.uploader}/{self.file_name}"
         }
         }
@@ -468,7 +470,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
                   "file_name": f"{self.uploader}/{self.folder}/{self.file_name}",
-                  "zone": "Greenroom"
+                  "zone": ConfigClass.GREEN_ZONE_LABEL
                   }
                   }
         headers = {
@@ -498,7 +500,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
                   "project_code": self.project_code,
                   "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
                   "file_name": f"{self.uploader}/{self.folder_core}/{self.file_name}",
-                  "zone": "VRECore"
+                  "zone": ConfigClass.CORE_ZONE_LABEL
                   }
                   }
         headers = {

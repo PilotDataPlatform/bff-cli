@@ -8,15 +8,10 @@ from ..service_logger.logger_factory_service import SrvLoggerFactory
 _logger = SrvLoggerFactory("Helpers").get_logger()
 
 def get_zone(namespace):
-    return {"greenroom": "Greenroom",
-            "vrecore": "VRECore"}.get(namespace.lower(), 'greenroom')
+    return {ConfigClass.GREEN_ZONE_LABEL.lower(): ConfigClass.GREEN_ZONE_LABEL,
+            ConfigClass.CORE_ZONE_LABEL.lower(): ConfigClass.CORE_ZONE_LABEL
+            }.get(namespace.lower(), ConfigClass.GREEN_ZONE_LABEL.lower())
 
-
-def get_path_by_zone(namespace, project_code):
-    return {"greenroom": f"/data/vre-storage/{project_code}/",
-            "vrecore": f"/vre-data/{project_code}/"
-            }.get(namespace.lower(), 'greenroom')
-            
 
 def get_user_role(user_id, project_id):
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations"
@@ -98,16 +93,15 @@ def batch_query_node_by_geid(geid_list):
     return located_geid, query_result
 
 
-def query_file_in_project(project_code, filename, zone='Greenroom'):
+def query_file_in_project(project_code, filename, zone=ConfigClass.GREEN_ZONE_LABEL):
     _logger.info("query_file_in_project".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    path = get_path_by_zone(zone, project_code) + filename
     data = {"query": {
         "name": filename.split('/')[-1],
-        "full_path": path,
+        "display_path": filename,
         "archived": False,
         "project_code": project_code,
-        "labels": ["File", zone]}}
+        "labels": [zone]}}
     _logger.info(f"Query url: {url}")
     try:
         _logger.info(f"Get file info payload: {data}")
@@ -117,35 +111,17 @@ def query_file_in_project(project_code, filename, zone='Greenroom'):
         file_res = res.json()
         _logger.info(f"file response: {file_res}")
         if file_res.get('code') == 200 and file_res.get('result'):
-            return file_res
+            result =  file_res
         else:
-            _logger.info("Get name as folder")
-            _logger.info(filename.split('/'))
-            if len(filename.split('/')) < 2:
-                relative_path = ''
-            else:
-                relative_path = '/'.join(filename.split('/')[0: -1])
-            _logger.info(f'relative_path: {relative_path}')
-            folder = {"query": {
-                "name": filename.split('/')[-1],
-                "folder_relative_path": relative_path,
-                "archived": False,
-                "project_code": project_code,
-                "labels": ["Folder", zone]}}
-            _logger.info(f"Query folder payload: {folder}")
-            _res = client.post(url=url, json=folder)
-            _logger.info(f"Query folder response: {_res.text}")
-            _res = _res.json()
-            if _res.get('code') == 200 and _res.get('result'):
-                return _res
-            else:
-                return []
+            result = []
     except Exception as e:
         _logger.error(str(e))
-        return []
+        result = []
+    finally:
+        return result
 
 
-def get_file_entity_id(project_code, file_name, zone='Greenroom'):
+def get_file_entity_id(project_code, file_name, zone=ConfigClass.GREEN_ZONE_LABEL):
     res = query_file_in_project(project_code, file_name, zone)
     res = res.get('result')
     if not res:
@@ -177,28 +153,6 @@ def get_node_by_code(code, label):
         return response.json()[0]
     except Exception:
         return None
-
-
-def has_permission(event):
-    _logger.info("has_permission".center(80, '-'))
-    user_role = event.get('user_role')
-    username = event.get('username')
-    project_code = event.get('project_code')
-    _logger.info(f"user role: {user_role}, user name: {username}, project code: {project_code}")
-    if user_role == 'admin':
-        result = 'permit'
-        code = EAPIResponseCode.success
-    else:
-        _projects = get_user_projects(user_role, username)
-        _projects = [p.get('code') for p in _projects]
-        if project_code not in _projects:
-            result = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-            code = EAPIResponseCode.forbidden
-        else:
-            result = 'permit'
-            code = EAPIResponseCode.success
-    return code, result
-
 
 def get_user_projects(user_role, username):
     _logger.info("get_user_projects".center(80, '-'))

@@ -71,7 +71,6 @@ class ManifestAttachResponse(APIResponse):
                     "id": 690,
                     "labels": [
                         "File",
-                        "Raw",
                         "Greenroom"
                     ],
                     "global_entity_id": "file_data-11f0d2b4-7163-11eb-8428-be498ca98c54-1613595588",

@@ -159,19 +159,19 @@ class SetupTest:
             raise Exception(f"Error getting folder: {e}")
 
     def create_file(self, project_code, filename,
-                    folder=None, zone='Greenroom', uploader='jzhang'):
+                    folder=None, zone=ConfigClass.GREEN_ZONE_LABEL, uploader='jzhang'):
         self.log.info("\n")
         self.log.info("Preparing testing file".ljust(80, '-'))
         self.log.info(f"File will be created in {zone} under {folder}")
         testing_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/File"
         relation_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/own"
         global_entity_id = self.generate_entity_id()
-        if zone.lower() == 'vrecore':
+        if zone.lower() == ConfigClass.CORE_ZONE_LABEL.lower():
             root_path = "/vre-data"
-            file_label = 'VRECore'
+            file_label = ConfigClass.CORE_ZONE_LABEL
         else:
             root_path = "/data/vre-storage"
-            file_label = 'Greenroom'
+            file_label = ConfigClass.GREEN_ZONE_LABEL
         if folder:
             payload = {
                 "name": filename,
@@ -244,9 +244,9 @@ class SetupTest:
             root_path = path.strip('/').split('/')[0]
             self.log.info(f"File root path: {root_path}")
             if root_path == 'data':
-                zone = 'Greenroom'
+                zone = ConfigClass.CORE_ZONE_LABEL.lower()
             else:
-                zone = 'VRECore'
+                zone = ConfigClass.GREEN_ZONE_LABEL.lower()
             time_stamp = int(time.time()*1000)
             payload = data.copy()
             payload['zone'] = zone

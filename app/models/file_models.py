@@ -1,7 +1,6 @@
 from pydantic import Field, BaseModel
 from .base_models import APIResponse
 
-
 class GetProjectFileList(BaseModel):
     project_code: str
     zone: str
@@ -87,7 +86,7 @@ class POSTDownloadFileResponse(APIResponse):
                 "files": [
                     "/data/vre-storage/may511/raw/contributor_file_a"
                 ],
-                "zone": "greenroom",
+                "zone": 'Greenroom',
                 "frontend_zone": "Green Room"
             },
             "update_timestamp": "1621521356"

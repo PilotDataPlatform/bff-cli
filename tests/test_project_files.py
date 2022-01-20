@@ -51,7 +51,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "operator": "jzhang10",
             "upload_message": "Greg Testing",
             "type": "processed",
-            "zone": "greenroom",
+            "zone": ConfigClass.GREEN_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
             "generate_id": "undefined",
@@ -65,13 +65,13 @@ class TestFiles(IsolatedAsyncioTestCase):
         self.log.info(response.text)
         self.assertEqual(response.status_code, 500)
 
-    async def test_02_post_files_vrecore_processed(self):
+    async def test_02_post_files_core_processed(self):
         project_code = self.project["code"]
         payload = {
             "operator": "jzhang10",
             "upload_message": "Greg Testing",
             "type": "processed",
-            "zone": "vrecore",
+            "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
             "generate_id": "undefined",
@@ -91,7 +91,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "operator": "jzhang10",
             "upload_message": "Greg Testing",
             "type": "raw",
-            "zone": "greenroom",
+            "zone": ConfigClass.GREEN_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
             "generate_id": "undefined",
@@ -130,7 +130,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "operator": "jzhang10",
             "upload_message": "Greg Testing",
             "type": "wrong",
-            "zone": "vrecore",
+            "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
             "generate_id": "undefined",
@@ -151,7 +151,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "operator": "jzhang10",
             "upload_message": "Greg Testing",
             "type": "raw",
-            "zone": "vrecore",
+            "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
             "generate_id": "undefined",

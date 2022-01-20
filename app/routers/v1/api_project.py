@@ -70,7 +70,7 @@ class APIProject:
             self._logger.info(f"User platform role: {role}")
             project_role, code = get_project_role(user_id, project_code)
             self._logger.info(f"User project role: {project_role}, {code}")
-            if data.zone == "vrecore" and project_role == "contributor":
+            if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role

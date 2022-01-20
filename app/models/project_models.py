@@ -67,7 +67,7 @@ class GetProjectFolderResponse(APIResponse):
         "result": {
             "id": 1552,
             "labels": [
-                "Greenroom",
+                "Greenroom"
                 "Folder"
             ],
             "global_entity_id": "bc8b4239-b22a-47dd-9d23-36ade331ebbf-1620685109",
