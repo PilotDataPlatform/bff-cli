@@ -17,7 +17,7 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
     else:
         VAULT_SERVICE = "https://127.0.0.1:8200/v1/vre/app/config"
         vc = VaultClient(VAULT_SERVICE, vault_config.VAULT_CRT, vault_config.VAULT_TOKEN)
-        print(vc.get_from_vault(SRV_NAMESPACE))
+
         return vc.get_from_vault(SRV_NAMESPACE)
 
 
@@ -25,32 +25,27 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
 class Settings(BaseSettings):
     port: int = 5080
     host: str = "0.0.0.0"
-    RDS_HOST: str
-    RDS_PORT: str
-    RDS_DBNAME: str = ""
-    RDS_USER: str
     RDS_PWD: str
-    RDS_SCHEMA_DEFAULT:str 
-    CLI_SECRET: str = ""
-    NEO4J_SERVICE: str
-    FILEINFO_HOST: str 
-    AUTH_SERVICE :str 
-    DATA_UPLOAD_SERVICE_VRE: str 
-    DATA_UPLOAD_SERVICE_GREENROOM: str 
-    UTILITY_SERVICE: str 
-    PROVENANCE_SERVICE: str
-    HPC_SERVICE: str 
-    RDS_HOST: str
-    RDS_PORT: str
-    RDS_DBNAME: str
-    RDS_USER: str 
-    RDS_PWD: str 
-    RDS_SCHEMA_DEFAULT:str
-    KG_SERVICE: str
+    CLI_SECRET: str = ''
     OPEN_TELEMETRY_HOST: str = '0.0.0.0'
     OPEN_TELEMETRY_PORT: int = 6831
+    OPEN_TELEMETRY_ENABLED: str="True"
     CORE_ZONE_LABEL: str = ''
     GREEN_ZONE_LABEL: str = ''
+
+    AUTH_SERVICE: str = os.environ.get('AUTH_SERVICE')
+    DATA_UPLOAD_SERVICE_CORE: str = os.environ.get('DATA_UPLOAD_SERVICE_CORE')
+    DATA_UPLOAD_SERVICE_GREENROOM: str = os.environ.get('DATA_UPLOAD_SERVICE_GREENROOM')
+    FILEINFO_HOST: str= os.environ.get('FILEINFO_HOST')
+    HPC_SERVICE: str = os.environ.get('HPC_SERVICE')
+    KG_SERVICE: str = os.environ.get('KG_SERVICE')
+    PROVENANCE_SERVICE: str = os.environ.get('PROVENANCE_SERVICE')
+    RDS_HOST: str = os.environ.get('RDS_HOST')
+    RDS_PORT: str = os.environ.get('RDS_PORT')
+    RDS_DBNAME: str = os.environ.get('RDS_DBNAME')
+    RDS_USER: str = os.environ.get('RDS_USER')
+    RDS_SCHEMA_DEFAULT: str = os.environ.get('RDS_SCHEMA_DEFAULT')
+    NEO4J_SERVICE: str = os.environ.get('NEO4J_SERVICE')
 
 
     class Config:
@@ -70,30 +65,27 @@ def get_settings():
 class ConfigClass(object):
     settings = get_settings()
     version = "1.8.0"
+    OPEN_TELEMETRY_HOST= settings.OPEN_TELEMETRY_HOST
+    OPEN_TELEMETRY_PORT= settings.OPEN_TELEMETRY_PORT
+    OPEN_TELEMETRY_ENABLED= settings.OPEN_TELEMETRY_ENABLED
+    AUTH_SERVICE = settings.AUTH_SERVICE
+    CLI_SECRET = settings.CLI_SECRET
+    CORE_ZONE_LABEL = settings.CORE_ZONE_LABEL
+    DATA_UPLOAD_SERVICE_CORE = settings.DATA_UPLOAD_SERVICE_CORE
+    DATA_UPLOAD_SERVICE_GREENROOM = settings.DATA_UPLOAD_SERVICE_GREENROOM
+    FILEINFO_HOST= settings.FILEINFO_HOST
+    GREEN_ZONE_LABEL = settings.GREEN_ZONE_LABEL
+    HPC_SERVICE = settings.HPC_SERVICE
+    KG_SERVICE = settings.KG_SERVICE
+    opentelemetry_enabled = settings.OPEN_TELEMETRY_ENABLED
+    OPEN_TELEMETRY_HOST = settings.OPEN_TELEMETRY_HOST
+    OPEN_TELEMETRY_PORT = settings.OPEN_TELEMETRY_PORT
+    PROVENANCE_SERVICE = settings.PROVENANCE_SERVICE
     RDS_HOST = settings.RDS_HOST
-    RDS_PORT = settings.RDS_PORT
+    # RDS_PORT = settings.RDS_PORT
     RDS_DBNAME = settings.RDS_DBNAME
     RDS_USER = settings.RDS_USER
     RDS_PWD = settings.RDS_PWD
     RDS_SCHEMA_DEFAULT = settings.RDS_SCHEMA_DEFAULT
     SQLALCHEMY_DATABASE_URI = f"postgresql://{RDS_USER}:{RDS_PWD}@{RDS_HOST}/{RDS_DBNAME}"
-    CLI_SECRET = settings.CLI_SECRET
     NEO4J_SERVICE = settings.NEO4J_SERVICE
-    FILEINFO_HOST= settings.FILEINFO_HOST
-    AUTH_SERVICE = settings.AUTH_SERVICE
-    DATA_UPLOAD_SERVICE_VRE = settings.DATA_UPLOAD_SERVICE_VRE
-    DATA_UPLOAD_SERVICE_GREENROOM = settings.DATA_UPLOAD_SERVICE_GREENROOM
-    UTILITY_SERVICE = settings.UTILITY_SERVICE
-    PROVENANCE_SERVICE = settings.PROVENANCE_SERVICE
-    HPC_SERVICE = settings.HPC_SERVICE
-    RDS_HOST = settings.RDS_HOST
-    RDS_PORT = settings.RDS_PORT
-    RDS_DBNAME = settings.RDS_DBNAME
-    RDS_USER = settings.RDS_USER
-    RDS_PWD = settings.RDS_PWD
-    RDS_SCHEMA_DEFAULT = settings.RDS_SCHEMA_DEFAULT
-    KG_SERVICE = settings.KG_SERVICE
-    OPEN_TELEMETRY_HOST = settings.OPEN_TELEMETRY_HOST
-    OPEN_TELEMETRY_PORT = settings.OPEN_TELEMETRY_PORT
-    CORE_ZONE_LABEL = settings.CORE_ZONE_LABEL
-    GREEN_ZONE_LABEL = settings.GREEN_ZONE_LABEL

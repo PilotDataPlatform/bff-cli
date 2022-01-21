@@ -29,11 +29,41 @@ spec:
             - containerPort: 5080
           env:
           - name: env
-            value: "staging"
+            value: "dev"
           - name: CONFIG_CENTER_ENABLED
             value: "true"
           - name: CONFIG_CENTER_BASE_URL
             value: "http://common.utility:5062/"
+          - name: AUTH_SERVICE
+            value: "http://auth.utility:5061"
+          - name: DATA_UPLOAD_SERVICE_GREENROOM
+            value: "http://upload.greenroom:5079"
+          - name: DATA_UPLOAD_SERVICE_CORE
+            value: "http://upload.vre:5079"
+          - name: FILEINFO_HOST
+            value: "http://entityinfo.utility:5066"
+          - name: HPC_SERVICE
+            value: "http://hpc.utility:5080"
+          - name: KG_SERVICE
+            value: "http://kg.utility:5081"
+          - name: PROVENANCE_SERVICE
+            value: "http://provenance.utility:5077"
+          - name: RDS_DBNAME
+            value: "INDOC_VRE"
+          - name: RDS_HOST
+            value: "opsdb.utility"
+          - name: RDS_PORT
+            value: "5432"
+          - name: RDS_USER
+            value: "postgres"
+          - name: RDS_SCHEMA_DEFAULT
+            value: "indoc_vre"
+          - name: DATA_OPS_UTIL
+            value: "http://dataops-ut.utility:5063"
+          - name: NEO4J_SERVICE
+            value: "http://neo4j.utility:5062"
+          - name: OPEN_TELEMETRY_ENABLED
+            value: "True"
       nodeSelector:
         namespace: utility
 ---

@@ -36,6 +36,8 @@ class APIManifest:
         self._logger.info("API list_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {current_identity}")
         self._logger.info(f"User request information: project_code: {project_code},")
+        self._logger.info(f"VAULT CRT: {ConfigClass.RDS_PWD}")
+        self._logger.info(f"VAULT CRT: {ConfigClass.RDS_HOST}")
         try:
             permission_event = {'user_id': _user_id,
                         'username': _username,

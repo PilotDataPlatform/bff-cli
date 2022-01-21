@@ -142,7 +142,7 @@ def void_check_file_in_zone(data, file, project_code):
 
 def select_url_by_zone(zone):
     if zone == ConfigClass.CORE_ZONE_LABEL.lower():
-        url = ConfigClass.DATA_UPLOAD_SERVICE_VRE + "/v1/files/jobs"
+        url = ConfigClass.DATA_UPLOAD_SERVICE_CORE + "/v1/files/jobs"
     else:
         url = ConfigClass.DATA_UPLOAD_SERVICE_GREENROOM + "/v1/files/jobs"
     return url

@@ -2,6 +2,7 @@ from app.config import ConfigClass
 import httpx
 from app.main import create_app
 import time
+import uuid
 
 class SetupTest:
 
@@ -116,15 +117,7 @@ class SetupTest:
 
     def generate_entity_id(self):
         self.log.info("Generating global entity ID".ljust(80, '-'))
-        testing_api = ConfigClass.UTILITY_SERVICE + "/v1/utility/id"
-        self.log.info(f"Request API: {testing_api}")
-        with httpx.Client() as client:
-            res = client.get(testing_api)
-        self.log.info(f"Request response: {res.text}")
-        if not res.json():
-            return None
-        else:
-            return res.json()['result']
+        return f"{str(uuid.uuid4())}-{str(time.time())[0:10]}"
 
     def get_folder(self, folder, project_code, zone):
         self.log.info("get_folder".ljust(80, '-'))
