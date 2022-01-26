@@ -1,11 +1,10 @@
 from ..models.error_model import HPCError
 from ..service_logger.logger_factory_service import SrvLoggerFactory
-import requests
 from ..config import ConfigClass
-from ..models.base_models import APIResponse, EAPIResponseCode
+from ..models.base_models import EAPIResponseCode
+import httpx
 
 _logger = SrvLoggerFactory("HPC").get_logger()
-
 
 def get_hpc_jwt_token(token_issuer, username, password = None):
     _logger.info("get_hpc_jwt_token".center(80, '-'))
@@ -18,7 +17,8 @@ def get_hpc_jwt_token(token_issuer, username, password = None):
         url = ConfigClass.HPC_SERVICE + "/v1/hpc/auth"
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request payload: {payload}")
-        res = requests.post(url, json=payload)
+        with httpx.Client() as client:
+            res = client.post(url, json=payload)
         _logger.info(f"Response: {res.text}")
         _logger.info(f"Response: {res.json()}")
         token = res.json().get('result')
@@ -60,7 +60,8 @@ def submit_hpc_job(job_submission_event) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request payload: {payload}")
-        res = requests.post(url, headers=headers, json=payload)
+        with httpx.Client() as client:
+            res = client.post(url, headers=headers, json=payload)
         _logger.info(f"Response: {res.json()}")
         response = res.json()
         status_code = response.get('code')
@@ -103,7 +104,8 @@ def get_hpc_job_info(job_id, host, username, token) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        res = requests.get(url, headers=headers, params=params)
+        with httpx.Client() as client:
+            res = client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -148,7 +150,8 @@ def get_hpc_nodes(host, username, hpc_token) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        res = requests.get(url, headers=headers, params=params)
+        with httpx.Client() as client:
+            res = client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -186,7 +189,8 @@ def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        res = requests.get(url, headers=headers, params=params)
+        with httpx.Client() as client:
+            res = client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -228,7 +232,8 @@ def get_hpc_partitions(host, username, hpc_token) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        res = requests.get(url, headers=headers, params=params)
+        with httpx.Client() as client:
+            res = client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -271,7 +276,8 @@ def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        res = requests.get(url, headers=headers, params=params)
+        with httpx.Client() as client:
+            res = client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')

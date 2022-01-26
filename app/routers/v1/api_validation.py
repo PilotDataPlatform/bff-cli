@@ -129,4 +129,3 @@ class APIValidation:
         api_response.error_msg = error
         api_response.result = result
         return api_response.json_response()
-

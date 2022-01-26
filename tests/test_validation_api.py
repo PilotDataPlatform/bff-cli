@@ -1,6 +1,6 @@
 import unittest
-
-from app.config import ConfigClass
+from unittest import IsolatedAsyncioTestCase
+from httpx import AsyncClient
 from .prepare_test import SetupTest
 from .logger import Logger
 import os
@@ -13,18 +13,19 @@ zone_env=""
 
 
 @unittest.skipUnless(case == 'generate' or case == 'all' or case=='', 'Run specific test')
-class TestGenerateIDValidation(unittest.TestCase):
+class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     log = Logger(name='test_gid_validation.log')
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/gid"
 
-    def test_01_validate_gid(self):
+    async def test_01_validate_gid(self):
         self.log.info('\n')
         self.log.info("test_01_validate_gid".center(80, '-'))
         payload = {'generate_id': 'ABC-1234'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -35,12 +36,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_02_test_gid_not_3_letters(self):
+    async def test_02_test_gid_not_3_letters(self):
         self.log.info('\n')
         self.log.info("test_02_test_gid_not_3_letters".center(80, '-'))
         payload = {'generate_id': 'AC-1234'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -51,12 +53,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_03_test_gid_not_3_capital_letters(self):
+    async def test_03_test_gid_not_3_capital_letters(self):
         self.log.info('\n')
         self.log.info("test_03_test_gid_not_3_capital_letters".center(80, '-'))
         payload = {'generate_id': 'AbC-1234'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -67,12 +70,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_04_test_gid_not_4_numbers(self):
+    async def test_04_test_gid_not_4_numbers(self):
         self.log.info('\n')
         self.log.info("test_04_test_gid_not_4_numbers".center(80, '-'))
         payload = {'generate_id': 'ABC-134'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -83,12 +87,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_05_test_not_hyphen(self):
+    async def test_05_test_not_hyphen(self):
         self.log.info('\n')
         self.log.info("test_05_test_not_hyphen".center(80, '-'))
         payload = {'generate_id': 'ABC1234'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -99,12 +104,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_06_test_more_than_3_letter(self):
+    async def test_06_test_more_than_3_letter(self):
         self.log.info('\n')
         self.log.info("test_06_test_not_hyphen".center(80, '-'))
         payload = {'generate_id': 'ABCD-1234'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -115,12 +121,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_07_test_more_than_4_numbers(self):
+    async def test_07_test_more_than_4_numbers(self):
         self.log.info('\n')
         self.log.info("test_07_test_more_than_4_numbers".center(80, '-'))
         payload = {'generate_id': 'ABCD-12345'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -131,12 +138,13 @@ class TestGenerateIDValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_08_test_contain_other_characters(self):
+    async def test_08_test_contain_other_characters(self):
         self.log.info('\n')
         self.log.info("test_08_test_contain_other_characters".center(80, '-'))
         payload = {'generate_id': 'ABCD-123!'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -149,14 +157,14 @@ class TestGenerateIDValidation(unittest.TestCase):
 
 
 @unittest.skipUnless(case == 'attribute' or case == 'all' or case=='', 'Run specific test')
-class TestAttributeValidation(unittest.TestCase):
+class TestAttributeValidation(IsolatedAsyncioTestCase):
     log = Logger(name='test_attribute_validation.log')
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/manifest"
     project_code = os.environ.get('project_code')
 
-    def test_01_validate_attribute(self):
+    async def test_01_validate_attribute(self):
         self.log.info('\n')
         self.log.info("test_01_validate_attribute".center(80, '-'))
         payload = {
@@ -171,7 +179,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -182,7 +191,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_02_validate_attribute_name_not_exist(self):
+    async def test_02_validate_attribute_name_not_exist(self):
         self.log.info('\n')
         self.log.info("test_02_validate_attribute_name_not_exist".center(80, '-'))
         payload = {
@@ -197,7 +206,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
@@ -208,7 +218,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_03_validate_attribute_type_wrong(self):
+    async def test_03_validate_attribute_type_wrong(self):
         self.log.info('\n')
         self.log.info("test_03_validate_attribute_type_wrong".center(80, '-'))
         payload = {
@@ -223,7 +233,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -234,7 +245,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_04_validate_attribute_value_wrong(self):
+    async def test_04_validate_attribute_value_wrong(self):
         self.log.info('\n')
         self.log.info("test_04_validate_attribute_value_wrong".center(80, '-'))
         payload = {
@@ -249,7 +260,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -260,7 +272,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_05_validate_attribute_text_too_long(self):
+    async def test_05_validate_attribute_text_too_long(self):
         self.log.info('\n')
         self.log.info("test_05_validate_attribute_text_too_long".center(80, '-'))
         payload = {
@@ -275,7 +287,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -286,7 +299,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_06_validate_with_attribute_not_exist(self):
+    async def test_06_validate_with_attribute_not_exist(self):
         self.log.info('\n')
         self.log.info("test_06_validate_with_attribute_not_exist".center(80, '-'))
         payload = {
@@ -301,7 +314,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -312,7 +326,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_07_validate_with_missing_mandatory_attribute(self):
+    async def test_07_validate_with_missing_mandatory_attribute(self):
         self.log.info('\n')
         self.log.info("test_07_validate_with_missing_mandatory_attribute".center(80, '-'))
         payload = {
@@ -326,7 +340,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -337,7 +352,7 @@ class TestAttributeValidation(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_08_project_code_not_exist(self):
+    async def test_08_project_code_not_exist(self):
         self.log.info('\n')
         self.log.info("test_08_project_code_not_exist".center(80, '-'))
         payload = {
@@ -351,7 +366,8 @@ class TestAttributeValidation(unittest.TestCase):
             }
         }
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
@@ -364,7 +380,7 @@ class TestAttributeValidation(unittest.TestCase):
 
 
 @unittest.skipUnless(case == 'environment' or case == 'all' or case=='', 'Run specific test')
-class TestEnvironmentValidation(unittest.TestCase):
+class TestEnvironmentValidation(IsolatedAsyncioTestCase):
     log = Logger(name='test_environment_validation.log')
     test = SetupTest(log)
     app = test.client
@@ -382,12 +398,13 @@ class TestEnvironmentValidation(unittest.TestCase):
     Upload         Yes            Yes
     Download       No             Yes
     """
-    def test_01_upload_from_vrecore_to_greenroom(self):
+    async def test_01_upload_from_vrecore_to_greenroom(self):
         self.log.info('\n')
         self.log.info("test_01_upload_from_greenroom_to_greenroom".center(80, '-'))
         payload = {"action": 'upload', "environ": "", 'zone': 'greenroom'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -403,12 +420,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             self.log.error(f"01 ERROR: {e}")
             raise e
 
-    def test_02_upload_from_vrecore_to_vrecore(self):
+    async def test_02_upload_from_vrecore_to_vrecore(self):
         self.log.info('\n')
         self.log.info("test_02_upload_from_vrecore_to_vrecore".center(80, '-'))
         payload = {"action": 'upload', "environ": "", 'zone': 'vrecore'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -424,12 +442,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             self.log.error(f"02 ERROR: {e}")
             raise e
 
-    def test_03_download_from_vrecore_in_vrecore(self):
+    async def test_03_download_from_vrecore_in_vrecore(self):
         self.log.info('\n')
         self.log.info("test_03_download_from_vrecore_in_vrecore".center(80, '-'))
         payload = {"action": 'download', "environ": "", 'zone': 'vrecore'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -445,12 +464,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             self.log.error(f"03 ERROR: {e}")
             raise e
 
-    def test_04_download_from_greenroom_in_vrecore(self):
+    async def test_04_download_from_greenroom_in_vrecore(self):
         self.log.info('\n')
         self.log.info("test_03_download_from_vrecore_in_vrecore".center(80, '-'))
         payload = {"action": 'download', "environ": "", 'zone': 'greenroom'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -466,12 +486,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             self.log.error(f"04 ERROR: {e}")
             raise e
 
-    def test_05_download_with_invalid_env(self):
+    async def test_05_download_with_invalid_env(self):
         self.log.info('\n')
         self.log.info("test_05_download_with_invalid_env".center(80, '-'))
         payload = {"action": 'download', "environ": "asdf", 'zone': 'greenroom'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -487,12 +508,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             self.log.error(f"05 ERROR: {e}")
             raise e
 
-    def test_06_upload_with_invalid_zone(self):
+    async def test_06_upload_with_invalid_zone(self):
         self.log.info('\n')
         self.log.info("test_06_upload_with_invalid_zone".center(80, '-'))
         payload = {"action": 'upload', "environ": "", 'zone': 'green'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -509,12 +531,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             raise e
 
     @unittest.skipIf(zone_env=="", "Missing essential information")
-    def test_07_upload_from_greenroom_to_greenroom(self):
+    async def test_07_upload_from_greenroom_to_greenroom(self):
         self.log.info('\n')
         self.log.info("test_07_upload_from_greenroom_to_greenroom".center(80, '-'))
         payload = {"action": 'upload', "environ": zone_env, 'zone': 'greenroom'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -531,12 +554,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             raise e
 
     @unittest.skipIf(zone_env=="", "Missing essential information")
-    def test_08_upload_from_greenroom_to_vrecore(self):
+    async def test_08_upload_from_greenroom_to_vrecore(self):
         self.log.info('\n')
         self.log.info("test_08_upload_from_greenroom_to_vrecore".center(80, '-'))
         payload = {"action": 'upload', "environ": zone_env, 'zone': 'vrecore'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -553,12 +577,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             raise e
 
     @unittest.skipIf(zone_env=="", "Missing essential information")
-    def test_09_download_from_vrecore_in_greenroom(self):
+    async def test_09_download_from_vrecore_in_greenroom(self):
         self.log.info('\n')
         self.log.info("test_09_download_from_vrecore_in_greenroom".center(80, '-'))
         payload = {"action": 'download', "environ": zone_env, 'zone': 'vrecore'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')
@@ -575,12 +600,13 @@ class TestEnvironmentValidation(unittest.TestCase):
             raise e
 
     @unittest.skipIf(zone_env=="", "Missing essential information")
-    def test_10_download_from_greenroom_in_greenroom(self):
+    async def test_10_download_from_greenroom_in_greenroom(self):
         self.log.info('\n')
         self.log.info("test_10_download_from_greenroom_in_greenroom".center(80, '-'))
         payload = {"action": 'download', "environ": zone_env, 'zone': 'greenroom'}
         try:
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             response = res.json()
             result = response.get('result')

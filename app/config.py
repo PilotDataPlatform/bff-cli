@@ -1,6 +1,5 @@
 import os
-import requests
-from requests.models import HTTPError
+import httpx
 from pydantic import BaseSettings, Extra
 from typing import Dict, Set, List, Any
 from functools import lru_cache
@@ -18,9 +17,10 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
 def vault_factory(config_center) -> dict:
     url = config_center + \
         "/v1/utility/config/{}".format(SRV_NAMESPACE)
-    config_center_respon = requests.get(url)
+    with httpx.Client() as client:
+        config_center_respon = client.get(url)
     if config_center_respon.status_code != 200:
-        raise HTTPError(config_center_respon.text)
+        raise Exception(config_center_respon.text)
     return config_center_respon.json()['result']
 
 class Settings(BaseSettings):

@@ -3,21 +3,20 @@ import time
 import os
 from .prepare_test import SetupTest
 from .logger import Logger
-
+from unittest import IsolatedAsyncioTestCase
+from httpx import AsyncClient
 # To run particular test, edit the case_to_run_variable with following values:
 # export attribute: export
 # get attributes: list
 # attach attribute: attach
 # run all tests: '' or 'all'
-
-case_to_run = ''
+case_to_run = 'all'
 
 no_access_user_name = "jzhang53"
 no_access_user_password = "Indoc1234567!"
 
-
 @unittest.skipIf(case_to_run == 'attach' or case_to_run == 'export', 'Run specific test')
-class TestGetAttributes(unittest.TestCase):
+class TestGetAttributes(IsolatedAsyncioTestCase):
     log = Logger(name='test_get_attributes.log')
     test = SetupTest(log)
     app = test.client
@@ -25,13 +24,15 @@ class TestGetAttributes(unittest.TestCase):
     token = test.auth()
     project_code = os.environ.get('project_code')
 
-    def test_01_get_attributes_without_token(self):
+    
+    async def test_01_get_attributes_without_token(self):
         self.log.info('\n')
         self.log.info("test_01_get_attributes".center(80, '-'))
         param = {'project_code': self.project_code}
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 401")
@@ -41,7 +42,7 @@ class TestGetAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_02_get_attributes(self):
+    async def test_02_get_attributes(self):
         self.log.info('\n')
         self.log.info("test_02_get_attributes".center(80, '-'))
         param = {'project_code': self.project_code}
@@ -51,7 +52,8 @@ class TestGetAttributes(unittest.TestCase):
         try:
             self.log.info(f"GET API: {self.test_api}")
             self.log.info(f'GET PARAM: {param}')
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -61,7 +63,7 @@ class TestGetAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_03_get_attributes_no_access(self):
+    async def test_03_get_attributes_no_access(self):
         self.log.info('\n')
         self.log.info("test_03_get_attributes_no_access".center(80, '-'))
         param = {'project_code': self.project_code}
@@ -76,7 +78,8 @@ class TestGetAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
@@ -87,7 +90,7 @@ class TestGetAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_04_get_attributes_project_not_exist(self):
+    async def test_04_get_attributes_project_not_exist(self):
         self.log.info('\n')
         self.log.info("test_04_get_attributes_project_not_exist".center(80, '-'))
         param = {'project_code': 't1000'}
@@ -96,7 +99,8 @@ class TestGetAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
@@ -107,7 +111,7 @@ class TestGetAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_05_get_project_no_attribute(self):
+    async def test_05_get_project_no_attribute(self):
         self.log.info('\n')
         self.log.info("test_05_get_project_no_attribute".center(80, '-'))
         param = {'project_code': 'noattribute'}
@@ -122,7 +126,8 @@ class TestGetAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -134,7 +139,7 @@ class TestGetAttributes(unittest.TestCase):
 
 
 @unittest.skipIf(case_to_run == 'attach' or case_to_run == 'list', 'Run specific test')
-class TestExportAttributes(unittest.TestCase):
+class TestExportAttributes(IsolatedAsyncioTestCase):
     log = Logger(name='test_export_attribute.log')
     test = SetupTest(log)
     app = test.client
@@ -142,14 +147,15 @@ class TestExportAttributes(unittest.TestCase):
     token = test.auth()
     project_code = os.environ.get('project_code')
 
-    def test_01_export_attributes_without_token(self):
+    async def test_01_export_attributes_without_token(self):
         self.log.info('\n')
         self.log.info("test_01_export_attributes_without_token".center(80, '-'))
         param = {'project_code': self.project_code,
                  'manifest_name': 'Manifest1'}
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 401")
@@ -160,7 +166,7 @@ class TestExportAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_02_export_attributes(self):
+    async def test_02_export_attributes(self):
         self.log.info('\n')
         self.log.info("test_02_export_attributes".center(80, '-'))
         self.log.info(f'Project code: {self.project_code}')
@@ -171,7 +177,8 @@ class TestExportAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -185,7 +192,7 @@ class TestExportAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_03_export_attributes_no_access(self):
+    async def test_03_export_attributes_no_access(self):
         self.log.info('\n')
         self.log.info("test_03_export_attributes_no_access".center(80, '-'))
         param = {'project_code': self.project_code,
@@ -201,7 +208,8 @@ class TestExportAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
@@ -212,7 +220,7 @@ class TestExportAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_04_export_attributes_not_exist(self):
+    async def test_04_export_attributes_not_exist(self):
         self.log.info('\n')
         self.log.info("test_04_export_attributes_not_exist".center(80, '-'))
         param = {'project_code': self.project_code,
@@ -222,7 +230,8 @@ class TestExportAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
@@ -233,7 +242,7 @@ class TestExportAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_05_export_attributes_project_not_exist(self):
+    async def test_05_export_attributes_project_not_exist(self):
         self.log.info('\n')
         self.log.info("test_05_export_attributes_project_not_exist".center(80, '-'))
         param = {'project_code': 't1000',
@@ -243,7 +252,8 @@ class TestExportAttributes(unittest.TestCase):
         }
         try:
             self.log.info(f"GET API: {self.test_api}")
-            res = self.app.get(self.test_api, headers=headers, params=param)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.get(self.test_api, headers=headers, params=param)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
@@ -256,7 +266,7 @@ class TestExportAttributes(unittest.TestCase):
 
 
 @unittest.skipIf(case_to_run == 'list' or case_to_run == 'export', 'Run specific test')
-class TestAttachAttributes(unittest.TestCase):
+class TestAttachAttributes(IsolatedAsyncioTestCase):
     log = Logger(name='test_attach_attribute.log')
     test = SetupTest(log)
     app = test.client
@@ -297,7 +307,7 @@ class TestAttachAttributes(unittest.TestCase):
         delete_folder_file_core_res = cls.test.delete_file(cls.folder_file_core_id)
         cls.log.info(f"DELETE FOLDER FILE: {delete_folder_file_core_res}")
 
-    def test_01_attach_attributes_without_token(self):
+    async def test_01_attach_attributes_without_token(self):
         self.log.info('\n')
         self.log.info("test_01_attach_attributes_without_token".center(80, '-'))
         payload = {"manifest_json": {
@@ -311,7 +321,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 401")
@@ -322,7 +333,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_02_attach_attributes(self):
+    async def test_02_attach_attributes(self):
         self.log.info('\n')
         self.log.info("test_02_attach_attributes".center(80, '-'))
         payload = {"manifest_json": {
@@ -339,7 +350,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -351,7 +363,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_03_attach_attributes_wrong_file(self):
+    async def test_03_attach_attributes_wrong_file(self):
         self.log.info('\n')
         self.log.info("test_03_attach_attributes_wrong_file".center(80, '-'))
         wrong_file = self.file_name + '10000'
@@ -369,7 +381,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 404")
@@ -381,7 +394,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_04_attach_attributes_wrong_name(self):
+    async def test_04_attach_attributes_wrong_name(self):
         self.log.info('\n')
         self.log.info("test_04_attach_attributes_wrong_name".center(80, '-'))
         payload = {"manifest_json": {
@@ -398,7 +411,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
@@ -410,7 +424,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_05_attach_attributes_no_access(self):
+    async def test_05_attach_attributes_no_access(self):
         self.log.info('\n')
         self.log.info("test_05_attach_attributes_no_access".center(80, '-'))
         payload = {"manifest_json": {
@@ -433,7 +447,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 403")
@@ -445,7 +460,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_06_attach_attributes_in_folder_gr(self):
+    async def test_06_attach_attributes_in_folder_gr(self):
         self.log.info('\n')
         self.log.info("test_06_attach_attributes_in_folder_gr".center(80, '-'))
         payload = {"manifest_json": {
@@ -462,7 +477,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")
@@ -474,7 +490,7 @@ class TestAttachAttributes(unittest.TestCase):
             self.log.error(f"ERROR: {e}")
             raise e
 
-    def test_07_attach_attributes_in_folder_core(self):
+    async def test_07_attach_attributes_in_folder_core(self):
         self.log.info('\n')
         self.log.info("test_07_attach_attributes_in_folder_core".center(80, '-'))
         payload = {"manifest_json": {
@@ -491,7 +507,8 @@ class TestAttachAttributes(unittest.TestCase):
         try:
             self.log.info(f"POST API: {self.test_api}")
             self.log.info(f"POST PAYLOAD: {payload}")
-            res = self.app.post(self.test_api, headers=headers, json=payload)
+            async with AsyncClient(app=self.app, base_url="http://test") as ac:
+                res = await ac.post(self.test_api, headers=headers, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 200")

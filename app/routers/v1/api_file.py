@@ -7,7 +7,7 @@ from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
 from ...resources.helpers import *
 from ...service_logger.logger_factory_service import SrvLoggerFactory
-
+import httpx
 
 router = APIRouter()
 _API_TAG = 'V1 files'
@@ -192,7 +192,8 @@ class APIFile:
         self._logger.info(f"Query file/folder payload: {payload}")
         self._logger.info(f"Query file/folder API: {url}")
         try:
-            res = requests.post(url, json=payload)
+            with httpx.Client() as client:
+                res = client.post(url, json=payload)
             res = res.json()
             query_result = []
             for f in res:
@@ -205,82 +206,3 @@ class APIFile:
             file_response.error_msg = str(e)
             file_response.code = EAPIResponseCode.internal_error
             return file_response.json_response()
-
-
-@cbv(router)
-class APIDownload:
-    current_identity: dict = Depends(jwt_required)
-
-    def __init__(self):
-        self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
-
-    @router.post("/files/download/pre", tags=[_API_TAG],
-                 response_model=POSTDownloadFileResponse,
-                 summary="Permission check for downloading")
-    @catch_internal(_API_NAMESPACE)
-    async def forward_download_pre(self, data: POSTDownloadFile):
-        """
-        List files and folders in project
-        """
-        download_response = POSTDownloadFileResponse()
-        try:
-            role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
-            user_name = self.current_identity['username']
-        except (AttributeError, TypeError):
-            return self.current_identity
-        self._logger.info("API forward_donwload_pre".center(80, '-'))
-        self._logger.info(f"User request with identity: {self.current_identity}")
-        zone = get_zone(data.zone)
-        permission_event = {'user_id': user_id,
-                            'username': user_name,
-                            'role': role,
-                            'project_code': data.project_code,
-                            'zone': zone}
-        permission = check_permission(permission_event)
-        error_msg = permission.get('error_msg', '')
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        if error_msg:
-            self._logger.info(f"Permission check error: {error_msg}")
-            download_response.error_msg = error_msg
-            download_response.code = permission.get('code')
-            download_response.result = permission.get('result')
-            return download_response.json_response()
-        limited_file_access = permission.get('uploader', '')
-        if limited_file_access:
-            try:
-                payload = {"query": {
-                    "global_entity_id": data.files[0].get('geid'),
-                    "project_code": data.project_code,
-                    "labels": [zone]
-                }
-                }
-                self._logger.info(f"File query payload: {payload}")
-                self._logger.info(f"File query API: {ConfigClass.NEO4J_SERVICE + '/v2/neo4j/nodes/query'}")
-                file_res = requests.post(ConfigClass.NEO4J_SERVICE + '/v2/neo4j/nodes/query', json=payload)
-                self._logger.info(f"File query result: {file_res.text}")
-                file_info = file_res.json().get('result')[0]
-                owner = file_info.get('uploader')
-                if owner != permission.get('uploader'):
-                    download_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                    download_response.code = EAPIResponseCode.forbidden
-                    download_response.result = f"{permission.get('uploader')} No permission to access file {file_info}"
-                    return download_response.json_response()
-            except Exception as e:
-                download_response.error_msg = 'File may not exist in the given project (geid does not match project code)'
-                download_response.code = EAPIResponseCode.bad_request
-                download_response.result = str(e)
-                return download_response.json_response()
-        if zone == 'VRECore':
-            url = ConfigClass.url_download_vrecore
-        else:
-            url = ConfigClass.url_download_greenroom
-        payload = {'files': data.files,
-                   'operator': data.operator,
-                   'project_code': data.project_code,
-                   'session_id': data.session_id}
-        self._logger.info(f"Download requests payload: {payload}")
-        self._logger.info(f"Download requests API: {url}")
-        pre_res = requests.post(url, json=payload)
-        return JSONResponse(content=pre_res.json(), status_code=pre_res.status_code)
