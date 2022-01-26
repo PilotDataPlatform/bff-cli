@@ -23,7 +23,17 @@ pipeline {
     stage('DEV unit test') {
       when {branch "k8s-dev"}
       steps{
+          withCredentials([
+            usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD'),
+            string(credentialsId:'VAULT_TOKEN', variable: 'VAULT_TOKEN'),
+            string(credentialsId:'VAULT_URL', variable: 'VAULT_URL'),
+            file(credentialsId:'VAULT_CRT', variable: 'VAULT_CRT')
+          ]) 
+        {
         sh """
+        export VAULT_TOKEN=${VAULT_TOKEN}
+        export VAULT_URL=${VAULT_URL}
+        export VAULT_CRT=${VAULT_CRT}
         pip3 install virtualenv
         /home/indoc/.local/bin/virtualenv -p python3 venv
         . venv/bin/activate
@@ -38,9 +48,11 @@ pipeline {
       when {branch "k8s-dev"}
       steps{
         script {
+            withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('http://10.3.7.221:5000', registryCredential) {
-                customImage = docker.build("10.3.7.221:5000/bff-vrecli:${env.BUILD_ID}")
+                customImage = docker.build("10.3.7.221:5000/bff-vrecli:${env.BUILD_ID}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
                 customImage.push()
+            }
             }
         }
       }
@@ -76,9 +88,11 @@ pipeline {
       when {branch "k8s-staging"}
       steps{
         script {
+            withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('http://10.3.7.241:5000', registryCredential) {
-                customImage = docker.build("10.3.7.241:5000/bff-vrecli:${env.BUILD_ID}")
+                customImage = docker.build("10.3.7.241:5000/provenance:${env.BUILD_ID}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
                 customImage.push()
+            }
             }
         }
       }

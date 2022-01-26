@@ -25,8 +25,12 @@ class APILineage:
     @catch_internal(_API_NAMESPACE)
     def create_lineage(self, request_payload: LineageCreatePost,
                              current_identity: dict = Depends(jwt_required)):
+        self._logger.info("API Lineage".center(80, '-'))
         api_response = LineageCreateResponse()
         proxy_payload = request_payload.__dict__
+        url = ConfigClass.PROVENANCE_SERVICE + "/v1/lineage"
+        self._logger.info(f"url: {url}")
+        self._logger.info(f"payload: {proxy_payload}")
         with httpx.Client() as client:
-            fw_response = client.post(ConfigClass.PROVENANCE_SERVICE + "/v1/lineage", json=proxy_payload)
+            fw_response = client.post(url, json=proxy_payload)
         return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)

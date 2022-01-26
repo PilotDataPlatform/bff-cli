@@ -49,8 +49,8 @@ def create_app():
     create app function
     """
     app = FastAPI(
-        title="BFF VRECLI",
-        description="BFF for vrecli",
+        title="BFF CLI",
+        description="BFF for cli",
         docs_url="/v1/api-doc",
         version=ConfigClass.version
     )

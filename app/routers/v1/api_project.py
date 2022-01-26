@@ -84,6 +84,22 @@ class APIProject:
             void_check_file_in_zone(data, file, project_code)
         session_id = request.headers.get("Session-ID")
         result = transfer_to_pre(data, project_code, session_id)
+
+        trans_payload = {
+            "current_folder_node": data.current_folder_node,
+            "project_code": project_code,
+            "operator": data.operator,
+            "upload_message": data.upload_message,
+            "data": data.data,
+            "job_type": data.job_type
+        }
+
+        url = select_url_by_zone(data.zone)
+        self._logger.info(f"Transfer to pre url: {url}")
+        self._logger.info(f"Transfer to pre payload: {trans_payload}")
+        self._logger.info(f"Transfer to pre result: {result}")
+        self._logger.info(f"Transfer to pre result: {result.status_code}")
+        self._logger.info(f"Transfer to pre result: {result.__dict__}")
         if result.status_code == 409:
             api_response.error_msg = result.json()['error_msg']
             api_response.code = EAPIResponseCode.conflict

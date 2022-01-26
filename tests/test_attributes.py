@@ -72,7 +72,7 @@ class TestGetAttributes(IsolatedAsyncioTestCase):
         login_user = {
             "username": no_access_user_name,
             "password": no_access_user_password,
-            "realm": "vre"
+    
         }
         _token = self.test.auth(login_user)
         headers = {
@@ -119,8 +119,7 @@ class TestGetAttributes(IsolatedAsyncioTestCase):
         param = {'project_code': 'noattribute'}
         login_user = {
             "username": "jzhang3",
-            "password": "Indoc1234567!",
-            "realm": "vre"
+            "password": "Indoc1234567!"
         }
         _token = self.test.auth(login_user)
         headers = {
@@ -201,8 +200,7 @@ class TestExportAttributes(IsolatedAsyncioTestCase):
                  'manifest_name': 'Manifest1'}
         login_user = {
             "username": no_access_user_name,
-            "password": no_access_user_password,
-            "realm": "vre"
+            "password": no_access_user_password
         }
         _token = self.test.auth(login_user)
         headers = {
@@ -439,8 +437,7 @@ class TestAttachAttributes(IsolatedAsyncioTestCase):
         }
         login_user = {
             "username": no_access_user_name,
-            "password": no_access_user_password,
-            "realm": "vre"
+            "password": no_access_user_password
         }
         _token = self.test.auth(login_user)
         headers = {

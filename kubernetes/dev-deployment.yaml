@@ -32,8 +32,12 @@ spec:
             value: "dev"
           - name: CONFIG_CENTER_ENABLED
             value: "true"
-          - name: CONFIG_CENTER_BASE_URL
-            value: "http://common.utility:5062/"
+          - name: VAULT_URL
+            value: "https://vault.vault:8200/v1/vre/app/config"
+          - name: VAULT_CRT
+            value: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          - name: VAULT_TOKEN
+            value: "s.p97lqlxBZ61C6sx5aHAFB4Ya"
           - name: AUTH_SERVICE
             value: "http://auth.utility:5061"
           - name: DATA_UPLOAD_SERVICE_GREENROOM
@@ -64,6 +68,12 @@ spec:
             value: "http://neo4j.utility:5062"
           - name: OPEN_TELEMETRY_ENABLED
             value: "True"
+          - name: VAULT_URL
+            value: "https://vault.vault:8200/v1/vre/app/config"
+          - name: VAULT_CRT
+            value: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          - name: VAULT_TOKEN
+            value: "s.p97lqlxBZ61C6sx5aHAFB4Ya"
       nodeSelector:
         namespace: utility
 ---

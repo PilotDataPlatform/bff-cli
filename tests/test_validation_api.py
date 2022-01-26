@@ -358,7 +358,7 @@ class TestAttributeValidation(IsolatedAsyncioTestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrec100000000000",
+                "project_code": "c100000000000",
                 "attributes": {
                     "attr2": "test attribute",
                     "attr3": "t1"
@@ -386,7 +386,7 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
     app = test.client
     test_api = "/v1/validate/env"
     """
-    VRE CLI Workbench VM Validation rules:
+    CLI Workbench VM Validation rules:
 
     Greenroom VM:
                 Greenroom        Core

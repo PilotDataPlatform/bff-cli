@@ -15,14 +15,14 @@ class CheckFileResponse(APIResponse):
         "file_size": 1048576,
         "tags": [],
         "archived": "false",
-        "path": "/data/vre-storage/mar04/raw",
+        "path": "/data/core-storage/mar04/raw",
         "time_lastmodified": "2021-03-05T19:37:06",
         "uploader": "admin",
         "process_pipeline": "",
         "name": "Testdateiäöüßs4",
         "time_created": "2021-03-05T19:37:06",
         "guid": "f91b258d-2f1d-409a-9551-91af8057e70e",
-        "full_path": "/data/vre-storage/mar04/raw/Testdateiäöüßs4",
+        "full_path": "/data/core-storage/mar04/raw/Testdateiäöüßs4",
         "generate_id": "undefined"
     }
     )
