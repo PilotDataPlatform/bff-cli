@@ -1,9 +1,10 @@
 pipeline {
     agent { label 'small' }
     environment {
-      imagename_dev = "10.3.7.221:5000/bff-vrecli"
-      imagename_staging = "10.3.7.241:5000/bff-vrecli"
-      registryCredential = 'docker-registry'
+      imagename_dev = "registry-gitlab.indocresearch.org/charite/bff_vrecli"
+      imagename_staging = "registry-gitlab.indocresearch.org/charite/bff_vrecli"
+      commit = sh(returnStdout: true, script: 'git describe --always').trim()
+      registryCredential = 'gitlab-registry'
       dockerImage = ''
     }
 
@@ -19,7 +20,7 @@ pipeline {
             }
         }
     }
-    
+
     stage('DEV unit test') {
       when {branch "k8s-dev"}
       steps{
@@ -38,8 +39,8 @@ pipeline {
       when {branch "k8s-dev"}
       steps{
         script {
-            docker.withRegistry('http://10.3.7.221:5000', registryCredential) {
-                customImage = docker.build("10.3.7.221:5000/bff-vrecli:${env.BUILD_ID}")
+            docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
+                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:${commit}")
                 customImage.push()
             }
         }
@@ -48,14 +49,14 @@ pipeline {
     stage('DEV Remove image') {
       when {branch "k8s-dev"}
       steps{
-        sh "docker rmi $imagename_dev:$BUILD_NUMBER"
+        sh "docker rmi $imagename_dev:$commit"
       }
     }
 
     stage('DEV Deploy') {
       when {branch "k8s-dev"}
       steps{
-        sh "sed -i 's/<VERSION>/${BUILD_NUMBER}/g' kubernetes/dev-deployment.yaml"
+        sh "sed -i 's/<VERSION>/${commit}/g' kubernetes/dev-deployment.yaml"
         sh "kubectl config use-context dev"
         sh "kubectl apply -f kubernetes/dev-deployment.yaml"
       }
@@ -76,8 +77,8 @@ pipeline {
       when {branch "k8s-staging"}
       steps{
         script {
-            docker.withRegistry('http://10.3.7.241:5000', registryCredential) {
-                customImage = docker.build("10.3.7.241:5000/bff-vrecli:${env.BUILD_ID}")
+            docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
+                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:${commit}")
                 customImage.push()
             }
         }
@@ -87,14 +88,14 @@ pipeline {
     stage('STAGING Remove image') {
       when {branch "k8s-staging"}
       steps{
-        sh "docker rmi $imagename_staging:$BUILD_NUMBER"
+        sh "docker rmi $imagename_staging:$commit"
       }
     }
 
     stage('STAGING Deploy') {
       when {branch "k8s-staging"}
       steps{
-        sh "sed -i 's/<VERSION>/${BUILD_NUMBER}/g' kubernetes/staging-deployment.yaml"
+        sh "sed -i 's/<VERSION>/${commit}/g' kubernetes/staging-deployment.yaml"
         sh "kubectl config use-context staging"
         sh "kubectl apply -f kubernetes/staging-deployment.yaml"
       }
@@ -102,7 +103,7 @@ pipeline {
   }
   post {
       failure {
-        slackSend color: '#FF0000', message: "Build Failed! - ${env.JOB_NAME} ${env.BUILD_NUMBER}  (<${env.BUILD_URL}|Open>)", channel: 'jenkins-dev-staging-monitor'
+        slackSend color: '#FF0000', message: "Build Failed! - ${env.JOB_NAME} ${env.commit}  (<${env.BUILD_URL}|Open>)", channel: 'jenkins-dev-staging-monitor'
       }
   }
 

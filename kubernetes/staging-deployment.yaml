@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: bff-vrecli
-          image: 10.3.7.241:5000/bff-vrecli:<VERSION>
+          image: registry-gitlab.indocresearch.org/charite/bff_vrecli:<VERSION>
           ports:
             - containerPort: 5080
           env:
