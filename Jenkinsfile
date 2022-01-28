@@ -90,7 +90,7 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('http://10.3.7.241:5000', registryCredential) {
-                customImage = docker.build("10.3.7.241:5000/provenance:${env.BUILD_ID}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
+                customImage = docker.build("10.3.7.241:5000/bff-vrecli:${env.BUILD_ID}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
                 customImage.push()
             }
             }
