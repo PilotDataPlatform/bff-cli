@@ -7,3 +7,5 @@ Jenkinsfile
 # Misc
 .DS_Store
 .env.local
+.env
+.venv

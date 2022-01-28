@@ -139,5 +139,4 @@ vrecli.egg-info
 logs
 gunicorn_error.log
 gunicorn_access.log
-starter.sh
 .env

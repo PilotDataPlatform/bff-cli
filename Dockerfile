@@ -12,6 +12,6 @@ apt-get install -y vim-tiny less && ln -s /usr/bin/vim.tiny /usr/bin/vim && rm -
 
 COPY . .
 
-RUN PIP_USERNAME=$pip_username PIP_PASSWORD=$pip_password pip install --no-cache-dir -r requirements.txt && chmod +x gunicorn_starter.sh
+RUN PIP_USERNAME=$pip_username PIP_PASSWORD=$pip_password pip install --no-cache-dir -r requirements.txt -r internal_requirements.txt && chmod +x gunicorn_starter.sh
 
 CMD ["./gunicorn_starter.sh"]
