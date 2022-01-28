@@ -29,7 +29,7 @@ spec:
             - containerPort: 5080
           env:
           - name: env
-            value: "dev"
+            value: "staging"
           - name: CONFIG_CENTER_ENABLED
             value: "true"
           - name: VAULT_URL
