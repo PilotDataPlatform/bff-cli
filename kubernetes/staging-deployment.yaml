@@ -37,7 +37,10 @@ spec:
           - name: VAULT_CRT
             value: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
           - name: VAULT_TOKEN
-            value: "s.L35l8Ip6lgLikVJK4CaktfrE"
+            valueFrom:
+              secretKeyRef:
+                name: vault-secret
+                key: token
           - name: OPEN_TELEMETRY_ENABLED
             value: "True"
       nodeSelector:

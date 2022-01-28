@@ -39,7 +39,10 @@ spec:
           - name: VAULT_CRT
             value: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
           - name: VAULT_TOKEN
-            value: "s.p97lqlxBZ61C6sx5aHAFB4Ya"
+            valueFrom:
+              secretKeyRef:
+                name: vault-secret
+                key: token
       nodeSelector:
         namespace: utility
 ---
