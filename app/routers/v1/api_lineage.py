@@ -28,5 +28,5 @@ class APILineage:
         api_response = LineageCreateResponse()
         proxy_payload = request_payload.__dict__
         with httpx.Client() as client:
-            fw_response = client.post(ConfigClass.PROVENANCE_SERVICE + "/v1/lineage", json=proxy_payload)
+            fw_response = client.post(ConfigClass.PROVENANCE_SERVICE + "/v1/lineage/", json=proxy_payload)
         return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)
