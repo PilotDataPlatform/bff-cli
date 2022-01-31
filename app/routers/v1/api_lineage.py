@@ -23,7 +23,7 @@ class APILineage:
                  response_model=LineageCreatePost,
                  summary="[PENDING] Create lineage for given geid")
     @catch_internal(_API_NAMESPACE)
-    def create_lineage(self, request_payload: LineageCreatePost,
+    async def create_lineage(self, request_payload: LineageCreatePost,
                              current_identity: dict = Depends(jwt_required)):
         self._logger.info("API Lineage".center(80, '-'))
         api_response = LineageCreateResponse()
@@ -32,5 +32,5 @@ class APILineage:
         self._logger.info(f"url: {url}")
         self._logger.info(f"payload: {proxy_payload}")
         with httpx.Client() as client:
-            fw_response = client.post(url, json=proxy_payload)
+            fw_response = client.post(url, json=proxy_payload, timeout=100, follow_redirects=True)
         return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)
