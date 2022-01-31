@@ -32,8 +32,17 @@ spec:
             value: "staging"
           - name: CONFIG_CENTER_ENABLED
             value: "true"
-          - name: CONFIG_CENTER_BASE_URL
-            value: "http://common.utility:5062/"
+          - name: VAULT_URL
+            value: "https://vault.vault:8200/v1/vre/app/config"
+          - name: VAULT_CRT
+            value: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          - name: VAULT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: vault-secret
+                key: token
+          - name: OPEN_TELEMETRY_ENABLED
+            value: "True"
       nodeSelector:
         namespace: utility
 ---

@@ -65,7 +65,8 @@ class APIFile:
                 labels = query_result[global_entity_id].get('labels')
                 display_path = query_result[global_entity_id].get('display_path').lstrip('/')
                 name_folder = display_path.split('/')[0]
-                zone = 'VRECore' if 'VRECore' in labels else 'Greenroom'
+                zone = ConfigClass.CORE_ZONE_LABEL if ConfigClass.CORE_ZONE_LABEL in labels \
+                    else ConfigClass.GREEN_ZONE_LABEL
                 self._logger.info(f'File zone: {zone}')
                 permission_event = {'user_id': user_id,
                                     'username': user_name,

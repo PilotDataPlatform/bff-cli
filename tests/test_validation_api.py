@@ -1,4 +1,5 @@
 import unittest
+from app.config import ConfigClass
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 from .prepare_test import SetupTest
@@ -10,7 +11,6 @@ cases: generate, attribute, environment
 """
 case = "all"
 zone_env=""
-
 
 @unittest.skipUnless(case == 'generate' or case == 'all' or case=='', 'Run specific test')
 class TestGenerateIDValidation(IsolatedAsyncioTestCase):
@@ -358,7 +358,7 @@ class TestAttributeValidation(IsolatedAsyncioTestCase):
         payload = {
             "manifest_json": {
                 "manifest_name": "Manifest1",
-                "project_code": "vrec100000000000",
+                "project_code": "c100000000000",
                 "attributes": {
                     "attr2": "test attribute",
                     "attr3": "t1"
@@ -386,22 +386,22 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
     app = test.client
     test_api = "/v1/validate/env"
     """
-    VRE CLI Workbench VM Validation rules:
+    CLI Workbench VM Validation rules:
 
     Greenroom VM:
-                Greenroom       VRECore
+                Greenroom        Core
     Upload         Yes            No
     Download       Yes            No
 
-    VRECore VM:
-                Greenroom       VRECore
+    Core VM:
+                Greenroom        Core
     Upload         Yes            Yes
     Download       No             Yes
     """
-    async def test_01_upload_from_vrecore_to_greenroom(self):
+    async def test_01_upload_from_core_to_greenroom(self):
         self.log.info('\n')
         self.log.info("test_01_upload_from_greenroom_to_greenroom".center(80, '-'))
-        payload = {"action": 'upload', "environ": "", 'zone': 'greenroom'}
+        payload = {"action": 'upload', "environ": "", 'zone': ConfigClass.GREEN_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -420,10 +420,10 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             self.log.error(f"01 ERROR: {e}")
             raise e
 
-    async def test_02_upload_from_vrecore_to_vrecore(self):
+    async def test_02_upload_from_core_to_core(self):
         self.log.info('\n')
-        self.log.info("test_02_upload_from_vrecore_to_vrecore".center(80, '-'))
-        payload = {"action": 'upload', "environ": "", 'zone': 'vrecore'}
+        self.log.info("test_02_upload_from_core_to_core".center(80, '-'))
+        payload = {"action": 'upload', "environ": "", 'zone': ConfigClass.CORE_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -442,11 +442,12 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             self.log.error(f"02 ERROR: {e}")
             raise e
 
-    async def test_03_download_from_vrecore_in_vrecore(self):
+    async def test_03_download_from_core_in_core(self):
         self.log.info('\n')
-        self.log.info("test_03_download_from_vrecore_in_vrecore".center(80, '-'))
-        payload = {"action": 'download', "environ": "", 'zone': 'vrecore'}
+        self.log.info("test_03_download_from_core_in_core".center(80, '-'))
+        payload = {"action": 'download', "environ": "", 'zone': ConfigClass.CORE_ZONE_LABEL.lower()}
         try:
+            self.log.info(f"PAYLOAD: {payload}")
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
             self.log.info(f"RESPONSE: {res.text}")
@@ -464,10 +465,10 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             self.log.error(f"03 ERROR: {e}")
             raise e
 
-    async def test_04_download_from_greenroom_in_vrecore(self):
+    async def test_04_download_from_greenroom_in_core(self):
         self.log.info('\n')
-        self.log.info("test_03_download_from_vrecore_in_vrecore".center(80, '-'))
-        payload = {"action": 'download', "environ": "", 'zone': 'greenroom'}
+        self.log.info("test_03_download_from_core_in_core".center(80, '-'))
+        payload = {"action": 'download', "environ": "", 'zone': ConfigClass.GREEN_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -478,8 +479,8 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             error = response.get('error_msg')
             self.log.info(F"COMPARING: {result} VS 'Invalid'")
             self.assertEqual(result, 'Invalid')
-            self.log.info(F"COMPARING: {error} VS 'Invalid action: download from greenroom in vrecore'")
-            self.assertEqual(error, 'Invalid action: download from greenroom in vrecore')
+            self.log.info(F"COMPARING: {error} VS 'Invalid action: download from {ConfigClass.GREEN_ZONE_LABEL.lower()} in {ConfigClass.CORE_ZONE_LABEL.lower}'")
+            self.assertEqual(error, f'Invalid action: download from {ConfigClass.GREEN_ZONE_LABEL.lower()} in {ConfigClass.CORE_ZONE_LABEL.lower()}')
             self.log.info(F"COMPARING: {code} VS 403")
             self.assertEqual(code, 403)
         except Exception as e:
@@ -489,7 +490,7 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
     async def test_05_download_with_invalid_env(self):
         self.log.info('\n')
         self.log.info("test_05_download_with_invalid_env".center(80, '-'))
-        payload = {"action": 'download', "environ": "asdf", 'zone': 'greenroom'}
+        payload = {"action": 'download', "environ": "asdf", 'zone': ConfigClass.GREEN_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -534,7 +535,7 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
     async def test_07_upload_from_greenroom_to_greenroom(self):
         self.log.info('\n')
         self.log.info("test_07_upload_from_greenroom_to_greenroom".center(80, '-'))
-        payload = {"action": 'upload', "environ": zone_env, 'zone': 'greenroom'}
+        payload = {"action": 'upload', "environ": zone_env, 'zone': ConfigClass.GREEN_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -554,10 +555,10 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             raise e
 
     @unittest.skipIf(zone_env=="", "Missing essential information")
-    async def test_08_upload_from_greenroom_to_vrecore(self):
+    async def test_08_upload_from_greenroom_to_core(self):
         self.log.info('\n')
-        self.log.info("test_08_upload_from_greenroom_to_vrecore".center(80, '-'))
-        payload = {"action": 'upload', "environ": zone_env, 'zone': 'vrecore'}
+        self.log.info("test_08_upload_from_greenroom_to_core".center(80, '-'))
+        payload = {"action": 'upload', "environ": zone_env, 'zone': ConfigClass.CORE_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -568,8 +569,8 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             error = response.get('error_msg')
             self.log.info(F"COMPARING: {result} VS 'Invalid'")
             self.assertEqual(result, 'Invalid')
-            self.log.info(F"COMPARING: {error} VS 'Invalid action: upload to vrecore in greenroom'")
-            self.assertEqual(error, 'Invalid action: upload to vrecore in greenroom')
+            self.log.info(F"COMPARING: {error} VS 'Invalid action: upload to {ConfigClass.CORE_ZONE_LABEL.lower()} in {ConfigClass.GREEN_ZONE_LABEL.lower()}'")
+            self.assertEqual(error, f'Invalid action: upload to {ConfigClass.CORE_ZONE_LABEL.lower()} in {ConfigClass.GREEN_ZONE_LABEL.lower()}')
             self.log.info(F"COMPARING: {code} VS 403")
             self.assertEqual(code, 403)
         except Exception as e:
@@ -577,10 +578,10 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             raise e
 
     @unittest.skipIf(zone_env=="", "Missing essential information")
-    async def test_09_download_from_vrecore_in_greenroom(self):
+    async def test_09_download_from_core_in_greenroom(self):
         self.log.info('\n')
-        self.log.info("test_09_download_from_vrecore_in_greenroom".center(80, '-'))
-        payload = {"action": 'download', "environ": zone_env, 'zone': 'vrecore'}
+        self.log.info("test_09_download_from_core_in_greenroom".center(80, '-'))
+        payload = {"action": 'download', "environ": zone_env, 'zone': ConfigClass.CORE_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -591,8 +592,8 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
             error = response.get('error_msg')
             self.log.info(F"COMPARING: {result} VS 'Invalid'")
             self.assertEqual(result, 'Invalid')
-            self.log.info(F"COMPARING: {error} VS 'Invalid action: download from vrecore in greenroom'")
-            self.assertEqual(error, 'Invalid action: download from vrecore in greenroom')
+            self.log.info(F"COMPARING: {error} VS 'Invalid action: download from {ConfigClass.CORE_ZONE_LABEL.lower()} in {ConfigClass.GREEN_ZONE_LABEL.lower()}'")
+            self.assertEqual(error, f'Invalid action: download from {ConfigClass.CORE_ZONE_LABEL.lower()} in {ConfigClass.GREEN_ZONE_LABEL.lower()}')
             self.log.info(F"COMPARING: {code} VS 403")
             self.assertEqual(code, 403)
         except Exception as e:
@@ -603,7 +604,7 @@ class TestEnvironmentValidation(IsolatedAsyncioTestCase):
     async def test_10_download_from_greenroom_in_greenroom(self):
         self.log.info('\n')
         self.log.info("test_10_download_from_greenroom_in_greenroom".center(80, '-'))
-        payload = {"action": 'download', "environ": zone_env, 'zone': 'greenroom'}
+        payload = {"action": 'download', "environ": zone_env, 'zone': ConfigClass.GREEN_ZONE_LABEL.lower()}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)

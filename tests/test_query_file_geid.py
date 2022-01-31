@@ -1,4 +1,4 @@
-import unittest
+from app.config import ConfigClass
 import time
 import os
 from .prepare_test import SetupTest
@@ -32,7 +32,7 @@ class TestQueryFileGeid(IsolatedAsyncioTestCase):
         create_folder_file_res = cls.test.create_file(cls.project_code, cls.file_name,
                                                       folder=cls.folder, uploader=cls.uploader)
         folder_file_core_res = cls.test.create_file(cls.project_code, cls.file_name,
-                                                    folder=cls.folder_core, zone='VRECore',
+                                                    folder=cls.folder_core, zone=ConfigClass.CORE_ZONE_LABEL,
                                                     uploader=cls.uploader)
         cls.log.info(f"CREATE FILE: {create_res}")
         cls.file_geid = create_res.get('global_entity_id')
@@ -84,7 +84,7 @@ class TestQueryFileGeid(IsolatedAsyncioTestCase):
                 self.assertEqual(self.project_code, project_code)
                 if geid == self.file_geid:
                     display_path = f"{self.uploader}/{self.file_name}"
-                    labels = ['File', 'Greenroom']
+                    labels = ['File', ConfigClass.GREEN_ZONE_LABEL]
                     query_display_path = file_info.get('display_path')
                     query_label = file_info.get('labels')
                     self.log.info(f"Comparing display_path: {display_path} VS {query_display_path}")
@@ -93,7 +93,7 @@ class TestQueryFileGeid(IsolatedAsyncioTestCase):
                     self.assertEqual(set(labels), set(query_label))
                 elif geid == self.folder_file_geid:
                     display_path = f"{self.uploader}/{self.folder}/{self.file_name}"
-                    labels = ['File', 'Greenroom']
+                    labels = ['File', ConfigClass.GREEN_ZONE_LABEL]
                     query_display_path = file_info.get('display_path')
                     query_label = file_info.get('labels')
                     self.log.info(f"Comparing display_path: {display_path} VS {query_display_path}")
@@ -102,7 +102,7 @@ class TestQueryFileGeid(IsolatedAsyncioTestCase):
                     self.assertEqual(set(labels), set(query_label))
                 elif geid == self.folder_file_core_geid:
                     display_path = f"{self.uploader}/{self.folder_core}/{self.file_name}"
-                    labels = ['File', 'VRECore']
+                    labels = ['File', ConfigClass.CORE_ZONE_LABEL]
                     query_display_path = file_info.get('display_path')
                     query_label = file_info.get('labels')
                     self.log.info(f"Comparing display_path: {display_path} VS {query_display_path}")

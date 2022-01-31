@@ -15,8 +15,7 @@ class TestFiles(IsolatedAsyncioTestCase):
         self.log.info("test_01_admin_get_list".center(80, '-'))
         payload = {
             "username": "admin",
-            "password": "admin",
-            "realm": "vre"
+            "password": "admin"
         }
         token = self.test.auth(payload)
         self.log.info(f"GET API: {self.test_api}")
@@ -40,8 +39,7 @@ class TestFiles(IsolatedAsyncioTestCase):
         self.log.info("test_02_platform_user_get_list".center(80, '-'))
         payload = {
             "username": "jzhang21",
-            "password": "Indoc1234567!",
-            "realm": "vre"
+            "password": "Indoc1234567!"
         }
         token = self.test.auth(payload)
         self.log.info(f"GET API: {self.test_api}")
@@ -55,7 +53,6 @@ class TestFiles(IsolatedAsyncioTestCase):
             projects = res_json.get('result')
             self.log.info(f"Listed projects: {projects}")
             self.log.info(f"COMPARING LENGTH: {len(projects)} 3")
-            # user in generate, vrevlitest, pacs 3 projects
             self.assertEqual(len(projects), 3)
         except Exception as e:
             self.log.error(f"ERROR: {e}")

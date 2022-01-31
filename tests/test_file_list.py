@@ -1,4 +1,6 @@
 import unittest
+
+from app.config import ConfigClass
 from .prepare_test import SetupTest
 from .logger import Logger
 import time
@@ -15,7 +17,7 @@ contributor_user = 'jzhang33'
 pre_defined_folder = "admin_folder"
 
 
-@unittest.skipIf(case_to_run == 'vrecore', 'Run specific test')
+@unittest.skipIf(case_to_run == 'core', 'Run specific test')
 class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
     log = Logger(name='test_list_files_folders.log')
     test = SetupTest(log)
@@ -30,11 +32,10 @@ class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
     admin_core = ""
     collaborator_core = ""
     contributor_core = ""
-    zone = "greenroom"
+    zone = ConfigClass.GREEN_ZONE_LABEL.lower()
 
     @classmethod
     def setUpClass(cls):
-        # greenroom files
         cls.admin_gr = "admin_gr_" + str(time.time() * 1000)[0:12]
         cls.collaborator_gr = "collaborator_gr_" + str(time.time() * 1000)[0:12]
         cls.contributor_gr = "contributor_gr_" + str(time.time() * 1000)[0:12]
@@ -42,20 +43,20 @@ class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
         cls.contributor_folder_file_gr = "contributor__folder_gr_" + str(time.time() * 1000)[0:12]
         # create GR files
         admin_file_res_gr = cls.test.create_file(cls.project_code, cls.admin_gr, uploader=admin_user)
-        cls.log.info(f"admin greenroom file response: {admin_file_res_gr}")
+        cls.log.info(f"admin {ConfigClass.GREEN_ZONE_LABEL} file response: {admin_file_res_gr}")
         collaborator_res_gr = cls.test.create_file(cls.project_code, cls.collaborator_gr,
                                                    uploader=collaborator_user)
-        cls.log.info(f"collaborator greenroom file response: {collaborator_res_gr}")
+        cls.log.info(f"collaborator {ConfigClass.GREEN_ZONE_LABEL} file response: {collaborator_res_gr}")
         contributor_res_gr = cls.test.create_file(cls.project_code, cls.contributor_gr,
                                                   uploader=contributor_user)
-        cls.log.info(f"contributor greenroom file response: {contributor_res_gr}")
+        cls.log.info(f"contributor {ConfigClass.GREEN_ZONE_LABEL} file response: {contributor_res_gr}")
         # create file in folder
         collaborator_folder_gr = cls.test.create_file(cls.project_code, cls.collaborator_folder_file_gr,
                                                       folder=pre_defined_folder, uploader=collaborator_user)
-        cls.log.info(f"collaborator greenroom folder file response: {collaborator_folder_gr}")
+        cls.log.info(f"collaborator {ConfigClass.GREEN_ZONE_LABEL} folder file response: {collaborator_folder_gr}")
         contributor_folder_gr = cls.test.create_file(cls.project_code, cls.contributor_folder_file_gr,
                                                      folder=pre_defined_folder, uploader=contributor_user)
-        cls.log.info(f"contributor greenroom folder file response: {contributor_folder_gr}")
+        cls.log.info(f"contributor {ConfigClass.GREEN_ZONE_LABEL} folder file response: {contributor_folder_gr}")
 
         admin_id = admin_file_res_gr.get('id')
         collaborator_id = collaborator_res_gr.get('id')
@@ -95,8 +96,8 @@ class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
             for f in result:
                 self.log.info(f"{f.get('name')}")
                 name_folders.append(f.get('name'))
-                self.log.info(f"COMPARING LABELS: 'Greenroom' VS {f.get('labels')}")
-                self.assertIn('Greenroom', f.get('labels'))
+                self.log.info(f"COMPARING LABELS: {ConfigClass.GREEN_ZONE_LABEL} VS {f.get('labels')}")
+                self.assertIn(ConfigClass.GREEN_ZONE_LABEL, f.get('labels'))
                 self.log.info(f"COMPARING PROJECT CODE: {self.project_code} VS {f.get('project_code')}")
                 self.assertEqual(self.project_code, f.get('project_code'))
             self.log.info(f"Check jzhang10 IN {name_folders}")
@@ -132,8 +133,8 @@ class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
             for f in result:
                 self.log.info(f"{f.get('name')}")
                 name_folders.append(f.get('name'))
-                self.log.info(f"COMPARING LABELS: 'Greenroom' VS {f.get('labels')}")
-                self.assertIn('Greenroom', f.get('labels'))
+                self.log.info(f"COMPARING LABELS: {ConfigClass.GREEN_ZONE_LABEL} VS {f.get('labels')}")
+                self.assertIn(ConfigClass.GREEN_ZONE_LABEL, f.get('labels'))
                 self.log.info(f"COMPARING PROJECT CODE: {self.project_code} VS {f.get('project_code')}")
                 self.assertEqual(self.project_code, f.get('project_code'))
             self.log.info(f"Check jzhang10 NOT IN {name_folders}")
@@ -169,8 +170,8 @@ class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
             for f in result:
                 self.log.info(f"{f.get('name')}")
                 name_folders.append(f.get('name'))
-                self.log.info(f"COMPARING LABELS: 'Greenroom' VS {f.get('labels')}")
-                self.assertIn('Greenroom', f.get('labels'))
+                self.log.info(f"COMPARING LABELS: {ConfigClass.GREEN_ZONE_LABEL} VS {f.get('labels')}")
+                self.assertIn(ConfigClass.GREEN_ZONE_LABEL, f.get('labels'))
                 self.log.info(f"COMPARING PROJECT CODE: {self.project_code} VS {f.get('project_code')}")
                 self.assertEqual(self.project_code, f.get('project_code'))
             self.log.info(f"Check jzhang10 NOT IN {name_folders}")
@@ -342,7 +343,7 @@ class TestGetFilesFoldersCore(IsolatedAsyncioTestCase):
     admin_core = ""
     collaborator_core = ""
     contributor_core = ""
-    zone = "vrecore"
+    zone = ConfigClass.CORE_ZONE_LABEL.lower()
 
     @classmethod
     def setUpClass(cls):
@@ -351,15 +352,16 @@ class TestGetFilesFoldersCore(IsolatedAsyncioTestCase):
         collaborator_file_core = "collaborator_core_" + str(time.time() * 1000)[0:12]
         contributor_file_core = "contributor_core_" + str(time.time() * 1000)[0:12]
         # create Core files
+        core = ConfigClass.CORE_ZONE_LABEL
         admin_file_res_core = cls.test.create_file(cls.project_code, admin_file_core,
-                                                   zone='VRECore', uploader=admin_user)
+                                                   zone=core, uploader=admin_user)
         cls.log.info(f"admin core file response: {admin_file_res_core}")
         collaborator_file_res_core = cls.test.create_file(cls.project_code, collaborator_file_core,
-                                                          zone='VRECore',
+                                                          zone=core,
                                                           uploader=collaborator_user)
         cls.log.info(f"collaborator core file response: {collaborator_file_res_core}")
         contributor_file_res_core = cls.test.create_file(cls.project_code, contributor_file_core,
-                                                         zone='VRECore',
+                                                         zone=core,
                                                          uploader=contributor_user)
         cls.log.info(f"contributor core file response: {contributor_file_res_core}")
 
@@ -402,8 +404,8 @@ class TestGetFilesFoldersCore(IsolatedAsyncioTestCase):
             for f in result:
                 self.log.info(f"{f.get('name')}")
                 name_folders.append(f.get('name'))
-                self.log.info(f"COMPARING LABELS: 'VRECore' VS {f.get('labels')}")
-                self.assertIn('VRECore', f.get('labels'))
+                self.log.info(f"COMPARING LABELS: {ConfigClass.CORE_ZONE_LABEL} VS {f.get('labels')}")
+                self.assertIn(ConfigClass.CORE_ZONE_LABEL, f.get('labels'))
                 self.log.info(f"COMPARING PROJECT CODE: {self.project_code} VS {f.get('project_code')}")
                 self.assertEqual(self.project_code, f.get('project_code'))
             self.log.info(f"Check jzhang10 IN {name_folders}")
@@ -439,8 +441,8 @@ class TestGetFilesFoldersCore(IsolatedAsyncioTestCase):
             for f in result:
                 self.log.info(f"{f.get('name')}")
                 name_folders.append(f.get('name'))
-                self.log.info(f"COMPARING LABELS: 'VRECore' VS {f.get('labels')}")
-                self.assertIn('VRECore', f.get('labels'))
+                self.log.info(f"COMPARING LABELS: {ConfigClass.CORE_ZONE_LABEL} VS {f.get('labels')}")
+                self.assertIn(ConfigClass.CORE_ZONE_LABEL, f.get('labels'))
                 self.log.info(f"COMPARING PROJECT CODE: {self.project_code} VS {f.get('project_code')}")
                 self.assertEqual(self.project_code, f.get('project_code'))
             self.log.info(f"Check jzhang10 IN {name_folders}")

@@ -1,4 +1,4 @@
-import unittest
+from app.config import ConfigClass
 from .prepare_test import SetupTest
 from .logger import Logger
 import os
@@ -105,13 +105,13 @@ class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
             self.log.error(f"test_03 error: {e}")
             raise e
 
-    async def test_04_get_folder_no_access_vrecore(self):
+    async def test_04_get_folder_no_access_core(self):
         self.log.info('\n')
-        self.log.info("test_04_get_folder_no_access_vrecore".center(80, '-'))
+        self.log.info("test_04_get_folder_no_access_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         try:
             token = self.test.auth(self.test.login_contributor())
-            param = {'zone': 'vrecore',
+            param = {'zone': ConfigClass.CORE_ZONE_LABEL.lower(),
                      'project_code': self.project_code,
                      'folder': f'{self.contributor_user}/{self.folder_core}'}
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
@@ -128,12 +128,12 @@ class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
             self.log.error(f"test_04 error: {e}")
             raise e
 
-    async def test_05_get_folder_vrecore(self):
+    async def test_05_get_folder_core(self):
         self.log.info('\n')
-        self.log.info("test_05_get_folder_vrecore".center(80, '-'))
+        self.log.info("test_05_get_folder_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         try:
-            param = {'zone': 'vrecore',
+            param = {'zone': ConfigClass.CORE_ZONE_LABEL.lower(),
                      'project_code': self.project_code,
                      'folder': f'{self.admin_user}/{self.folder_core}'}
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
@@ -149,8 +149,8 @@ class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
             name = result.get('name')
             project = result.get('project_code')
             rel_path = result.get('folder_relative_path')
-            self.log.info(f"COMPARING LABELS: {labels} VS ['VRECore', 'Folder']")
-            self.assertEqual(set(labels), {'VRECore', 'Folder'})
+            self.log.info(f"COMPARING LABELS: {labels} VS f{[ConfigClass.CORE_ZONE_LABEL, 'Folder']}")
+            self.assertEqual(set(labels), {ConfigClass.CORE_ZONE_LABEL, 'Folder'})
             self.log.info(f"COMPARING name: {name} VS {self.folder_core}")
             self.assertEqual(name, self.folder_core)
             self.log.info(f"COMPARING project: {project} VS {self.project_code}")
@@ -161,15 +161,15 @@ class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
             self.log.error(f"test_05 error: {e}")
             raise e
 
-    async def test_06_get_sub_folder_vrecore(self):
+    async def test_06_get_sub_folder_core(self):
         self.log.info('\n')
-        self.log.info("test_06_get_sub_folder_vrecore".center(80, '-'))
+        self.log.info("test_06_get_sub_folder_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         sub_folder = 'core1'
         folder_path = f'{self.admin_user}/{self.folder_core}/{sub_folder}'
         relative_path = f'{self.admin_user}/{self.folder_core}'
         try:
-            param = {'zone': 'vrecore',
+            param = {'zone': ConfigClass.CORE_ZONE_LABEL.lower(),
                      'project_code': self.project_code,
                      'folder': folder_path}
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
@@ -185,8 +185,8 @@ class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
             name = result.get('name')
             project = result.get('project_code')
             rel_path = result.get('folder_relative_path')
-            self.log.info(f"COMPARING LABELS: {labels} VS ['VRECore', 'Folder']")
-            self.assertEqual(set(labels), {'VRECore', 'Folder'})
+            self.log.info(f"COMPARING LABELS: {labels} VS {[ConfigClass.CORE_ZONE_LABEL, 'Folder']}")
+            self.assertEqual(set(labels), {ConfigClass.CORE_ZONE_LABEL, 'Folder'})
             self.log.info(f"COMPARING name: {name} VS {sub_folder}")
             self.assertEqual(name, sub_folder)
             self.log.info(f"COMPARING project: {project} VS {self.project_code}")
@@ -197,14 +197,14 @@ class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
             self.log.error(f"test_06 error: {e}")
             raise e
 
-    async def test_07_get_folder_not_exist_vrecore(self):
+    async def test_07_get_folder_not_exist_core(self):
         self.log.info('\n')
-        self.log.info("test_07_get_folder_not_exist_vrecore".center(80, '-'))
+        self.log.info("test_07_get_folder_not_exist_core".center(80, '-'))
         self.log.info(f"GET API: {self.test_api}")
         sub_folder = 'core2021'
         relative_path = f'{self.admin_user}/{self.folder_core}/{sub_folder}'
         try:
-            param = {'zone': 'vrecore',
+            param = {'zone': ConfigClass.CORE_ZONE_LABEL.lower(),
                      'project_code': self.project_code,
                      'folder': relative_path}
             async with AsyncClient(app=self.app, base_url="http://test") as ac:

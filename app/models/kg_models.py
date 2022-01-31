@@ -39,7 +39,7 @@ class KGResponseModel(APIResponse):
                         'existing_duplicate': False
                         }, 
                     '@context': 'https://context.org', 
-                    'feedback': 'Resource http://10.3.7.220/kg/v1/resources/charite/VRE_Datasets/_/1634922993 already exists in project charite/VRE_Datasets'
+                    'feedback': 'Resource http://10.3.7.220/kg/v1/resources/charite/CORE_Datasets/_/1634922993 already exists in project charite/CORE_Datasets'
                     }
                     }
                 }

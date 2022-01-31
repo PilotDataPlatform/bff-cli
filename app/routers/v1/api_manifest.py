@@ -30,21 +30,28 @@ class APIManifest:
         try:
             _username = current_identity['username']
             _user_role = current_identity['role']
+            _user_id = current_identity["user_id"]
         except (AttributeError, TypeError):
             return current_identity
         self._logger.info("API list_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {current_identity}")
         self._logger.info(f"User request information: project_code: {project_code},")
+        self._logger.info(f"VAULT CRT: {ConfigClass.RDS_PWD}")
+        self._logger.info(f"VAULT CRT: {ConfigClass.RDS_HOST}")
         try:
-            permission_check_event = {'user_role': _user_role,
-                                      'username': _username,
-                                      'project_code': project_code}
-            self._logger.info(f"User permission check event: {permission_check_event}")
-            code, result = has_permission(permission_check_event)
-            self._logger.info(f"User permission code: {code}, permission result: {result}")
-            if result != 'permit':
-                api_response.error_msg = result
-                api_response.code = code
+            permission_event = {'user_id': _user_id,
+                        'username': _username,
+                        'role': _user_role,
+                        'project_code': project_code,
+                        'zone': ConfigClass.GREEN_ZONE_LABEL}
+            permission = check_permission(permission_event)
+            self._logger.info(f"Permission check event: {permission_event}")
+            self._logger.info(f"Permission check result: {permission}")
+            error_msg = permission.get('error_msg', '')
+            if error_msg:
+                api_response.error_msg = error_msg
+                api_response.code = permission.get('code')
+                api_response.result = permission.get('result')
                 return api_response.json_response()
             mani_project_event = {"project_code": project_code}
             self._logger.info("Getiting project manifests")
@@ -83,32 +90,31 @@ class APIManifest:
             manifest_name = manifests["manifest_name"]
             project_code = manifests['project_code']
             file_name = manifests['file_name']
-            zone_type = get_zone(manifests['zone'])
-            zone = get_zone(zone_type)
+            zone = manifests['zone']
+            permission_event = {'user_id': _user_id,
+                            'username': _username,
+                            'role': _user_role,
+                            'project_code': project_code,
+                            'zone': zone}
+            permission = check_permission(permission_event)
+            self._logger.info(f"Permission check event: {permission_event}")
+            self._logger.info(f"Permission check result: {permission}")
+            error_msg = permission.get('error_msg', '')
+            if error_msg:
+                api_response.error_msg = error_msg
+                api_response.code = permission.get('code')
+                api_response.result = permission.get('result')
+                return api_response.json_response()
+            project_role = permission.get('project_role')
+            zone_type = get_zone(zone)
         except KeyError as e:
             self._logger.error(f"Missing information error: {str(e)}")
             api_response.error_msg = customized_error_template(ECustomizedError.MISSING_INFO) % str(e)
             api_response.code = EAPIResponseCode.bad_request
             api_response.result = str(e)
             return api_response.json_response()
-        permission_event = {'user_id': _user_id,
-                            'username': _username,
-                            'role': _user_role,
-                            'project_code': project_code,
-                            'zone': zone}
-        permission = check_permission(permission_event)
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        error_msg = permission.get('error_msg', '')
-        if error_msg:
-            api_response.error_msg = error_msg
-            api_response.code = permission.get('code')
-            api_response.result = permission.get('result')
-            return api_response.json_response()
-        uploader = permission.get('uploader')
-        project_role = permission.get('project_role')
         self._logger.info(f"Getting info for file: {file_name} IN {project_code}")
-        file_node = query_file_in_project(project_code, file_name, zone)
+        file_node = query_file_in_project(project_code, file_name, zone_type)
         if not file_node:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
             api_response.code = EAPIResponseCode.not_found
@@ -119,16 +125,6 @@ class APIManifest:
             file_owner = file_node[0].get('uploader')
         self._logger.info(f"Globale entity id for {file_name}: {global_entity_id}")
         self._logger.info(f"File {file_name} uploaded by {file_owner}")
-        if _user_role == 'admin' or project_role == 'admin':
-            pass
-        elif zone == 'VRECore' and project_role == 'collaborator':
-            pass
-        elif zone == 'Greenroom' and file_owner == uploader:
-            pass
-        else:
-            api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
         project_code = manifests['project_code']
         attributes = manifests.get("attributes", {})
         mani_project_event = {"project_code": project_code, "manifest_name": manifest_name}
@@ -170,6 +166,7 @@ class APIManifest:
         try:
             _username = current_identity['username']
             _user_role = current_identity['role']
+            _user_id = current_identity["user_id"]
         except (AttributeError, TypeError):
             return current_identity
         self._logger.info("API attach_manifest".center(80, '-'))
@@ -178,13 +175,20 @@ class APIManifest:
                                   'username': _username,
                                   'project_code': project_code}
         self._logger.info(f"Permission check event: {permission_check_event}")
-        code, result = has_permission(permission_check_event)
-        self._logger.info(f"Permission code: {code}, permission result: {result}")
-        if result != 'permit':
-            api_response.error_msg = result
-            api_response.code = code
+        permission_event = {'user_id': _user_id,
+                    'username': _username,
+                    'role': _user_role,
+                    'project_code': project_code,
+                    'zone': ConfigClass.GREEN_ZONE_LABEL}
+        permission = check_permission(permission_event)
+        self._logger.info(f"Permission check event: {permission_event}")
+        self._logger.info(f"Permission check result: {permission}")
+        error_msg = permission.get('error_msg', '')
+        if error_msg:
+            api_response.error_msg = error_msg
+            api_response.code = permission.get('code')
+            api_response.result = permission.get('result')
             return api_response.json_response()
-
         manifest_event = {"project_code": project_code,
                           "manifest_name": manifest_name}
         manifest = self.db.get_manifest_name_from_project_in_db(manifest_event)

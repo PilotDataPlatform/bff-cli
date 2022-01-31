@@ -24,11 +24,21 @@ pipeline {
     stage('DEV unit test') {
       when {branch "k8s-dev"}
       steps{
+          withCredentials([
+            usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD'),
+            string(credentialsId:'VAULT_TOKEN', variable: 'VAULT_TOKEN'),
+            string(credentialsId:'VAULT_URL', variable: 'VAULT_URL'),
+            file(credentialsId:'VAULT_CRT', variable: 'VAULT_CRT')
+          ]) 
+        {
         sh """
+        export VAULT_TOKEN=${VAULT_TOKEN}
+        export VAULT_URL=${VAULT_URL}
+        export VAULT_CRT=${VAULT_CRT}
         pip3 install virtualenv
         /home/indoc/.local/bin/virtualenv -p python3 venv
         . venv/bin/activate
-        pip3 install -r requirements.txt -r tests/test_requirements.txt
+        PIP_USERNAME=${PIP_USERNAME} PIP_PASSWORD=${PIP_PASSWORD} pip3 install -r requirements.txt -r internal_requirements.txt -r tests/test_requirements.txt
         pytest -c tests/pytest.ini
         """
       }
@@ -39,9 +49,11 @@ pipeline {
       when {branch "k8s-dev"}
       steps{
         script {
+            withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:${commit}")
+                customImage = docker.build("https://registry-gitlab.indocresearch.org/charite/bff-vrecli:${env.BUILD_ID}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
                 customImage.push()
+            }
             }
         }
       }
@@ -77,9 +89,11 @@ pipeline {
       when {branch "k8s-staging"}
       steps{
         script {
+            withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:${commit}")
+                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:${commit}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
                 customImage.push()
+            }
             }
         }
       }

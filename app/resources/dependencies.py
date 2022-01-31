@@ -98,10 +98,10 @@ def check_permission(event: dict):
         return permission
     else:
         permission = {'project_role': project_role}
-    if project_role != 'admin' and zone.lower() == 'greenroom':
+    if project_role != 'admin' and zone.lower() == ConfigClass.GREEN_ZONE_LABEL.lower():
         permission['project_code'] = project_code
         permission['uploader'] = username
-    elif project_role != 'contributor' and zone.lower() == 'vrecore':
+    elif project_role != 'contributor' and zone.lower() == ConfigClass.CORE_ZONE_LABEL.lower():
         permission['project_code'] = project_code
     elif project_role == 'admin':
         permission['project_code'] = project_code
@@ -141,15 +141,15 @@ def void_check_file_in_zone(data, file, project_code):
 
 
 def select_url_by_zone(zone):
-    if zone == "vrecore":
-        url = ConfigClass.DATA_UPLOAD_SERVICE_VRE + "/v1/files/jobs"
+    if zone == ConfigClass.CORE_ZONE_LABEL.lower():
+        url = ConfigClass.DATA_UPLOAD_SERVICE_CORE + "/v1/files/jobs"
     else:
         url = ConfigClass.DATA_UPLOAD_SERVICE_GREENROOM + "/v1/files/jobs"
     return url
 
 
 def validate_upload_event(zone, data_type=None):
-    if zone not in ["vrecore", "greenroom"]:
+    if zone not in [ConfigClass.CORE_ZONE_LABEL.lower(), ConfigClass.GREEN_ZONE_LABEL.lower()]:
         error_msg = "Invalid Zone"
         return error_msg
     if data_type and data_type not in ["raw", "processed"]:

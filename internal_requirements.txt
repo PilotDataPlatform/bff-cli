@@ -1,0 +1,3 @@
+--index-url https://${PIP_USERNAME}:${PIP_PASSWORD}@git.indocresearch.org/api/v4/groups/charite/-/packages/pypi/simple
+common==0.0.12
+
