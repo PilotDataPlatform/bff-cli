@@ -30,20 +30,20 @@ pipeline {
             string(credentialsId:'VAULT_URL', variable: 'VAULT_URL'),
             file(credentialsId:'VAULT_CRT', variable: 'VAULT_CRT')
           ]) 
-        {
-        sh """
-        export VAULT_TOKEN=${VAULT_TOKEN}
-        export VAULT_URL=${VAULT_URL}
-        export VAULT_CRT=${VAULT_CRT}
-        pip3 install virtualenv
-        /home/indoc/.local/bin/virtualenv -p python3 venv
-        . venv/bin/activate
-        PIP_USERNAME=${PIP_USERNAME} PIP_PASSWORD=${PIP_PASSWORD} pip3 install -r requirements.txt -r internal_requirements.txt -r tests/test_requirements.txt
-        pytest -c tests/pytest.ini
-        """
+          {
+            sh """
+            export VAULT_TOKEN=${VAULT_TOKEN}
+            export VAULT_URL=${VAULT_URL}
+            export VAULT_CRT=${VAULT_CRT}
+            pip3 install virtualenv
+            /home/indoc/.local/bin/virtualenv -p python3 venv
+            . venv/bin/activate
+            PIP_USERNAME=${PIP_USERNAME} PIP_PASSWORD=${PIP_PASSWORD} pip3 install -r requirements.txt -r internal_requirements.txt -r tests/test_requirements.txt
+            pytest -c tests/pytest.ini
+            """
+            }
       }
     }
-
 
     stage('DEV Build and push image') {
       when {branch "k8s-dev"}
