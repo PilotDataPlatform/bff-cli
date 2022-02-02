@@ -5,9 +5,8 @@ from ...models.lineage_models import *
 from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
-from ...resources.helpers import *
-from sqlalchemy.orm import Session
-from ...resources.error_handler import customized_error_template, ECustomizedError
+from ...config import ConfigClass
+import httpx
 
 router = APIRouter()
 
@@ -26,18 +25,12 @@ class APILineage:
     @catch_internal(_API_NAMESPACE)
     async def create_lineage(self, request_payload: LineageCreatePost,
                              current_identity: dict = Depends(jwt_required)):
+        self._logger.info("API Lineage".center(80, '-'))
         api_response = LineageCreateResponse()
-        # try:
-        #     _username = current_identity['username']
-        # except (AttributeError, TypeError):
-        #     # catch username not found
-        #     api_response.code = EAPIResponseCode.unauthorized
-        #     api_response.result = None
-        #     error_msg = "Invalid identity token"
-        #     self._logger.error(error_msg)
-        #     api_response.error_msg = error_msg
-        #     return api_response.json_response()
         proxy_payload = request_payload.__dict__
-        fw_response = requests.post(
-            ConfigClass.PROVENANCE_SERVICE + "/v1/lineage", json=proxy_payload)
+        url = ConfigClass.PROVENANCE_SERVICE + "/v1/lineage"
+        self._logger.info(f"url: {url}")
+        self._logger.info(f"payload: {proxy_payload}")
+        with httpx.Client() as client:
+            fw_response = client.post(url, json=proxy_payload, timeout=100, follow_redirects=True)
         return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)

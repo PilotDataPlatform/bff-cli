@@ -88,15 +88,18 @@ class APIValidation:
         zone = request_payload.zone
         action = request_payload.action
         self._logger.info(f'msg: {encrypted_msg}')
-        if zone not in ['greenroom', 'vrecore']:
+        self._logger.info(request_payload)
+        if zone not in [ConfigClass.GREEN_ZONE_LABEL.lower(), ConfigClass.CORE_ZONE_LABEL.lower()]:
             self._logger.debug(f"Invalid zone value: {zone}")
             api_response.code = EAPIResponseCode.bad_request
             api_response.error_msg = customized_error_template(ECustomizedError.INVALID_ZONE)
             api_response.result = "Invalid"
             return api_response.json_response()
+        greenroom = ConfigClass.GREEN_ZONE_LABEL.lower()
+        core = ConfigClass.CORE_ZONE_LABEL.lower()
         restrict_zone = {
-        'greenroom': {'upload': ['greenroom'], 'download': ['greenroom']},
-        'vrecore': {'upload': ['greenroom', 'vrecore'], 'download': ['vrecore']}
+        greenroom: {'upload': [greenroom], 'download': [greenroom]},
+        core: {'upload': [greenroom, core], 'download': [core]}
         }
         if encrypted_msg:
             try:
@@ -108,7 +111,7 @@ class APIValidation:
                 api_response.result = "Invalid"
                 return api_response.json_response()
         else:
-            current_zone = 'vrecore'
+            current_zone = ConfigClass.CORE_ZONE_LABEL.lower()
         permit_action = restrict_zone.get(current_zone)
         permit_zone = permit_action.get(action)
         self._logger.info(f"Current zone: {current_zone}")
@@ -129,4 +132,3 @@ class APIValidation:
         api_response.error_msg = error
         api_response.result = result
         return api_response.json_response()
-

@@ -1,30 +1,23 @@
 import json
-import requests
-import time
+import httpx
 from ..config import ConfigClass
 from ..resources. error_handler import customized_error_template, ECustomizedError
-from ..models.base_models import APIResponse, EAPIResponseCode
-from ..models.error_model import HPCError
+from ..models.base_models import EAPIResponseCode
 from ..service_logger.logger_factory_service import SrvLoggerFactory
 
 _logger = SrvLoggerFactory("Helpers").get_logger()
 
-
 def get_zone(namespace):
-    return {"greenroom": "Greenroom",
-            "vrecore": "VRECore"}.get(namespace.lower(), 'greenroom')
+    return {ConfigClass.GREEN_ZONE_LABEL.lower(): ConfigClass.GREEN_ZONE_LABEL,
+            ConfigClass.CORE_ZONE_LABEL.lower(): ConfigClass.CORE_ZONE_LABEL
+            }.get(namespace.lower(), ConfigClass.GREEN_ZONE_LABEL.lower())
 
-
-def get_path_by_zone(namespace, project_code):
-    return {"greenroom": f"/data/vre-storage/{project_code}/",
-            "vrecore": f"/vre-data/{project_code}/"
-            }.get(namespace.lower(), 'greenroom')
-            
 
 def get_user_role(user_id, project_id):
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations"
     try:
-        res = requests.get(
+        with httpx.Client() as client:
+            res = client.get(
             url=url,
             params={"start_id": user_id,
                     "end_id": project_id})
@@ -40,7 +33,8 @@ def query__node_has_relation_with_admin(label='Container'):
     _logger.info(f"Requesting API: {url}")
     data = {'is_all': 'true'}
     try:
-        res = requests.post(url=url, json=data)
+        with httpx.Client() as client:
+            res = client.post(url=url, json=data)
         project = res.json()
         return project
     except Exception:
@@ -57,7 +51,8 @@ def query_node_has_relation_for_user(username, label='Container'):
     _logger.info(f"Requesting API: {url}")
     _logger.info(f'Query payload: {data}')
     try:
-        res = requests.post(url=url, json=data)
+        with httpx.Client() as client:
+            res = client.post(url=url, json=data)
         _logger.info(f'Query response: {res.text}')
         res = res.json()
         return res
@@ -69,7 +64,8 @@ def get_node_by_geid(geid):
     url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/geid/{geid}"
     _logger.info(f'Getting node: {url}')
     try:
-        res = requests.get(url)
+        with httpx.Client() as client:
+            res = client.get(url)
         _logger.info(f'Getting node info: {res.text}')
         result = res.json()
     except Exception as e:
@@ -83,7 +79,8 @@ def batch_query_node_by_geid(geid_list):
     payload = {
         "geids": geid_list
     }
-    res = requests.post(url, json=payload)
+    with httpx.Client() as client:
+        res = client.post(url, json=payload)
     res_json = res.json()
     result = res_json.get('result')
     located_geid = []
@@ -96,53 +93,35 @@ def batch_query_node_by_geid(geid_list):
     return located_geid, query_result
 
 
-def query_file_in_project(project_code, filename, zone='Greenroom'):
+def query_file_in_project(project_code, filename, zone=ConfigClass.GREEN_ZONE_LABEL):
     _logger.info("query_file_in_project".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    path = get_path_by_zone(zone, project_code) + filename
     data = {"query": {
         "name": filename.split('/')[-1],
-        "full_path": path,
+        "display_path": filename,
         "archived": False,
         "project_code": project_code,
-        "labels": ["File", zone]}}
+        "labels": [zone]}}
     _logger.info(f"Query url: {url}")
     try:
         _logger.info(f"Get file info payload: {data}")
-        res = requests.post(url=url, json=data)
+        with httpx.Client() as client:
+            res = client.post(url=url, json=data)
         _logger.info(f"Query file response: {res.text}")
         file_res = res.json()
         _logger.info(f"file response: {file_res}")
         if file_res.get('code') == 200 and file_res.get('result'):
-            return file_res
+            result =  file_res
         else:
-            _logger.info("Get name as folder")
-            _logger.info(filename.split('/'))
-            if len(filename.split('/')) < 2:
-                relative_path = ''
-            else:
-                relative_path = '/'.join(filename.split('/')[0: -1])
-            _logger.info(f'relative_path: {relative_path}')
-            folder = {"query": {
-                "name": filename.split('/')[-1],
-                "folder_relative_path": relative_path,
-                "archived": False,
-                "project_code": project_code,
-                "labels": ["Folder", zone]}}
-            _logger.info(f"Query folder payload: {folder}")
-            _res = requests.post(url=url, json=folder)
-            _logger.info(f"Query folder response: {_res.text}")
-            _res = _res.json()
-            if _res.get('code') == 200 and _res.get('result'):
-                return _res
-            else:
-                return []
+            result = []
     except Exception as e:
         _logger.error(str(e))
-        return []
+        result = []
+    finally:
+        return result
 
 
-def get_file_entity_id(project_code, file_name, zone='Greenroom'):
+def get_file_entity_id(project_code, file_name, zone=ConfigClass.GREEN_ZONE_LABEL):
     res = query_file_in_project(project_code, file_name, zone)
     res = res.get('result')
     if not res:
@@ -155,7 +134,8 @@ def get_file_entity_id(project_code, file_name, zone='Greenroom'):
 def get_file_by_id(file_id):
     post_data = {"global_entity_id": file_id}
     try:
-        response = requests.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
+        with httpx.Client() as client:
+            response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
@@ -166,34 +146,13 @@ def get_file_by_id(file_id):
 def get_node_by_code(code, label):
     post_data = {"code": code}
     try:
-        response = requests.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
+        with httpx.Client() as client:
+            response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
         if not response.json():
             return None
         return response.json()[0]
     except Exception:
         return None
-
-
-def has_permission(event):
-    _logger.info("has_permission".center(80, '-'))
-    user_role = event.get('user_role')
-    username = event.get('username')
-    project_code = event.get('project_code')
-    _logger.info(f"user role: {user_role}, user name: {username}, project code: {project_code}")
-    if user_role == 'admin':
-        result = 'permit'
-        code = EAPIResponseCode.success
-    else:
-        _projects = get_user_projects(user_role, username)
-        _projects = [p.get('code') for p in _projects]
-        if project_code not in _projects:
-            result = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-            code = EAPIResponseCode.forbidden
-        else:
-            result = 'permit'
-            code = EAPIResponseCode.success
-    return code, result
-
 
 def get_user_projects(user_role, username):
     _logger.info("get_user_projects".center(80, '-'))
@@ -240,7 +199,8 @@ def attach_manifest_to_file(event):
                "username": username}
     _logger.info(f"POSTING: {url}")
     _logger.info(f"PAYLOAD: {payload}")
-    response = requests.post(url=url, json=payload)
+    with httpx.Client() as client:
+        response = client.post(url=url, json=payload)
     _logger.info(f"RESPONSE: {response.text}")
     if not response.json():
         return None
@@ -264,7 +224,8 @@ def http_query_node_zone(folder_event):
             "labels": ['Folder', zone_label]}
     }
     node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    response = requests.post(node_query_url, json=payload)
+    with httpx.Client() as client:
+        response = client.post(node_query_url, json=payload)
     return response
 
 

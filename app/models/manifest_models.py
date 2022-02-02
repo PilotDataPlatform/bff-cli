@@ -52,7 +52,7 @@ class ManifestAttachPost(BaseModel):
     manifest_json: dict = Field({}, example={
         "manifest_json": {
             "manifest_name": "Manifest1",
-            "project_code": "vrecli",
+            "project_code": "indoctestproject",
             "attributes": {"attr1": "a1", "attr2": "asdf", "attr3": "t1"},
             "file_name": "file1"
         }
@@ -71,7 +71,6 @@ class ManifestAttachResponse(APIResponse):
                     "id": 690,
                     "labels": [
                         "File",
-                        "Raw",
                         "Greenroom"
                     ],
                     "global_entity_id": "file_data-11f0d2b4-7163-11eb-8428-be498ca98c54-1613595588",
@@ -81,14 +80,14 @@ class ManifestAttachResponse(APIResponse):
                         "tag"
                     ],
                     "archived": 'false',
-                    "path": "/data/vre-storage/0216/raw",
+                    "path": "/data/core-storage/0216/raw",
                     "time_lastmodified": "2021-02-19T19:06:06",
                     "uploader": "admin",
                     "process_pipeline": "",
                     "name": "testf1",
                     "time_created": "2021-02-17T20:59:48",
                     "guid": "6afa671d-f093-446c-a5a2-a495adcf29a5",
-                    "full_path": "/data/vre-storage/0216/raw/testf1",
+                    "full_path": "/data/core-storage/0216/raw/testf1",
                     "generate_id": "undefined",
                     "manifest_id": 270,
                     "attr_attr1": "a1",

@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: bff-vrecli
-          image: 10.3.7.221:5000/bff-vrecli:<VERSION>
+          image: registry-gitlab.indocresearch.org/charite/bff_vrecli:<VERSION>
           ports:
             - containerPort: 5080
           env:
@@ -32,8 +32,17 @@ spec:
             value: "dev"
           - name: CONFIG_CENTER_ENABLED
             value: "true"
-          - name: CONFIG_CENTER_BASE_URL
-            value: "http://common.utility:5062/"
+          - name: OPEN_TELEMETRY_ENABLED
+            value: "True"
+          - name: VAULT_URL
+            value: "https://vault.vault:8200/v1/vre/app/config"
+          - name: VAULT_CRT
+            value: "/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          - name: VAULT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: vault-secret
+                key: token
       nodeSelector:
         namespace: utility
 ---

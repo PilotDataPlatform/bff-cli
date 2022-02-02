@@ -1,7 +1,6 @@
 from pydantic import Field, BaseModel
 from .base_models import APIResponse
 
-
 class GetProjectFileList(BaseModel):
     project_code: str
     zone: str
@@ -27,7 +26,7 @@ class GetProjectFileListResponse(APIResponse):
                 "tags": [],
                 "list_priority": 20,
                 "archived": 'false',
-                "path": "/data/vre-storage/may511/raw/folders1",
+                "path": "/data/core-storage/may511/raw/folders1",
                 "time_lastmodified": "2021-05-18T14:34:21",
                 "process_pipeline": "",
                 "uploader": "jzhang33",
@@ -35,7 +34,7 @@ class GetProjectFileListResponse(APIResponse):
                 "name": "Testdateiäöüßs2",
                 "time_created": "2021-05-18T14:34:21",
                 "guid": "4e06b8c5-8235-476e-b818-1ea5b0f0043c",
-                "full_path": "/data/vre-storage/may511/raw/folders1/Testdateiäöüßs2",
+                "full_path": "/data/core-storage/may511/raw/folders1/Testdateiäöüßs2",
                 "generate_id": "undefined"
             },
             {
@@ -76,7 +75,7 @@ class POSTDownloadFileResponse(APIResponse):
             "session_id": "downloadtest",
             "job_id": "data-download-1621521355",
             "geid": "6c890078-1596-44a5-b695-1a9a1b1d974a-1621347776",
-            "source": "/data/vre-storage/may511/raw/contributor_file_a",
+            "source": "/data/core-storage/may511/raw/contributor_file_a",
             "action": "data_download",
             "status": "READY_FOR_DOWNLOADING",
             "project_code": "may511",
@@ -85,9 +84,9 @@ class POSTDownloadFileResponse(APIResponse):
             "payload": {
                 "hash_code": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZWlkIjoiNmM4OTAwNzgtMTU5Ni00NGE1LWI2OTUtMWE5YTFiMWQ5NzRhLTE2MjEzNDc3NzYiLCJmdWxsX3BhdGgiOiIvZGF0YS92cmUtc3RvcmFnZS9tYXk1MTEvcmF3L2NvbnRyaWJ1dG9yX2ZpbGVfYSIsImlzc3VlciI6IlNFUlZJQ0UgREFUQSBET1dOTE9BRCIsIm9wZXJhdG9yIjoianpoYW5nMzMiLCJzZXNzaW9uX2lkIjoiZG93bmxvYWR0ZXN0Iiwiam9iX2lkIjoiZGF0YS1kb3dubG9hZC0xNjIxNTIxMzU1IiwicHJvamVjdF9jb2RlIjoibWF5NTExIiwiaWF0IjoxNjIxNTIxMzU1LCJleHAiOjE2MjE1MjE2NTV9.t0pMGdvZ-KDgDBi2Q7rpOlwJerd7g6PLxnDPEx80QjA",
                 "files": [
-                    "/data/vre-storage/may511/raw/contributor_file_a"
+                    "/data/core-storage/may511/raw/contributor_file_a"
                 ],
-                "zone": "greenroom",
+                "zone": 'Greenroom',
                 "frontend_zone": "Green Room"
             },
             "update_timestamp": "1621521356"
@@ -117,7 +116,7 @@ class QueryDataInfoResponse(APIResponse):
                     "tags":[],
                     "archived": False,
                     "list_priority":20,
-                    "path":"/data/vre-storage/jul08/jzhang33",
+                    "path":"/data/core-storage/jul08/jzhang33",
                     "time_lastmodified":"2021-07-29T18:18:00",
                     "process_pipeline":"",
                     "uploader":"jzhang7",
@@ -126,7 +125,7 @@ class QueryDataInfoResponse(APIResponse):
                     "time_created":"2021-07-29T18:18:00",
                     "guid":"12e23fb5-51d5-4ee9-8fb4-78fe9f9810d9",
                     "location":"minio://http://minio.minio:9000/gr-jul08/jzhang33/Testdateiäöüßs14",
-                    "full_path":"/data/vre-storage/jul08/jzhang33/Testdateiäöüßs14",
+                    "full_path":"/data/core-storage/jul08/jzhang33/Testdateiäöüßs14",
                     "generate_id":"undefined"}],
              "geid":"3586fa29-18ef-4a68-b833-5c04d3c2831c-1627582679"},
             {"status":"Permission Denied","result":[],"geid":"a17fcf3a-179c-4099-a607-1438464527e2-1626816193"},

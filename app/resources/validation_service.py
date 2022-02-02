@@ -1,5 +1,4 @@
 from ..resources. error_handler import customized_error_template, ECustomizedError
-from ..models.base_models import APIResponse, EAPIResponseCode
 from ..models.error_model import InvalidEncryptionError
 from .database_service import RDConnection
 from .helpers import *
