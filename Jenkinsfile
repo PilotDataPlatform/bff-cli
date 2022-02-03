@@ -32,6 +32,7 @@ pipeline {
           ])
           {
             sh """
+            export CONFIG_CENTER_ENABLED='true'
             export VAULT_TOKEN=${VAULT_TOKEN}
             export VAULT_URL=${VAULT_URL}
             export VAULT_CRT=${VAULT_CRT}
@@ -93,7 +94,7 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:${commit}", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
+                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
                 customImage.push()
             }
             }
@@ -111,7 +112,7 @@ pipeline {
     stage('STAGING Deploy') {
       when {branch "k8s-staging"}
       steps{
-        sh "sed -i 's/<VERSION>/${commit}/g' kubernetes/staging-deployment.yaml"
+        sh "sed -i 's/<VERSION>/$commit/g' kubernetes/staging-deployment.yaml"
         sh "kubectl config use-context staging"
         sh "kubectl apply -f kubernetes/staging-deployment.yaml"
       }
@@ -124,4 +125,4 @@ pipeline {
   }
 
 }
-// trigger the cicd
+
