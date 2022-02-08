@@ -112,9 +112,11 @@ pipeline {
     stage('STAGING Deploy') {
       when {branch "k8s-staging"}
       steps{
-        sh "sed -i 's/<VERSION>/$commit/g' kubernetes/staging-deployment.yaml"
-        sh "kubectl config use-context staging"
-        sh "kubectl apply -f kubernetes/staging-deployment.yaml"
+        build(job: "/VRE-IaC/UpdateAppVersion", parameters: [
+            [$class: 'StringParameterValue', name: 'TF_TARGET_ENV', value: 'staging' ],
+            [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'bff-vrecli' ],
+            [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "$commit" ]
+        ])
       }
     }
   }
@@ -125,4 +127,3 @@ pipeline {
   }
 
 }
-
