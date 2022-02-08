@@ -16,7 +16,7 @@ class DatasetListResponse(APIResponse):
             "Dataset"
          ],
          "global_entity_id":"bc0da1cf-8e25-45d5-a440-bc67539055d3-1628795709",
-         "creator":"jzhang7",
+         "creator":"admin",
          "modality":[
             
          ],
@@ -39,7 +39,7 @@ class DatasetListResponse(APIResponse):
          "name":"dataset1testdata",
          "time_created":"2021-08-12T19:15:09",
          "authors":[
-            "jzhang"
+            "admin"
          ]
       },
       {
@@ -48,7 +48,7 @@ class DatasetListResponse(APIResponse):
             "Dataset"
          ],
          "global_entity_id":"55626ddc-bcb6-47d9-8095-68129d521d15-1628277976",
-         "creator":"jzhang7",
+         "creator":"admin",
          "modality":[
             "anatomical approach"
          ],
@@ -57,11 +57,11 @@ class DatasetListResponse(APIResponse):
          "project_geid":"73d1fda2-a443-423a-96e5-6f0871b7d7cc-1628532375",
          "description":"test 123",
          "source":"",
-         "title":"AUG-06",
+         "title":"SAMPLE-DATASET",
          "type":"GENERAL",
          "tags":[
             "tag1",
-            "tag3"
+            "tag2"
          ],
          "license":"v1.4.1",
          "time_lastmodified":"2021-08-09T19:13:16",
@@ -72,7 +72,7 @@ class DatasetListResponse(APIResponse):
          "name":"aug06datasetcodetest",
          "time_created":"2021-08-06T19:26:16",
          "authors":[
-            "jzhang"
+            "admin"
          ]
       }
    ]
@@ -94,16 +94,16 @@ class DatasetDetailResponse(APIResponse):
             "Dataset"
          ],
          "global_entity_id":"3834290c-90c6-4c21-8642-c1f79cf2a145-1628791125",
-         "creator":"jzhang7",
+         "creator":"admin",
          "modality":[
             
          ],
-         "code":"testdataredcap2",
+         "code":"sampletestdataset",
          "project_geid":"6c62dc07-a0f4-4a58-9491-d4a46c2adc79-1628775520",
          "total_files":6,
          "description":"1",
          "source":"",
-         "title":"REDCap2",
+         "title":"SAMPLE-dataset",
          "type":"GENERAL",
          "tags":[
             
@@ -114,18 +114,18 @@ class DatasetDetailResponse(APIResponse):
          "collection_method":[
             
          ],
-         "name":"testdataredcap2",
+         "name":"sampletestdataset",
          "time_created":"2021-08-12T17:58:45",
          "authors":[
-            "jzhang7"
+            "admin"
          ]
       },
       "version_detail":[
          {
-            "dataset_code":"testdataredcap2",
+            "dataset_code":"sampletestdataset",
             "dataset_geid":"3834290c-90c6-4c21-8642-c1f79cf2a145-1628791125",
             "version":"1.0",
-            "created_by":"jzhang7",
+            "created_by":"admin",
             "created_at":"2021-08-12 18:15:54.115753",
             "location":"minio://http://10.3.7.220/testdataredcap2/versions/testdataredcap2_2021-08-12 14:15:53.608877.zip",
             "notes":"1"

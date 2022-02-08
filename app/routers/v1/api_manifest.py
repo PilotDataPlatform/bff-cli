@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.manifest_models import *
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required, check_permission
 from ...resources.helpers import *
 from ...resources.database_service import RDConnection
 from ...resources. error_handler import customized_error_template, ECustomizedError
-from ...service_logger.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 
 router = APIRouter()
 
@@ -18,7 +17,7 @@ class APIManifest:
     _API_NAMESPACE = "api_manifest"
 
     def __init__(self):
-        self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
         self.db = RDConnection()
 
     @router.get("/manifest", tags=[_API_TAG],

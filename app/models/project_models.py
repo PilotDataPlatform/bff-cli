@@ -11,12 +11,12 @@ class ProjectListResponse(APIResponse):
             "error_msg": "",
             "result": [
                 {
-                    "name": "GENERATE TEST",
-                    "code": "generate"
+                    "name": "Sample project 1",
+                    "code": "sampleproject1"
                 },
                 {
-                    "name": "Indoc Test Project",
-                    "code": "indoctestproject"
+                    "name": "Sample Project 2",
+                    "code": "sampleproject2"
                 }
             ]
         }
@@ -78,7 +78,7 @@ class GetProjectFolderResponse(APIResponse):
             "uploader": "admin",
             "name": "folder_test",
             "time_created": "2021-05-10T22:18:29",
-            "project_code": "may10",
+            "project_code": "sampleproject",
             "tags": []
         }
     }

@@ -1,12 +1,12 @@
 from app.config import ConfigClass
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 import os
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 
 class TestGetProjectFilesFolders(IsolatedAsyncioTestCase):
-    log = Logger(name='test_project_get_folder.log')
+    log = LoggerFactory(name='test_project_get_folder.log').get_logger()
     test = SetupTest(log)
     app = test.client
     token = test.auth()

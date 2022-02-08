@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.hpc_models import *
 from ...models.error_model import HPCError
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
 from ...resources.helpers import *
@@ -19,7 +19,7 @@ _API_NAMESPACE = "api_hpc"
 class APIProject:
     
     def __init__(self):
-        self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
 
     @router.post("/hpc/auth", tags=[_API_TAG],
                 response_model=HPCAuthResponse,

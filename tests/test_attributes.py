@@ -4,7 +4,7 @@ import os
 
 from app.config import ConfigClass
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 # To run particular test, edit the case_to_run_variable with following values:
@@ -19,7 +19,7 @@ no_access_user_password = "Indoc1234567!"
 
 @unittest.skipIf(case_to_run == 'attach' or case_to_run == 'export', 'Run specific test')
 class TestGetAttributes(IsolatedAsyncioTestCase):
-    log = Logger(name='test_get_attributes.log')
+    log = LoggerFactory(name='test_get_attributes.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/manifest"
@@ -141,7 +141,7 @@ class TestGetAttributes(IsolatedAsyncioTestCase):
 
 @unittest.skipIf(case_to_run == 'attach' or case_to_run == 'list', 'Run specific test')
 class TestExportAttributes(IsolatedAsyncioTestCase):
-    log = Logger(name='test_export_attribute.log')
+    log = LoggerFactory(name='test_export_attribute.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/manifest/export"
@@ -267,7 +267,7 @@ class TestExportAttributes(IsolatedAsyncioTestCase):
 
 @unittest.skipIf(case_to_run == 'list' or case_to_run == 'export', 'Run specific test')
 class TestAttachAttributes(IsolatedAsyncioTestCase):
-    log = Logger(name='test_attach_attribute.log')
+    log = LoggerFactory(name='test_attach_attribute.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/manifest/attach"

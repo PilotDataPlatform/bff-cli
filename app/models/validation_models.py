@@ -8,9 +8,9 @@ class ManifestValidatePost(BaseModel):
     """
     manifest_json: dict = Field({}, example={
                 "manifest_name": "Manifest1",
-                "project_code": "0216",
+                "project_code": "sampleproject",
                 "attributes": {"attr1": "a1", "attr2": "test cli upload"},
-                "file_path": "/data/core-storage/0216/raw/testf1"
+                "file_path": "/data/core-storage/sampleproject/raw/testf1"
             }
     )
 
