@@ -1,8 +1,8 @@
 from app.config import ConfigClass
 import time
 import os
-from .prepare_test import SetupTest
-from .logger import Logger
+from ...prepare_test import SetupTest
+from ...logger import Logger
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 

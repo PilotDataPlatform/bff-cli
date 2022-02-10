@@ -1,8 +1,8 @@
 import unittest
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
-from .prepare_test import SetupTest
-from .logger import Logger
+from ...prepare_test import SetupTest
+from ...logger import Logger
 from unittest.mock import patch
 from requests.models import Response
 import json

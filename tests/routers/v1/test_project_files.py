@@ -3,8 +3,8 @@ import unittest
 # from fastapi.testclient import TestClient
 # from app.main import create_app    
 from app.config import ConfigClass
-from .prepare_test import SetupTest
-from .logger import Logger
+from ...prepare_test import SetupTest
+from ...logger import Logger
 # import requests
 import httpx
 from unittest import IsolatedAsyncioTestCase

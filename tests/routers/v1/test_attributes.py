@@ -3,8 +3,8 @@ import time
 import os
 
 from app.config import ConfigClass
-from .prepare_test import SetupTest
-from .logger import Logger
+from ...prepare_test import SetupTest
+from ...logger import Logger
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 # To run particular test, edit the case_to_run_variable with following values:
