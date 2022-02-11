@@ -1,10 +1,10 @@
 pipeline {
     agent { label 'small' }
     environment {
-      imagename_dev = "registry-gitlab.indocresearch.org/charite/bff_vrecli"
-      imagename_staging = "registry-gitlab.indocresearch.org/charite/bff_vrecli"
+      imagename_dev = "registry-gitlab.indocresearch.org/pilot/bff_cli"
+      imagename_staging = "registry-gitlab.indocresearch.org/pilot/bff_cli"
       commit = sh(returnStdout: true, script: 'git describe --always').trim()
-      registryCredential = 'gitlab-registry'
+      registryCredential = 'pilot-gitlab-registry'
       dockerImage = ''
     }
 
@@ -52,7 +52,7 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
+                customImage = docker.build("registry-gitlab.indocresearch.org/pilot/bff_cli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
                 customImage.push()
             }
             }
@@ -94,7 +94,7 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/charite/bff_vrecli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
+                customImage = docker.build("registry-gitlab.indocresearch.org/pilot/bff_cli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
                 customImage.push()
             }
             }
