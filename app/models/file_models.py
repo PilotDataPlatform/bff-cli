@@ -35,7 +35,7 @@ class GetProjectFileListResponse(APIResponse):
                 "time_created": "2021-05-18T14:34:21",
                 "guid": "4e06b8c5-8235-476e-b818-1ea5b0f0043c",
                 "full_path": "/data/core-storage/sampleproject/raw/folders1/Testdateiäöüßs2",
-                "generate_id": "undefined"
+                "dcm_id": "undefined"
             },
             {
                 "id": 2842,
@@ -126,7 +126,7 @@ class QueryDataInfoResponse(APIResponse):
                     "guid":"12e23fb5-51d5-4ee9-8fb4-78fe9f9810d9",
                     "location":"minio://http://minio.minio:9000/gr-sampleproject/admin/Testdateiäöüßs14",
                     "full_path":"/data/core-storage/sampleproject/admin/Testdateiäöüßs14",
-                    "generate_id":"undefined"}],
+                    "dcm_id":"undefined"}],
              "geid":"3586fa29-18ef-4a68-b833-5c04d3c2831c-1627582679"},
             {"status":"Permission Denied","result":[],"geid":"a17fcf3a-179c-4099-a607-1438464527e2-1626816193"},
             {"status":"File Not Exist","result":[],"geid":"80c08693-9ac8-4b94-bb02-9aebe0ec9f20-16274078223"}
