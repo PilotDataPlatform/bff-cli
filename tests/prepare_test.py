@@ -160,10 +160,10 @@ class SetupTest:
         relation_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/own"
         global_entity_id = self.create_entity_id()
         if zone.lower() == ConfigClass.CORE_ZONE_LABEL.lower():
-            root_path = "/vre-data"
+            root_path = "/data"
             file_label = ConfigClass.CORE_ZONE_LABEL
         else:
-            root_path = "/data/vre-storage"
+            root_path = "/data/storage"
             file_label = ConfigClass.GREEN_ZONE_LABEL
         if folder:
             payload = {
