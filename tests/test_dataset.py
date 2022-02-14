@@ -1,7 +1,7 @@
 import unittest
 import os
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 # To run particular test, edit the case_to_run_variable with following values:
@@ -17,7 +17,7 @@ no_access_user_password = "Indoc1234567!"
 
 @unittest.skipIf(case_to_run == 'detail', 'Run specific test')
 class TestListDataset(IsolatedAsyncioTestCase):
-    log = Logger(name='test_list_dataset.log')
+    log = LoggerFactory(name='test_list_dataset.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/datasets"
@@ -81,7 +81,7 @@ class TestListDataset(IsolatedAsyncioTestCase):
 
 @unittest.skipIf(case_to_run == 'list', 'Run specific test')
 class TestDatasetDetail(IsolatedAsyncioTestCase):
-    log = Logger(name='test_dataset_detail.log')
+    log = LoggerFactory(name='test_dataset_detail.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/dataset/"

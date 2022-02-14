@@ -8,9 +8,9 @@ class ManifestValidatePost(BaseModel):
     """
     manifest_json: dict = Field({}, example={
                 "manifest_name": "Manifest1",
-                "project_code": "0216",
+                "project_code": "sampleproject",
                 "attributes": {"attr1": "a1", "attr2": "test cli upload"},
-                "file_path": "/data/core-storage/0216/raw/testf1"
+                "file_path": "/data/core-storage/sampleproject/raw/testf1"
             }
     )
 
@@ -27,14 +27,14 @@ class ManifestValidateResponse(APIResponse):
             )
 
 
-class ValidateGenerateIDPOST(BaseModel):
-    """Validate Generate ID Post model"""
-    generate_id: str
+class ValidateDICOMIDPOST(BaseModel):
+    """Validate DICOM ID Post model"""
+    dcm_id: str
 
 
-class ValidateGenerateIDResponse(APIResponse):
+class ValidateDICOMIDResponse(APIResponse):
     """
-    Validate Generate ID response class
+    Validate DICOM ID response class
     """
     result: dict = Field({}, example={
             "code": 200,

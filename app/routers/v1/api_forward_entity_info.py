@@ -1,13 +1,11 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi_utils.cbv import cbv
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
 from ...resources.helpers import *
-from ...resources.error_handler import customized_error_template, ECustomizedError
-from ...models.base_models import APIResponse
 from ...models.entity_info_models import CheckFileResponse
+from logger import LoggerFactory
 import httpx
 
 router = APIRouter()
@@ -19,7 +17,7 @@ class APIEntityInfo:
     _API_NAMESPACE = "api_forward_entity_info"
 
     def __init__(self):
-        self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
 
     @router.get("/project/{project_code}/file/exist", tags=[_API_TAG],
                 response_model=CheckFileResponse,

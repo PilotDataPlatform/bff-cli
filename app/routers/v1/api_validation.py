@@ -2,7 +2,7 @@ from logging import error
 from app.models.error_model import InvalidEncryptionError
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 from ...commons.data_providers.database import DBConnection
 from ...resources.error_handler import catch_internal
 from ...resources.helpers import *
@@ -20,22 +20,22 @@ class APIValidation:
     _API_NAMESPACE = "api_validation"
 
     def __init__(self):
-        self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
         self.db = RDConnection()
 
     @router.post("/validate/gid", tags=[_API_TAG],
-                 response_model=ValidateGenerateIDResponse,
-                 summary="Validate GENERATE ID")
+                 response_model=ValidateDICOMIDResponse,
+                 summary="Validate DICOM ID")
     @catch_internal(_API_NAMESPACE)
-    async def validate_generate_id(self, request_payload: ValidateGenerateIDPOST):
-        api_response = ValidateGenerateIDResponse()
-        generate_id = request_payload.generate_id
-        is_valid = re.match("^([A-Z]{3})-([0-9]{4})$", generate_id)
+    async def validate_dicom_id(self, request_payload: ValidateDICOMIDPOST):
+        api_response = ValidateDICOMIDResponse()
+        dcm_id = request_payload.dcm_id
+        is_valid = re.match("^([A-Z]{3})-([0-9]{4})$", dcm_id)
         if is_valid:
             result = "Valid"
             res_code = EAPIResponseCode.success
         else:
-            result = customized_error_template(ECustomizedError.INVALID_GENERATE_ID)
+            result = customized_error_template(ECustomizedError.INVALID_DICOM_ID)
             res_code = EAPIResponseCode.bad_request
         api_response.result = result
         api_response.code = res_code

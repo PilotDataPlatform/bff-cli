@@ -1,11 +1,8 @@
 from email import header
 import unittest
-# from fastapi.testclient import TestClient
-# from app.main import create_app    
 from app.config import ConfigClass
 from .prepare_test import SetupTest
-from .logger import Logger
-# import requests
+from logger import LoggerFactory
 import httpx
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
@@ -29,7 +26,7 @@ def mocked_requests_post(*args, **kwargs):
 
 
 class TestFiles(IsolatedAsyncioTestCase):
-    log = Logger(name='test_lineage_operation.log')
+    log = LoggerFactory(name='test_lineage_operation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     project = {}
@@ -54,7 +51,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.GREEN_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -74,7 +71,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -94,7 +91,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.GREEN_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -113,7 +110,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": "wrong",
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -133,7 +130,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -154,7 +151,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }

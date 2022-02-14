@@ -1,12 +1,12 @@
 import unittest
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 
 
 class TestFiles(IsolatedAsyncioTestCase):
-    log = Logger(name='test_projects.log')
+    log = LoggerFactory(name='test_projects.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/projects"

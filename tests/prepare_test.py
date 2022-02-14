@@ -13,8 +13,8 @@ class SetupTest:
     def auth(self, payload=None):
         if not payload:
             payload = {
-                "username": "jzhang10",
-                "password": "CMDvrecli2021!"
+                "username": "sample_username",
+                "password": "sample_password!"
             }
         url = ConfigClass.AUTH_SERVICE + "/v1/users/auth"
         self.log.info(url)
@@ -25,10 +25,10 @@ class SetupTest:
         return data["result"].get("access_token")
 
     def login_collaborator(self):
-        return {"username": "jzhang3", "password": "Indoc1234567!"}
+        return {"username": "sample_username1", "password": "sample_password1!"}
 
     def login_contributor(self):
-        return {"username": "jzhang33", "password": "Indoc1234567!"}
+        return {"username": "sample_username2", "password": "sample_password2!"}
 
     def get_user(self):
         payload = {
@@ -115,7 +115,7 @@ class SetupTest:
         except Exception as e:
             raise e
 
-    def generate_entity_id(self):
+    def create_entity_id(self):
         self.log.info("Generating global entity ID".ljust(80, '-'))
         return f"{str(uuid.uuid4())}-{str(time.time())[0:10]}"
 
@@ -158,12 +158,12 @@ class SetupTest:
         self.log.info(f"File will be created in {zone} under {folder}")
         testing_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/File"
         relation_api = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/own"
-        global_entity_id = self.generate_entity_id()
+        global_entity_id = self.create_entity_id()
         if zone.lower() == ConfigClass.CORE_ZONE_LABEL.lower():
-            root_path = "/vre-data"
+            root_path = "/data"
             file_label = ConfigClass.CORE_ZONE_LABEL
         else:
-            root_path = "/data/vre-storage"
+            root_path = "/data/storage"
             file_label = ConfigClass.GREEN_ZONE_LABEL
         if folder:
             payload = {
@@ -176,7 +176,7 @@ class SetupTest:
                 "process_pipeline": "",
                 "project_code": project_code,
                 "uploader": uploader,
-                "generate_id": "undefined",
+                "dcm_id": "undefined",
                 "display_path": f"{uploader}/{folder}/{filename}",
                 "list_priority": 20,
                 "location": f"unittest://fake-minio-location/{project_code}/{uploader}",
@@ -197,7 +197,7 @@ class SetupTest:
                         "process_pipeline": "unittest",
                         "project_code": project_code,
                         "uploader": uploader,
-                        "generate_id": "undefined",
+                        "dcm_id": "undefined",
                         "display_path": f"{uploader}/{filename}",
                         "list_priority": 20,
                         "location": f"unittest://fake-minio-location/gr-{project_code}/{uploader}/{filename}",

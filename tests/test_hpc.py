@@ -2,7 +2,7 @@ import unittest
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 from unittest.mock import patch
 from requests.models import Response
 import json
@@ -18,7 +18,7 @@ def create_resposne(code, content):
 
 @unittest.skipUnless(case == 'all' or case == 'auth', 'specified cases')
 class TestHPCAuth(IsolatedAsyncioTestCase):
-    log = Logger(name='test_hpc_auth.log')
+    log = LoggerFactory(name='test_hpc_auth.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/hpc/auth"
@@ -56,7 +56,7 @@ class TestHPCAuth(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'all' or case == 'job', 'specified cases')
 class TestHPCJob(IsolatedAsyncioTestCase):
-    log = Logger(name='test_hpc_job.log')
+    log = LoggerFactory(name='test_hpc_job.log').get_logger()
     test = SetupTest(log)
     app = test.client
     token = test.auth()
@@ -260,7 +260,7 @@ class TestHPCJob(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'all' or case == 'node', 'specified cases')
 class TestHPCNode(IsolatedAsyncioTestCase):
-    log = Logger(name='test_hpc_node.log')
+    log = LoggerFactory(name='test_hpc_node.log').get_logger()
     test = SetupTest(log)
     app = test.client
     token = test.auth()
@@ -422,7 +422,7 @@ class TestHPCNode(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'all' or case == 'partition', 'specified cases')
 class TestHPCPartition(IsolatedAsyncioTestCase):
-    log = Logger(name='test_hpc_partition.log')
+    log = LoggerFactory(name='test_hpc_partition.log').get_logger()
     test = SetupTest(log)
     app = test.client
     token = test.auth()

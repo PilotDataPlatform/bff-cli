@@ -1,12 +1,12 @@
 # import unittest
 import os
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 
 class TestKGImport(IsolatedAsyncioTestCase):
-    log = Logger(name='test_kg_import.log')
+    log = LoggerFactory(name='test_kg_import.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/kg/resources"

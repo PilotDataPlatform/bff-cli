@@ -1,10 +1,10 @@
 from ..models.error_model import HPCError
-from ..service_logger.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 from ..config import ConfigClass
 from ..models.base_models import EAPIResponseCode
 import httpx
 
-_logger = SrvLoggerFactory("HPC").get_logger()
+_logger = LoggerFactory("HPC").get_logger()
 
 def get_hpc_jwt_token(token_issuer, username, password = None):
     _logger.info("get_hpc_jwt_token".center(80, '-'))

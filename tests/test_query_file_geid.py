@@ -2,12 +2,12 @@ from app.config import ConfigClass
 import time
 import os
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 
 class TestQueryFileGeid(IsolatedAsyncioTestCase):
-    log = Logger(name='test_query_file_geid.log')
+    log = LoggerFactory(name='test_query_file_geid.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/query/geid"

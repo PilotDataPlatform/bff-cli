@@ -9,7 +9,6 @@ httptools==0.1.1
 requests==2.24.0
 PyJWT==1.4.2
 python-multipart==0.0.5
-python-json-logger==0.1.11
 aiofiles==0.6.0
 redis==3.5.3
 

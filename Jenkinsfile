@@ -15,7 +15,7 @@ pipeline {
         steps{
           script {
           git branch: "k8s-dev",
-              url: 'https://git.indocresearch.org/charite/bff_vrecli.git',
+              url: 'https://git.indocresearch.org/pilot/bff_cli.git',
               credentialsId: 'lzhao'
             }
         }
@@ -70,7 +70,7 @@ pipeline {
       when {branch "k8s-dev"}
       steps{
         build(job: "/VRE-IaC/UpdateAppVersion", parameters: [
-          [$class: 'StringParameterValue', name: 'TARGET_ENV', value: 'dev' ],
+          [$class: 'StringParameterValue', name: 'TF_TARGET_ENV', value: 'dev' ],
           [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'bff-vrecli' ],
           [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "$commit" ]
         ])
@@ -82,7 +82,7 @@ pipeline {
         steps{
           script {
           git branch: "k8s-staging",
-              url: 'https://git.indocresearch.org/charite/bff_vrecli.git',
+              url: 'https://git.indocresearch.org/pilot/bff_cli.git',
               credentialsId: 'lzhao'
             }
         }

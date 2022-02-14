@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.project_models import *
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
 from ...resources.helpers import *
@@ -17,7 +17,7 @@ class APIProject:
     current_identity: dict = Depends(jwt_required)
 
     def __init__(self):
-        self._logger = SrvLoggerFactory(_API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
 
     @router.get("/projects", tags=[_API_TAG],
                 response_model=ProjectListResponse,
