@@ -15,14 +15,7 @@ from opentelemetry.instrumentation.asyncpg import AsyncPGInstrumentor
 from app.namespace import namespace
 from app.config import ConfigClass
 from app.commons.data_providers.database import engine
-"""
-opentelemetry instrument for additional packages could be found here:
 
-https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation
-
-In each folder of above link, open folder src/opentelemetry/instrumentation/{package}, 
-in __init__.py there suppose be a Instrumentor, such as Psycopg2Instrumentor
-"""
 
 def instrument_app(app):
     if not ConfigClass.OPEN_TELEMETRY_ENABLED:

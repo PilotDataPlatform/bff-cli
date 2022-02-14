@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     GREEN_ZONE_LABEL: str = ''
     AUTH_SERVICE: str 
     DATA_UPLOAD_SERVICE_GREENROOM: str
+    DATA_UPLOAD_SERVICE_CORE: str
     FILEINFO_HOST: str
     HPC_SERVICE: str 
     KG_SERVICE: str 

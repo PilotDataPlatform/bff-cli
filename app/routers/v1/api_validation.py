@@ -2,7 +2,7 @@ from logging import error
 from app.models.error_model import InvalidEncryptionError
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 from ...commons.data_providers.database import DBConnection
 from ...resources.error_handler import catch_internal
 from ...resources.helpers import *
@@ -20,7 +20,7 @@ class APIValidation:
     _API_NAMESPACE = "api_validation"
 
     def __init__(self):
-        self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
         self.db = RDConnection()
 
     @router.post("/validate/gid", tags=[_API_TAG],

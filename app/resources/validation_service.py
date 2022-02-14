@@ -7,10 +7,10 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.fernet import Fernet
 import base64
-from ..service_logger.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 
 
-_logger = SrvLoggerFactory("validation_service").get_logger()
+_logger = LoggerFactory("validation_service").get_logger()
 
 def decryption(encrypted_message, secret):
     """

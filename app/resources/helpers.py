@@ -3,9 +3,9 @@ import httpx
 from ..config import ConfigClass
 from ..resources. error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import EAPIResponseCode
-from ..service_logger.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 
-_logger = SrvLoggerFactory("Helpers").get_logger()
+_logger = LoggerFactory("Helpers").get_logger()
 
 def get_zone(namespace):
     return {ConfigClass.GREEN_ZONE_LABEL.lower(): ConfigClass.GREEN_ZONE_LABEL,
@@ -143,8 +143,7 @@ def get_file_by_id(file_id):
         return None
 
 
-def get_node_by_code(code, label):
-    post_data = {"code": code}
+def get_node(post_data, label):
     try:
         with httpx.Client() as client:
             response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)

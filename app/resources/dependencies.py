@@ -10,7 +10,8 @@ from ..models.base_models import APIResponse, EAPIResponseCode
 api_response = APIResponse()
 
 def get_project_role(user_id, project_code):
-    project = get_node_by_code(project_code, 'Container')
+    query_payload = {"code": project_code}
+    project = get_node(query_payload, 'Container')
     if not project:
         error_msg = customized_error_template(
             ECustomizedError.PROJECT_NOT_FOUND)
@@ -83,7 +84,13 @@ def check_permission(event: dict):
     project_code = event.get('project_code')
     zone = event.get('zone')
     project_role, code = get_project_role(user_id, project_code)
-    if role == "admin" and code != EAPIResponseCode.not_found:
+    user_info = get_node({'name': username}, 'User')
+    user_status = user_info.get('status')
+    if user_status != 'active':
+        permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
+                      'code': code,
+                      'result': f"User status: {user_status}"}
+    elif role == "admin" and code != EAPIResponseCode.not_found:
         project_role = 'admin'
         permission = {'project_role': project_role}
     elif project_role == 'User not in the project':

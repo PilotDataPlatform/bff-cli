@@ -3,7 +3,7 @@ from app.config import ConfigClass
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 import os
 
 """
@@ -14,7 +14,7 @@ zone_env=""
 
 @unittest.skipUnless(case == 'generate' or case == 'all' or case=='', 'Run specific test')
 class TestGenerateIDValidation(IsolatedAsyncioTestCase):
-    log = Logger(name='test_gid_validation.log')
+    log = LoggerFactory(name='test_gid_validation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/gid"
@@ -158,7 +158,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'attribute' or case == 'all' or case=='', 'Run specific test')
 class TestAttributeValidation(IsolatedAsyncioTestCase):
-    log = Logger(name='test_attribute_validation.log')
+    log = LoggerFactory(name='test_attribute_validation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/manifest"
@@ -381,7 +381,7 @@ class TestAttributeValidation(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'environment' or case == 'all' or case=='', 'Run specific test')
 class TestEnvironmentValidation(IsolatedAsyncioTestCase):
-    log = Logger(name='test_environment_validation.log')
+    log = LoggerFactory(name='test_environment_validation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/env"
