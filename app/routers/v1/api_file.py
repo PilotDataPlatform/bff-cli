@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.file_models import QueryDataInfoResponse, QueryDataInfo, GetProjectFileListResponse
 from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError, EAPIResponseCode
-from ...resources.dependencies import jwt_required, check_permission
+from ...resources.dependencies import jwt_required, has_permission
 from ...resources.helpers import batch_query_node_by_geid, verify_list_event, separate_rel_path, get_zone, get_parent_label, check_folder_exist
 from ...config import ConfigClass
 from logger import LoggerFactory
@@ -67,20 +67,11 @@ class APIFile:
                 zone = ConfigClass.CORE_ZONE_LABEL if ConfigClass.CORE_ZONE_LABEL in labels \
                     else ConfigClass.GREEN_ZONE_LABEL
                 self._logger.info(f'File zone: {zone}')
-                permission_event = {'user_id': user_id,
-                                    'username': user_name,
-                                    'role': role,
-                                    'project_code': project_code,
-                                    'zone': zone}
-                permission = check_permission(permission_event)
-                self._logger.info(f"Permission check event: {permission_event}")
-                self._logger.info(f"Permission check result: {permission}")
-                error_msg = permission.get('error_msg', '')
-                uploader = permission.get('uploader')
-                if error_msg:
-                    status = error_msg
-                    result = []
-                elif uploader and uploader != name_folder:
+                if not has_permission(self.current_identity, project_code, "file", zone.lower(), "view"):
+                    file_response.error_msg = "Permission denied"
+                    file_response.code = EAPIResponseCode.forbidden
+                    return file_response.json_response()
+                if user_name and user_name != name_folder:
                     self._logger.info(f'User {user_name} attempt getting file: {display_path}')
                     status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                     result = []
@@ -103,12 +94,6 @@ class APIFile:
         List files and folders in project
         """
         file_response = GetProjectFileListResponse()
-        try:
-            role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
-            user_name = self.current_identity['username']
-        except (AttributeError, TypeError):
-            return self.current_identity
         code, error_msg = verify_list_event(source_type, folder)
         self._logger.info("API file_list_query".center(80, '-'))
         self._logger.info(f"Received information project_code: {project_code}, zone: {zone}, "
@@ -121,26 +106,17 @@ class APIFile:
             return file_response.json_response()
         zone_type = get_zone(zone)
         zone_label = [zone_type]
-        permission_event = {'user_id': user_id,
-                            'username': user_name,
-                            'role': role,
-                            'project_code': project_code,
-                            'zone': zone}
-        permission = check_permission(permission_event)
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        error_msg = permission.get('error_msg', '')
-        if error_msg:
-            file_response.error_msg = error_msg
-            file_response.code = permission.get('code')
-            file_response.result = permission.get('result')
+        if not has_permission(self.current_identity, project_code, "file", zone, "view"):
+            file_response.error_msg = "Permission denied"
+            file_response.code = EAPIResponseCode.forbidden
             return file_response.json_response()
-        uploader = permission.get('uploader')
-        if uploader and source_type == 'Container':
+
+        username = self.current_identity["username"]
+        if username and source_type == 'Container':
             child_attribute = {'project_code': project_code,
-                               'uploader': user_name,
+                               'uploader': username,
                                'archived': False}
-        elif uploader and source_type == 'Folder':
+        elif username and source_type == 'Folder':
             child_attribute = {'project_code': project_code,
                                'archived': False}
         else:
@@ -165,20 +141,20 @@ class APIFile:
             self._logger.info(f"Check folder exist payload: 'zone':{zone}, 'project_code':{project_code}, 'folder_name':{folder_name}, 'rel_path':{rel_path}")
             self._logger.info(f"Check folder exist response: {code}, {error_msg}")
             self._logger.debug(
-                f"uploader != '': {uploader != ''}, not rel_path: {not rel_path}, folder != uploader: {folder != uploader}")
-            self._logger.debug(f"uploader: {uploader}, rel_path: {rel_path}, folder: {folder}")
+                f"username != '': {username != ''}, not rel_path: {not rel_path}, folder != username: {folder != username}")
+            self._logger.debug(f"username: {username}, rel_path: {rel_path}, folder: {folder}")
             if error_msg:
                 file_response.error_msg = error_msg
                 file_response.code = EAPIResponseCode.forbidden
                 self._logger.error(f'Returning error: {EAPIResponseCode.forbidden}, {error_msg}')
                 return file_response.json_response()
-            elif uploader and not rel_path and folder_name != uploader:
+            elif username and not rel_path and folder_name != username:
                 file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 file_response.code = EAPIResponseCode.forbidden
                 self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
                 return file_response.json_response()
-            elif uploader and rel_path and rel_path.split('/')[0] != uploader:
+            elif username and rel_path and rel_path.split('/')[0] != username:
                 file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 file_response.code = EAPIResponseCode.forbidden
                 self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
