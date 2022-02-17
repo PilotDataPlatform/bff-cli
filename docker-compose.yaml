@@ -1,0 +1,10 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "5080:8000"
+    environment:
+      CONFIG_CENTER_ENABLED: "true"
+      CONFIG_CENTER_BASE_URL: http://localhost:5062/
+

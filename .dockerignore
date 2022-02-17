@@ -1,0 +1,11 @@
+.git
+.gitignore
+Dockerfile*
+kubernetes
+Jenkinsfile
+
+# Misc
+.DS_Store
+.env.local
+.env
+.venv

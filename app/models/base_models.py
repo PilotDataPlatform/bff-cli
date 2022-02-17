@@ -1,0 +1,25 @@
+from enum import Enum
+from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+
+
+class EAPIResponseCode(Enum):
+    success = 200
+    internal_error = 500
+    bad_request = 400
+    not_found = 404
+    forbidden = 403
+    unauthorized = 401
+    conflict = 409
+
+
+class APIResponse(BaseModel):
+    code: EAPIResponseCode = EAPIResponseCode.success
+    error_msg: str = ""
+    result = []
+
+    def json_response(self):
+        data = self.dict()
+        data["code"] = self.code.value
+        return JSONResponse(status_code=self.code.value, content=data)
+
