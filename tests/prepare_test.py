@@ -13,8 +13,8 @@ class SetupTest:
     def auth(self, payload=None):
         if not payload:
             payload = {
-                "username": "sample_username",
-                "password": "sample_password!"
+                "username": "jzhang10",
+                "password": "CMDvrecli2021!"
             }
         url = ConfigClass.AUTH_SERVICE + "/v1/users/auth"
         self.log.info(url)
@@ -25,10 +25,10 @@ class SetupTest:
         return data["result"].get("access_token")
 
     def login_collaborator(self):
-        return {"username": "sample_username1", "password": "sample_password1!"}
+        return {"username": "jzhang3", "password": "Indoc1234567!"}
 
     def login_contributor(self):
-        return {"username": "sample_username2", "password": "sample_password2!"}
+        return {"username": "jzhang33", "password": "Indoc1234567!"}
 
     def get_user(self):
         payload = {
