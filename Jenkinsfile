@@ -37,7 +37,7 @@ pipeline {
             export VAULT_URL=${VAULT_URL}
             export VAULT_CRT=${VAULT_CRT}
             pip3 install virtualenv
-            /home/indoc/.local/bin/virtualenv -p python3 venv
+            /home/indoc/.local/bin/virtualenv -p python3.8 venv
             . venv/bin/activate
             PIP_USERNAME=${PIP_USERNAME} PIP_PASSWORD=${PIP_PASSWORD} pip3 install -r requirements.txt -r internal_requirements.txt -r tests/test_requirements.txt
             pip freeze | grep logger
