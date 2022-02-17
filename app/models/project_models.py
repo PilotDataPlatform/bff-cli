@@ -39,7 +39,7 @@ class POSTProjectFile(BaseModel):
     type: str
     zone: str
     filename: str
-    generate_id: str
+    dcm_id: str
     current_folder_node: str
     data: list
 

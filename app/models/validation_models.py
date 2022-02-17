@@ -27,14 +27,14 @@ class ManifestValidateResponse(APIResponse):
             )
 
 
-class ValidateGenerateIDPOST(BaseModel):
-    """Validate Generate ID Post model"""
-    generate_id: str
+class ValidateDICOMIDPOST(BaseModel):
+    """Validate DICOM ID Post model"""
+    dcm_id: str
 
 
-class ValidateGenerateIDResponse(APIResponse):
+class ValidateDICOMIDResponse(APIResponse):
     """
-    Validate Generate ID response class
+    Validate DICOM ID response class
     """
     result: dict = Field({}, example={
             "code": 200,

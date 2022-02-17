@@ -51,7 +51,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.GREEN_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -71,7 +71,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -91,7 +91,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.GREEN_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -110,7 +110,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": "wrong",
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -130,7 +130,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
@@ -151,7 +151,7 @@ class TestFiles(IsolatedAsyncioTestCase):
             "zone": ConfigClass.CORE_ZONE_LABEL.lower(),
             "filename": "fake.png",
             "job_type": "AS_FILE",
-            "generate_id": "undefined",
+            "dcm_id": "undefined",
             "current_folder_node": "",
             "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
         }
