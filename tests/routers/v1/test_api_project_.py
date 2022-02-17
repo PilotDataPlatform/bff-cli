@@ -1,0 +1,191 @@
+import pytest
+import app.routers.v1.api_project
+from requests.models import Response
+
+test_project_api = "/v1/projects"
+test_get_project_file_api = "/v1/project/test_project/files"
+test_get_project_folder_api = "/v1/project/test_project/folder"
+project_code = "test_project"
+
+
+@pytest.mark.asyncio
+async def test_get_project_list_should_return_200(test_async_client_auth, mocker):
+    test_project = ["project1", "project2", "project3"]
+    mocker.patch('app.routers.v1.api_project.get_user_projects',
+                 return_value=test_project)
+    header = {'Authorization': 'fake token'}
+    res = await test_async_client_auth.get(test_project_api, headers=header)
+    res_json = res.json()
+    projects = res_json.get('result')
+    assert res.status_code == 200
+    assert len(projects) == len(test_project)
+
+
+@pytest.mark.asyncio
+async def test_get_project_list_without_token_should_return_401(test_async_client):
+    res = await test_async_client.get(test_project_api)
+    res_json = res.json()
+    assert res_json.get('code') == 401
+    assert res_json.get('error_msg') == "Token required"
+
+
+@pytest.mark.asyncio
+async def test_upload_files_into_project_should_return_200(test_async_client_auth, mocker):
+    payload = {
+        "operator": "test_user",
+        "upload_message": "test",
+        "type": "processed",
+        "zone": "zone",
+        "filename": "fake.png",
+        "job_type": "AS_FILE",
+        "dcm_id": "undefined",
+        "current_folder_node": "",
+        "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
+        }
+    mocker.patch('app.routers.v1.api_project.validate_upload_event',
+                 return_value=None)
+    mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
+                 return_value={})
+    mock_response = Response()
+    mock_response.status_code = 200
+    mock_response._content = b'{ "result" : "SUCCESSED" }'
+    mocker.patch('app.routers.v1.api_project.transfer_to_pre',
+                 return_value=mock_response)
+    header = {'Authorization': 'fake token'}
+    response = await test_async_client_auth.post(test_get_project_file_api, headers=header, json=payload)
+    assert response.status_code == 200
+    assert response.json()["result"] == "SUCCESSED"
+
+
+@pytest.mark.asyncio
+async def test_upload_files_with_invalid_upload_event_should_return_400(test_async_client_auth, mocker):
+    payload = {
+        "operator": "test_user",
+        "upload_message": "test",
+        "type": "processed",
+        "zone": "zone",
+        "filename": "fake.png",
+        "job_type": "AS_FILE",
+        "dcm_id": "undefined",
+        "current_folder_node": "",
+        "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
+    }
+    mocker.patch('app.routers.v1.api_project.validate_upload_event',
+                 return_value="Invalid Zone")
+    header = {'Authorization': 'fake token'}
+    response = await test_async_client_auth.post(test_get_project_file_api, headers=header, json=payload)
+    res_json = response.json()
+    assert res_json.get('code') == 400
+    assert res_json.get('error_msg') == "Invalid Zone"
+
+
+@pytest.mark.asyncio
+async def test_upload_for_project_member_should_return_200(test_async_client_project_member_auth, mocker):
+    payload = {
+        "operator": "test_user",
+        "upload_message": "test",
+        "type": "processed",
+        "zone": "zone",
+        "filename": "fake.png",
+        "job_type": "AS_FILE",
+        "dcm_id": "undefined",
+        "current_folder_node": "",
+        "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
+    }
+    mocker.patch('app.routers.v1.api_project.validate_upload_event',
+                 return_value=None)
+    mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
+                 return_value={})
+    mocker.patch('app.routers.v1.api_project.get_project_role',
+                 return_value=('User not in the project', 400))
+    header = {'Authorization': 'fake token'}
+    response = await test_async_client_project_member_auth.post(test_get_project_file_api, headers=header, json=payload)
+    res_json = response.json()
+    assert res_json.get('code') == 403
+    assert res_json.get('error_msg') == 'Permission Denied'
+    assert res_json.get('result') == 'User not in the project'
+
+
+@pytest.mark.asyncio
+async def test_upload_for_contributor_into_core_should_return_200(test_async_client_project_member_auth, mocker):
+    payload = {
+        "operator": "test_user",
+        "upload_message": "test",
+        "type": "processed",
+        "zone": "core",
+        "filename": "fake.png",
+        "job_type": "AS_FILE",
+        "dcm_id": "undefined",
+        "current_folder_node": "",
+        "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
+    }
+    mocker.patch('app.routers.v1.api_project.validate_upload_event',
+                 return_value=None)
+    mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
+                 return_value={})
+    mocker.patch('app.routers.v1.api_project.get_project_role',
+                 return_value=("contributor", 200))
+    header = {'Authorization': 'fake token'}
+    response = await test_async_client_project_member_auth.post(test_get_project_file_api, headers=header, json=payload)
+    res_json = response.json()
+    assert res_json.get('code') == 403
+    assert res_json.get('error_msg') == 'Permission Denied'
+    assert res_json.get('result') == 'contributor'
+
+
+@pytest.mark.asyncio
+async def test_upload_with_conflict_should_return_409(test_async_client_auth, mocker):
+    payload = {
+        "operator": "test_user",
+        "upload_message": "test",
+        "type": "processed",
+        "zone": "zone",
+        "filename": "fake.png",
+        "job_type": "AS_FILE",
+        "dcm_id": "undefined",
+        "current_folder_node": "",
+        "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
+    }
+    mocker.patch('app.routers.v1.api_project.validate_upload_event',
+                 return_value=None)
+    mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
+                 return_value={})
+    mock_response = Response()
+    mock_response.status_code = 409
+    mock_response._content = b'{ "error_msg" : "mock_conflict" }'
+    mocker.patch('app.routers.v1.api_project.transfer_to_pre',
+                 return_value=mock_response)
+    header = {'Authorization': 'fake token'}
+    response = await test_async_client_auth.post(test_get_project_file_api, headers=header, json=payload)
+    res_json = response.json()
+    assert res_json.get('code') == 409
+    assert res_json.get('error_msg') == "mock_conflict"
+
+
+@pytest.mark.asyncio
+async def test_upload_with_internal_error_should_return_500(test_async_client_auth, mocker):
+    payload = {
+        "operator": "test_user",
+        "upload_message": "test",
+        "type": "processed",
+        "zone": "zone",
+        "filename": "fake.png",
+        "job_type": "AS_FILE",
+        "dcm_id": "undefined",
+        "current_folder_node": "",
+        "data": [{"resumable_filename": "fake.png", "resumable_relative_path": ""}]
+    }
+    mocker.patch('app.routers.v1.api_project.validate_upload_event',
+                 return_value=None)
+    mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
+                 return_value={})
+    mock_response = Response()
+    mock_response.status_code = 400
+    mock_response._content = b'{ "error_msg" : "mock_internal_error" }'
+    mocker.patch('app.routers.v1.api_project.transfer_to_pre',
+                 return_value=mock_response)
+    header = {'Authorization': 'fake token'}
+    response = await test_async_client_auth.post(test_get_project_file_api, headers=header, json=payload)
+    res_json = response.json()
+    assert res_json.get('code') == 500
+    assert res_json.get('error_msg') == "Upload Error: mock_internal_error"
