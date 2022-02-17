@@ -1,1 +1,1 @@
-namespace = "bff_vrecli"
+namespace = "bff_cli"

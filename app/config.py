@@ -6,7 +6,7 @@ from functools import lru_cache
 from common import VaultClient
 
 load_dotenv()
-SRV_NAMESPACE = os.environ.get("APP_NAME", "bff_vrecli")
+SRV_NAMESPACE = os.environ.get("APP_NAME", "bff_cli")
 CONFIG_CENTER_ENABLED = os.environ.get("CONFIG_CENTER_ENABLED", "false")
 
 
@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     GREEN_ZONE_LABEL: str = ''
     AUTH_SERVICE: str 
     DATA_UPLOAD_SERVICE_GREENROOM: str
+    DATA_UPLOAD_SERVICE_CORE: str
     FILEINFO_HOST: str
     HPC_SERVICE: str 
     KG_SERVICE: str 

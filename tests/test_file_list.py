@@ -2,7 +2,7 @@ import unittest
 
 from app.config import ConfigClass
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 import time
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
@@ -19,7 +19,7 @@ pre_defined_folder = "admin_folder"
 
 @unittest.skipIf(case_to_run == 'core', 'Run specific test')
 class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
-    log = Logger(name='test_list_files_folders.log')
+    log = LoggerFactory(name='test_list_files_folders.log').get_logger()
     test = SetupTest(log)
     app = test.client
     token = test.auth()
@@ -329,7 +329,7 @@ class TestGetFilesFoldersGR(IsolatedAsyncioTestCase):
 
 @unittest.skipIf(case_to_run == 'greenroom', 'Run specific test')
 class TestGetFilesFoldersCore(IsolatedAsyncioTestCase):
-    log = Logger(name='test_list_files_folders.log')
+    log = LoggerFactory(name='test_list_files_folders.log').get_logger()
     test = SetupTest(log)
     app = test.client
     token = test.auth()

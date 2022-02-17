@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi_utils.cbv import cbv
 from ...models.lineage_models import *
-from ...commons.logger_services.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
 from ...config import ConfigClass
@@ -17,7 +17,7 @@ class APILineage:
     _API_NAMESPACE = "api_lineage"
 
     def __init__(self):
-        self._logger = SrvLoggerFactory(self._API_NAMESPACE).get_logger()
+        self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
 
     @router.post("/lineage", tags=[_API_TAG],
                  response_model=LineageCreatePost,

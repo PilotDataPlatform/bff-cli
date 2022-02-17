@@ -127,12 +127,9 @@ dmypy.json
 cython_debug/
 
 # Customized
-.vrectl
 .vscode/settings.json
-~/.vrecli/config.ini
 test_seeds
 build
-vrecli.egg-info
 .DS_Store
 *.__pycache__
 *.logs

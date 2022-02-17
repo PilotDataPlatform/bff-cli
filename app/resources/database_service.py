@@ -1,12 +1,12 @@
 from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel, DatasetVersionModel
 from ..commons.data_providers.database import DBConnection
-from ..service_logger.logger_factory_service import SrvLoggerFactory
+from logger import LoggerFactory
 
 
 class RDConnection:
     
     def __init__(self):
-        self._logger = SrvLoggerFactory("Helpers").get_logger()
+        self._logger = LoggerFactory("Helpers").get_logger()
         db = DBConnection()
         self.db_session = db.session
 

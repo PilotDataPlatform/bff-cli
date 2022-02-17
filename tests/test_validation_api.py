@@ -3,18 +3,18 @@ from app.config import ConfigClass
 from unittest import IsolatedAsyncioTestCase
 from httpx import AsyncClient
 from .prepare_test import SetupTest
-from .logger import Logger
+from logger import LoggerFactory
 import os
 
 """
-cases: generate, attribute, environment
+cases: dicom, attribute, environment
 """
 case = "all"
 zone_env=""
 
-@unittest.skipUnless(case == 'generate' or case == 'all' or case=='', 'Run specific test')
-class TestGenerateIDValidation(IsolatedAsyncioTestCase):
-    log = Logger(name='test_gid_validation.log')
+@unittest.skipUnless(case == 'dicom' or case == 'all' or case=='', 'Run specific test')
+class TestDICOMIDValidation(IsolatedAsyncioTestCase):
+    log = LoggerFactory(name='test_gid_validation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/gid"
@@ -22,7 +22,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_01_validate_gid(self):
         self.log.info('\n')
         self.log.info("test_01_validate_gid".center(80, '-'))
-        payload = {'generate_id': 'ABC-1234'}
+        payload = {'dcm_id': 'ABC-1234'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -39,7 +39,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_02_test_gid_not_3_letters(self):
         self.log.info('\n')
         self.log.info("test_02_test_gid_not_3_letters".center(80, '-'))
-        payload = {'generate_id': 'AC-1234'}
+        payload = {'dcm_id': 'AC-1234'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -47,8 +47,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -56,7 +56,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_03_test_gid_not_3_capital_letters(self):
         self.log.info('\n')
         self.log.info("test_03_test_gid_not_3_capital_letters".center(80, '-'))
-        payload = {'generate_id': 'AbC-1234'}
+        payload = {'dcm_id': 'AbC-1234'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -64,8 +64,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -73,7 +73,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_04_test_gid_not_4_numbers(self):
         self.log.info('\n')
         self.log.info("test_04_test_gid_not_4_numbers".center(80, '-'))
-        payload = {'generate_id': 'ABC-134'}
+        payload = {'dcm_id': 'ABC-134'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -81,8 +81,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -90,7 +90,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_05_test_not_hyphen(self):
         self.log.info('\n')
         self.log.info("test_05_test_not_hyphen".center(80, '-'))
-        payload = {'generate_id': 'ABC1234'}
+        payload = {'dcm_id': 'ABC1234'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -98,8 +98,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -107,7 +107,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_06_test_more_than_3_letter(self):
         self.log.info('\n')
         self.log.info("test_06_test_not_hyphen".center(80, '-'))
-        payload = {'generate_id': 'ABCD-1234'}
+        payload = {'dcm_id': 'ABCD-1234'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -115,8 +115,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -124,7 +124,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_07_test_more_than_4_numbers(self):
         self.log.info('\n')
         self.log.info("test_07_test_more_than_4_numbers".center(80, '-'))
-        payload = {'generate_id': 'ABCD-12345'}
+        payload = {'dcm_id': 'ABCD-12345'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -132,8 +132,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -141,7 +141,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
     async def test_08_test_contain_other_characters(self):
         self.log.info('\n')
         self.log.info("test_08_test_contain_other_characters".center(80, '-'))
-        payload = {'generate_id': 'ABCD-123!'}
+        payload = {'dcm_id': 'ABCD-123!'}
         try:
             async with AsyncClient(app=self.app, base_url="http://test") as ac:
                 res = await ac.post(self.test_api, json=payload)
@@ -149,8 +149,8 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
             res_json = res.json()
             self.log.info(f"COMPARING CODE: {res_json.get('code')}, 400")
             self.assertEqual(res_json.get('code'), 400)
-            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid Generate ID'")
-            self.assertEqual(res_json.get('result'), 'Invalid Generate ID')
+            self.log.info(f"COMPARING RESULT: {res_json.get('result')}, 'Invalid DICOM ID'")
+            self.assertEqual(res_json.get('result'), 'Invalid DICOM ID')
         except Exception as e:
             self.log.error(f"ERROR: {e}")
             raise e
@@ -158,7 +158,7 @@ class TestGenerateIDValidation(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'attribute' or case == 'all' or case=='', 'Run specific test')
 class TestAttributeValidation(IsolatedAsyncioTestCase):
-    log = Logger(name='test_attribute_validation.log')
+    log = LoggerFactory(name='test_attribute_validation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/manifest"
@@ -381,7 +381,7 @@ class TestAttributeValidation(IsolatedAsyncioTestCase):
 
 @unittest.skipUnless(case == 'environment' or case == 'all' or case=='', 'Run specific test')
 class TestEnvironmentValidation(IsolatedAsyncioTestCase):
-    log = Logger(name='test_environment_validation.log')
+    log = LoggerFactory(name='test_environment_validation.log').get_logger()
     test = SetupTest(log)
     app = test.client
     test_api = "/v1/validate/env"
