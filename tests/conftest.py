@@ -85,4 +85,5 @@ def mock_settings(monkeypatch):
     monkeypatch.setattr(ConfigClass, 'KG_SERVICE', 'http://kg_service')
     monkeypatch.setattr(ConfigClass, 'PROVENANCE_SERVICE',
                         'http://provenance_service')
-    # monkeypatch.setattr(ConfigClass, 'CORE_ZONE_LABEL', 'test')
+    monkeypatch.setattr(ConfigClass, 'GREEN_ZONE_LABEL', 'gr')
+    monkeypatch.setattr(ConfigClass, 'CORE_ZONE_LABEL', 'cr')

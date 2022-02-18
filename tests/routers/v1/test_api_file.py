@@ -1,6 +1,6 @@
 import pytest
 from pytest_httpx import HTTPXMock
-from enum import Enum
+from helper import EAPIResponseCode
 
 test_query_geid_api = "/v1/query/geid"
 test_get_file_api = "/v1/test_project/files/query"
@@ -378,13 +378,3 @@ async def test_query_file_by_geid_without_permission(test_async_client_auth, moc
     for entity in result:
         assert entity["status"] == "Permission Denied"
         assert entity["result"] == []
-
-
-class EAPIResponseCode(Enum):
-    success = 200
-    internal_error = 500
-    bad_request = 400
-    not_found = 404
-    forbidden = 403
-    unauthorized = 401
-    conflict = 409
