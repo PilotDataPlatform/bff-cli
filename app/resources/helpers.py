@@ -30,6 +30,7 @@ def get_user_role(user_id, project_id):
 def query__node_has_relation_with_admin(label='Container'):
     _logger.info("query__node_has_relation_with_admin".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query"
+    print(url)
     _logger.info(f"Requesting API: {url}")
     data = {'is_all': 'true'}
     try:
@@ -119,28 +120,6 @@ def query_file_in_project(project_code, filename, zone=ConfigClass.GREEN_ZONE_LA
         result = []
     finally:
         return result
-
-
-def get_file_entity_id(project_code, file_name, zone=ConfigClass.GREEN_ZONE_LABEL):
-    res = query_file_in_project(project_code, file_name, zone)
-    res = res.get('result')
-    if not res:
-        return None
-    else:
-        global_entity_id = res[0].get('global_entity_id')
-        return global_entity_id
-
-
-def get_file_by_id(file_id):
-    post_data = {"global_entity_id": file_id}
-    try:
-        with httpx.Client() as client:
-            response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
-        if not response.json():
-            return None
-        return response.json()[0]
-    except Exception:
-        return None
 
 
 def get_node_by_code(code, label):

@@ -1,7 +1,5 @@
 import pytest
 from pytest_httpx import HTTPXMock
-import app.routers.v1.api_kg
-from fastapi.security import HTTPBasicCredentials, HTTPBearer
 
 test_kg_api = "/v1/kg/resources"
 

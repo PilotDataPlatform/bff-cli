@@ -1,6 +1,6 @@
 import pytest
 from requests.models import Response
-from helper import EAPIResponseCode
+from tests.helper import EAPIResponseCode
 
 test_project_api = "/v1/projects"
 test_get_project_file_api = "/v1/project/test_project/files"

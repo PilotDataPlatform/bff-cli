@@ -87,3 +87,7 @@ def mock_settings(monkeypatch):
                         'http://provenance_service')
     monkeypatch.setattr(ConfigClass, 'GREEN_ZONE_LABEL', 'gr')
     monkeypatch.setattr(ConfigClass, 'CORE_ZONE_LABEL', 'cr')
+    monkeypatch.setattr(ConfigClass, 'DATA_UPLOAD_SERVICE_CORE',
+                        'http://data_upload_cr')
+    monkeypatch.setattr(
+        ConfigClass, 'DATA_UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')

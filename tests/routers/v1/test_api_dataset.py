@@ -1,8 +1,4 @@
 import pytest
-# To run particular test, edit the case_to_run_variable with following values:
-# dataset list: list
-# dataset detail: detail
-# run all tests: '' or 'all'
 
 test_dataset_api = "/v1/datasets"
 dataset_code = "testdataset"

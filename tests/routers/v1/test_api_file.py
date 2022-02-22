@@ -1,6 +1,6 @@
 import pytest
 from pytest_httpx import HTTPXMock
-from helper import EAPIResponseCode
+from tests.helper import EAPIResponseCode
 
 test_query_geid_api = "/v1/query/geid"
 test_get_file_api = "/v1/test_project/files/query"

@@ -2,7 +2,7 @@ from sre_constants import IN
 import pytest
 from unittest.mock import patch
 from app.models.error_model import HPCError
-from enum import Enum
+from tests.helper import EAPIResponseCode
 
 
 @pytest.mark.asyncio
@@ -282,11 +282,3 @@ async def test_hpc_get_partition_by_name_without_protocal_should_return_400(test
     assert response.get('error_msg') == "HPC protocal required"
 
 
-class EAPIResponseCode(Enum):
-    success = 200
-    internal_error = 500
-    bad_request = 400
-    not_found = 404
-    forbidden = 403
-    unauthorized = 401
-    conflict = 409

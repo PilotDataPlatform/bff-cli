@@ -1,17 +1,5 @@
-from attr import attributes
 import pytest
-
-from tests.logger import Logger
-from enum import Enum
-# # To run particular test, edit the case_to_run_variable with following values:
-# # export attribute: export
-# # get attributes: list
-# # attach attribute: attach
-# # run all tests: '' or 'all'
-# case_to_run = 'all'
-
-# no_access_user_name = "jzhang53"
-# no_access_user_password = "Indoc1234567!"
+from tests.helper import EAPIResponseCode
 
 test_api = "/v1/manifest"
 test_export_api = "/v1/manifest/export"
@@ -310,14 +298,6 @@ async def test_fail_to_attach_attributes_return_404(test_async_client_auth, mock
     error = res_json.get('error_msg')
     assert error == 'File Not Exist'
 
-class EAPIResponseCode(Enum):
-    success = 200
-    internal_error = 500
-    bad_request = 400
-    not_found = 404
-    forbidden = 403
-    unauthorized = 401
-    conflict = 409
 
 def mock_get_manifest_name_from_project_in_db(arg1, arg2):
     if arg2.get("manifest_name", "") == "Manifest1":
