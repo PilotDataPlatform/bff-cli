@@ -9,7 +9,7 @@ test_validate_env_api = '/v1/validate/env'
 
 @pytest.mark.asyncio
 async def test_validate_gid_should_return_200(test_async_client_auth):
-    payload = {'generate_id': 'ABC-1234'}
+    payload = {'dcm_id': 'ABC-1234'}
     res = await test_async_client_auth.post(test_validate_id_api, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 200
@@ -19,11 +19,11 @@ async def test_validate_gid_should_return_200(test_async_client_auth):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("test_input",["A-1234", "ABC-12", "abc-1234", "ABC-12345", "ABC12345", "ABC-!"])
 async def test_invalidate_gid_should_return_400(test_async_client_auth, test_input):
-    payload = {'generate_id': test_input}
+    payload = {'dcm_id': test_input}
     res = await test_async_client_auth.post(test_validate_id_api, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 400
-    assert res_json.get('result') == 'Invalid Generate ID'
+    assert res_json.get('result') == 'Invalid DICOM ID'
 
 
 @pytest.mark.asyncio
