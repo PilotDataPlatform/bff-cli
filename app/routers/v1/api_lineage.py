@@ -26,7 +26,6 @@ class APILineage:
     async def create_lineage(self, request_payload: LineageCreatePost,
                              current_identity: dict = Depends(jwt_required)):
         self._logger.info("API Lineage".center(80, '-'))
-        api_response = LineageCreateResponse()
         proxy_payload = request_payload.__dict__
         url = ConfigClass.PROVENANCE_SERVICE + "/v1/lineage"
         self._logger.info(f"url: {url}")
