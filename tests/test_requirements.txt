@@ -14,3 +14,4 @@ aiofiles==0.6.0
 redis==3.5.3
 pytest-httpx==0.20.0
 pytest-mock==3.7.0
+async-asgi-testclient==1.4.9
