@@ -91,3 +91,5 @@ def mock_settings(monkeypatch):
                         'http://data_upload_cr')
     monkeypatch.setattr(
         ConfigClass, 'DATA_UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')
+    monkeypatch.setattr(
+        ConfigClass, 'HPC_SERVICE', 'http://service_hpc')
