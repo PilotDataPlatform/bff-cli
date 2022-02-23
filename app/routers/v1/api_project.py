@@ -127,7 +127,7 @@ class APIProject:
             user_name = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info("API list_folder".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
         permission_event = {'user_id': user_id,
@@ -144,7 +144,7 @@ class APIProject:
             api_response.code = permission.get('code')
             api_response.result = permission.get('result')
             return api_response.json_response()
-        uploader = permission.get('uploader')
+        uploader = permission.get('uploader', '')
         accessing_folder = folder.split('/')[0]
         if uploader and uploader != accessing_folder:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
