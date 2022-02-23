@@ -113,7 +113,7 @@ pipeline {
     stage('STAGING Deploy') {
       when {branch "k8s-staging"}
       steps{
-        build(job: "/VRE-IaC/UpdateAppVersion", parameters: [
+        build(job: "/VRE-IaC/Staging-UpdateAppVersion", parameters: [
             [$class: 'StringParameterValue', name: 'TF_TARGET_ENV', value: 'staging' ],
             [$class: 'StringParameterValue', name: 'TARGET_RELEASE', value: 'bff-vrecli' ],
             [$class: 'StringParameterValue', name: 'NEW_APP_VERSION', value: "$commit" ]
