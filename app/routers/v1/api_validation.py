@@ -24,18 +24,18 @@ class APIValidation:
         self.db = RDConnection()
 
     @router.post("/validate/gid", tags=[_API_TAG],
-                 response_model=ValidateGenerateIDResponse,
-                 summary="Validate GENERATE ID")
+                 response_model=ValidateDICOMIDResponse,
+                 summary="Validate DICOM ID")
     @catch_internal(_API_NAMESPACE)
-    async def validate_generate_id(self, request_payload: ValidateGenerateIDPOST):
-        api_response = ValidateGenerateIDResponse()
-        generate_id = request_payload.generate_id
-        is_valid = re.match("^([A-Z]{3})-([0-9]{4})$", generate_id)
+    async def validate_dicom_id(self, request_payload: ValidateDICOMIDPOST):
+        api_response = ValidateDICOMIDResponse()
+        dcm_id = request_payload.dcm_id
+        is_valid = re.match("^([A-Z]{3})-([0-9]{4})$", dcm_id)
         if is_valid:
             result = "Valid"
             res_code = EAPIResponseCode.success
         else:
-            result = customized_error_template(ECustomizedError.INVALID_GENERATE_ID)
+            result = customized_error_template(ECustomizedError.INVALID_DICOM_ID)
             res_code = EAPIResponseCode.bad_request
         api_response.result = result
         api_response.code = res_code

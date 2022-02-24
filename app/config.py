@@ -6,7 +6,7 @@ from functools import lru_cache
 from common import VaultClient
 
 load_dotenv()
-SRV_NAMESPACE = os.environ.get("APP_NAME", "bff_vrecli")
+SRV_NAMESPACE = os.environ.get("APP_NAME", "bff_cli")
 CONFIG_CENTER_ENABLED = os.environ.get("CONFIG_CENTER_ENABLED", "false")
 
 

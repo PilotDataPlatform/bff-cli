@@ -23,6 +23,6 @@ class CheckFileResponse(APIResponse):
         "time_created": "2021-03-05T19:37:06",
         "guid": "f91b258d-2f1d-409a-9551-91af8057e70e",
         "full_path": "/data/core-storage/project/raw/Testdateiäöüßs4",
-        "generate_id": "undefined"
+        "dcm_id": "undefined"
     }
     )
