@@ -37,7 +37,7 @@ class APIManifest:
         self._logger.info(f"User request information: project_code: {project_code},")
         try:
             zone = ConfigClass.GREEN_ZONE_LABEL
-            if not has_permission(self.current_identity, project_code, "file_attribute_template", zone.lower(), "view"):
+            if not has_permission(current_identity, project_code, "file_attribute_template", zone.lower(), "view"):
                 api_response.error_msg = "Permission denied"
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
@@ -83,7 +83,7 @@ class APIManifest:
                 api_response.error_msg = "Permission denied"
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
-            project_role = get_project_role(self.current_identity, project_code)
+            project_role = get_project_role(current_identity, project_code)
             zone_type = get_zone(zone)
         except KeyError as e:
             self._logger.error(f"Missing information error: {str(e)}")

@@ -161,4 +161,5 @@ class APIProject:
                 error_msg = 'Folder not exist'
         api_response.result = result
         api_response.code = response_code
+        api_response.error_msg = error_msg
         return api_response.json_response()

@@ -56,11 +56,12 @@ def test_async_client_project_member_auth():
 
 async def overide_jwt_required(request: Request):
     return {
-        "code": 200, 
-        "user_id": 1, 
-        "username": "testuser", 
-        "role": "admin", 
-        "token": "fake token"
+        "code": 200,
+        "user_id": 1,
+        "username": "testuser",
+        "role": "admin",
+        "token": "fake token",
+        "relam-roles": ["platform-admin"]
     }
 
 
@@ -70,7 +71,8 @@ async def overide_member_jwt_required(request: Request):
         "user_id": 1,
         "username": "testuser",
         "role": "contributor",
-        "token": "fake token"
+        "token": "fake token",
+        "relam-roles": ["testproject-contributor"]
     }
 
 class HTTPAuthorizationCredentials(BaseModel):

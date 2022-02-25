@@ -22,9 +22,7 @@ async def jwt_required(request: Request):
     if token:
         token = token.replace("Bearer ", "")
     else:
-        api_response.code = EAPIResponseCode.unauthorized
-        api_response.error_msg = "Token required"
-        return api_response.json_response()
+        raise APIException(error_msg="Token required", status_code=EAPIResponseCode.unauthorized.value)
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
     realm_roles = payload["realm_access"]["roles"]
@@ -43,23 +41,21 @@ async def jwt_required(request: Request):
     with httpx.Client() as client:
         payload = {
             "username": username,
-            "status": "active",
-            "exact": True,
         }
-        res = client.get(ConfigClass.AUTH_SERVICE + "/v1/users", params=payload)
+        res = client.get(ConfigClass.AUTH_SERVICE + "/v1/admin/user", params=payload)
     if res.status_code != 200:
         api_response.code = EAPIResponseCode.forbidden
         api_response.error_msg = "Auth Service: " + str(res.json())
         return api_response.json_response()
 
-    users = res.json()["result"]
-    if not users:
+    user = res.json()["result"]
+    if not user:
         api_response.code = EAPIResponseCode.not_found
         api_response.error_msg = f"Auth service: User {username} does not exist."
         return api_response.json_response()
 
-    user_id = users[0]['id']
-    role = users[0]['role']
+    user_id = user['id']
+    role = user['role']
     return {
         "code": 200,
         "user_id": user_id,
