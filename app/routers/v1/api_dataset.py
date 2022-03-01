@@ -4,7 +4,8 @@ from ...models.dataset_models import *
 from ...models.base_models import EAPIResponseCode
 from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.database_service import RDConnection
-from ...resources.dependencies import jwt_required, query_node_has_relation_for_user, get_node
+from ...resources.dependencies import jwt_required, get_node
+from app.resources.helpers import get_user_datasets
 from logger import LoggerFactory
 
 
@@ -36,12 +37,9 @@ class APIDataset:
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(f"User request with identity: {self.current_identity}")
-        user_datasets = query_node_has_relation_for_user(username, 'Dataset')
-        self._logger.info(f"Getting user datasets: {user_datasets}")
-        self._logger.info(f"Number of datasets: {len(user_datasets)}")
-        dataset_list = []
-        for i in user_datasets:
-            dataset_list.append(i.get('end_node'))
+        dataset_list = get_user_datasets(username)
+        self._logger.info(f"Getting user datasets: {dataset_list}")
+        self._logger.info(f"Number of datasets: {len(dataset_list)}")
         api_response.result = dataset_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()

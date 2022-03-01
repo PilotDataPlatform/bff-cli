@@ -35,7 +35,7 @@ class APIProject:
             return self.current_identity
         self._logger.info("API list_project".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
-        project_list = get_user_projects(user_role, username)
+        project_list = get_user_projects(self.current_identity)
         self._logger.info(f"Getting user projects: {project_list}")
         self._logger.info(f"Number of projects: {len(project_list)}")
         api_response.result = project_list
@@ -121,32 +121,18 @@ class APIProject:
         Get folder in project
         """
         api_response = GetProjectFolderResponse()
-        try:
-            role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
-            user_name = self.current_identity['username']
-        except (AttributeError, TypeError):
-            return self.current_identity
-        self._logger.info("API list_folder".center(80, '-'))
+        username = self.current_identity["username"]
+        self._logger.info("API list_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
-        permission_event = {'user_id': user_id,
-                            'username': user_name,
-                            'role': role,
-                            'project_code': project_code,
-                            'zone': zone_type}
-        permission = check_permission(permission_event)
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        error_msg = permission.get('error_msg', '')
-        if error_msg:
-            api_response.error_msg = error_msg
-            api_response.code = permission.get('code')
-            api_response.result = permission.get('result')
+        error_msg = ""
+        if not has_permission(self.current_identity, project_code, "file", zone.lower(), "view"):
+            api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+            api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
-        uploader = permission.get('uploader', '')
+
         accessing_folder = folder.split('/')[0]
-        if uploader and uploader != accessing_folder:
+        if username != accessing_folder:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()

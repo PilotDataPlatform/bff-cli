@@ -5,55 +5,39 @@ import time
 from tests.helper import EAPIResponseCode
 from app.models.project_models import POSTProjectFile
 from app.resources.dependencies import *
+from app.config import ConfigClass
 
 project_code = "test_project"
 
 
 def test_get_project_role_successed_should_project_role_and_200(mocker):
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_user_role", mock_user_role)
-    role, code = get_project_role("fake_id", project_code)
-    print(role)
-    print(code)
+    identity = {"role": "member", "realm_roles": [f"{project_code}-collaborator"]}
+    role = get_project_role(identity, project_code)
     assert role == "collaborator"
-    assert code == EAPIResponseCode.success
 
 
 def test_get_project_role_with_project_not_found_should_return_404(mocker):
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node)
-    error_msg, code = get_project_role("fake_id", "fake_code")
-    assert error_msg == "Project not found"
-    assert code == EAPIResponseCode.not_found
-
-
-def test_get_project_role_with_user_not_found_should_return_403(mocker):
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_user_role", mock_user_role)
-    error_msg, code = get_project_role("fake_user_id", project_code)
-    assert error_msg == 'User not in the project'
-    assert code == EAPIResponseCode.forbidden
+    identity = {"role": "member", "realm_roles": []}
+    role = get_project_role(identity, "fake_code")
+    assert role == None
 
 
 @pytest.mark.asyncio
 async def test_jwt_required_should_return_successed(httpx_mock):
     mock_request = Request(scope={"type":"http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()+3}, key="unittest" ,algorithm="HS256").decode('utf-8')
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()+3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[
-            {
-                "id": 1,
-                "role": "admin"
-            }
-        ],
+        method='GET',
+        url=f'http://{ConfigClass.AUTH_SERVICE}v1/users?username=test_user&status=active&exact=true',
+        json={ "result": {
+            "id": 1,
+            "role": "admin"
+        }},
         status_code=200,
     )
     test_result = await jwt_required(mock_request)
@@ -74,8 +58,11 @@ async def test_jwt_required_without_token_should_return_unauthorized():
 @pytest.mark.asyncio
 async def test_jwt_required_with_token_expired_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()-3}, key="unittest", algorithm="HS256").decode('utf-8')
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()-3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     test_result = await jwt_required(mock_request)
     response = test_result.__dict__
@@ -83,15 +70,19 @@ async def test_jwt_required_with_token_expired_should_return_unauthorized():
 
 
 @pytest.mark.asyncio
-async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock):
+async def test_jwt_required_with_auth_error_should_return_forbidden(httpx_mock):
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()+3}, key="unittest", algorithm="HS256").decode('utf-8')
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()+3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json="mock internal error",
+        method='GET',
+        url='http://10.3.7.217:5061/v1/users?username=test_user&status=active&exact=true',
+        json={ "result": {
+        }},
         status_code=500,
     )
     test_result = await jwt_required(mock_request)
@@ -100,118 +91,24 @@ async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock)
 
 
 @pytest.mark.asyncio
-async def test_jwt_required_with_user_not_in_neo4j_should_return_not_found(httpx_mock):
-    mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()+3}, key="unittest", algorithm="HS256").decode('utf-8')
-    mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[],
-        status_code=200,
-    )
-    test_result = await jwt_required(mock_request)
-    response = test_result.__dict__
-    assert response['status_code'] == 404
-
-
-@pytest.mark.asyncio
 async def test_jwt_required_with_username_not_in_token_should_return_not_found(httpx_mock):
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": None, "exp": time.time()+3}, key="unittest", algorithm="HS256").decode('utf-8')
+
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()+3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[
-            {
-                "id": 1,
-                "role": "admin"
-            }
-        ],
-        status_code=200,
+        method='GET',
+        url='http://10.3.7.217:5061/v1/users?username=test_user&status=active&exact=true',
+        json={ "result": None},
+        status_code=404,
     )
     test_result = await jwt_required(mock_request)
     response = test_result.__dict__
-    assert response['status_code'] == 404
-
-
-def test_check_permission_should_return_correct_permission(mocker):
-    event = {'user_id': 1,
-             'username': "test_user",
-             'role': "admin",
-             'project_code': project_code,
-             'zone': "gr"}
-    mocker.patch.object(app.resources.dependencies,
-                        "get_project_role", mock_get_project_role)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node_user)
-    result = check_permission(event)
-    assert result == {'project_role': 'admin', 'project_code': 'test_project'}
-
-
-def test_check_permission_with_user_not_in_project_should_return_contributor_project_role(mocker):
-    event = {'user_id': 1,
-             'username': "test_user",
-             'role': "contributor",
-             'project_code': "fake_code",
-             'zone': "gr"}
-    mocker.patch.object(app.resources.dependencies,
-                        "get_project_role", mock_get_project_role)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node_user)
-    result = check_permission(event)
-    assert result["code"] == EAPIResponseCode.success
-    assert result["result"] == "User not in the project"
-
-
-def test_check_permission_with_project_not_found_should_return_project_not_found(mocker):
-    event = {'user_id': 1,
-             'username': "test_user",
-             'role': "admin",
-             'project_code': "fake_wrong_project",
-             'zone': "gr"}
-    mocker.patch.object(app.resources.dependencies,
-                        "get_project_role", mock_get_project_role)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node_user)
-    result = check_permission(event)
-    assert result["code"] == EAPIResponseCode.not_found
-    assert result["result"] == {}
-
-
-def test_check_permission_for_contributor_should_return_correct_permission(mocker):
-    event = {'user_id': 2,
-             'username': "test_user",
-             'role': "contributor",
-             'project_code': project_code,
-             'zone': "gr"}
-    mocker.patch.object(app.resources.dependencies,
-                        "get_project_role", mock_get_project_role)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node_user)
-    result = check_permission(event)
-    print(result)
-    assert result == {'project_role': 'contributor',
-                      'project_code': 'test_project', 
-                      'uploader': 'test_user'}
-
-
-def test_check_permission_for_contributor_in_core_should_return_forbidden(mocker):
-    event = {'user_id': 2,
-             'username': "test_user",
-             'role': "contributor",
-             'project_code': project_code,
-             'zone': "cr"}
-    mocker.patch.object(app.resources.dependencies,
-                        "get_project_role", mock_get_project_role)
-    mocker.patch.object(app.resources.dependencies,
-                        "get_node", mock_get_node_user)
-    result = check_permission(event)
-    assert result["code"] == EAPIResponseCode.forbidden
-    assert result["result"] == {}
+    assert response['status_code'] == 403
 
 
 def test_void_check_file_in_zone_should_return_bad_request(httpx_mock):

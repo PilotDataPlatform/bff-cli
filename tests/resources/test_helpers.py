@@ -5,54 +5,6 @@ from tests.helper import EAPIResponseCode
 from requests.models import Response
 
 
-def test_get_user_role_successed(httpx_mock):
-    httpx_mock.add_response(
-        method='GET',
-        url='http://neo4j_service/v1/neo4j/relations?start_id=1&end_id=1086',
-        json=[{"node":"fake_node"}],
-        status_code=200,
-    )
-    result = get_user_role(1, 1086)
-    assert result["node"] == "fake_node"
-
-
-def test_get_user_role_failed():
-    result = get_user_role(1, 1086)
-    assert result == None
-
-
-def test_query__node_has_relation_with_admin_successed(httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Container/query',
-        json=[{"node": "fake_node"}],
-        status_code=200,
-    )
-    result = query__node_has_relation_with_admin()
-    assert result[0]["node"] == "fake_node"
-
-
-def test_query__node_has_relation_with_admin_failed(httpx_mock):
-    result = query__node_has_relation_with_admin()
-    assert result == []
-
-
-def test_query_node_has_relation_for_user_successed(httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/relations/query',
-        json=[{"node": "fake_node"}],
-        status_code=200,
-    )
-    result = query_node_has_relation_for_user("test_user", "Container")
-    assert result[0]["node"] == "fake_node"
-
-
-def test_query_node_has_relation_for_user_failed():
-    result = query_node_has_relation_for_user("test_user", "Container")
-    assert result == []
-
-
 def test_get_node_by_geid_successed(httpx_mock):
     httpx_mock.add_response(
         method='GET',
@@ -146,22 +98,6 @@ def test_get_node_with_response_json_as_none(httpx_mock):
 def test_get_node_by_code_failed():
     result = get_node(123, "Container")
     assert result == None
-
-
-def test_get_user_admin_projects_successed(mocker):
-    mocker.patch.object(app.resources.helpers,
-                        "query__node_has_relation_with_admin", mock_query__node_has_relation_with_admin)
-    result = get_user_projects('admin', 'test_user')
-    assert result[0]['name'] == 'test_user'
-    assert result[0]['code'] == 123
-
-
-def test_get_user_project_user_projects_successed(mocker):
-    mocker.patch.object(app.resources.helpers,
-                        "query_node_has_relation_for_user", mock_query_node_has_relation_for_user)
-    result = get_user_projects('contributor', 'test_user')
-    assert result[0]['name'] == 'test_user'
-    assert result[0]['code'] == 123
 
 
 def test_attach_manifest_to_file_successed(httpx_mock):
@@ -280,10 +216,3 @@ def mock_query__node_has_relation_with_admin():
         'id':'fake_id',
         'global_entity_id': 'geid'
     }]
-
-
-def mock_query_node_has_relation_for_user(arg1):
-    return [{'r': {'status':'active'}, 'end_node': {'name': 'test_user',
-                                                       'code': 123,
-                                                       'id': 'fake_id',
-                                                       'global_entity_id': 'geid'}}]

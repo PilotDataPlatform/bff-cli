@@ -22,20 +22,17 @@ async def test_get_name_folders_in_project_should_return_200(test_async_client_a
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200, 
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_file.get_parent_label',
                  return_value="Container")
     mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('', "fake_user"))
+                 return_value=('', "testuser"))
     mocker.patch('app.routers.v1.api_file.check_folder_exist',
                  return_value=(EAPIResponseCode.success, ''))
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v1/neo4j/relations/query',
-        json=[{'end_node':{"name": "fake_user"}}],
+        json=[{'end_node':{"name": "testuser"}}],
         status_code=200,
     )
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
@@ -46,7 +43,7 @@ async def test_get_name_folders_in_project_should_return_200(test_async_client_a
     name_folders = []
     for f in result:
         name_folders.append(f.get('name'))
-    assert 'fake_user' in name_folders
+    assert 'testuser' in name_folders
 
 
 @pytest.mark.asyncio
@@ -54,7 +51,7 @@ async def test_get_files_in_folder_should_return_200(test_async_client_auth, moc
     param = {
         "project_code": project_code,
         "zone": "zone",
-        "folder": 'fake_user/fake_folder',
+        "folder": 'testuser/fake_folder',
         "source_type": 'Folder'
     }
     header = {'Authorization': 'fake token'}
@@ -62,14 +59,11 @@ async def test_get_files_in_folder_should_return_200(test_async_client_auth, moc
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200,
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_file.get_parent_label',
                  return_value="Folder")
     mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('fake_user/fake_folder', "fake_user"))
+                 return_value=('testuser/fake_folder', "testuser"))
     mocker.patch('app.routers.v1.api_file.check_folder_exist',
                  return_value=(EAPIResponseCode.success, ''))
     httpx_mock.add_response(
@@ -129,14 +123,11 @@ async def test_get_files_without_permission_should_return_403(test_async_client_
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={'error_msg': "Permission Denied",
-                               'code': EAPIResponseCode.forbidden,
-                               'result': "Contributor"})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=False)
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
     res_json = res.json()
     assert res.status_code == 403
-    assert res_json.get('error_msg') == "Permission Denied"
+    assert res_json.get('error_msg').lower() == "Permission Denied".lower()
 
 
 @pytest.mark.asyncio
@@ -150,14 +141,11 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(test_async
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200,
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_file.get_parent_label',
                  return_value="Folder")
     mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('fake_user/fake_folder', "fake_user"))
+                 return_value=('testuser/fake_folder', "testuser"))
     mocker.patch('app.routers.v1.api_file.check_folder_exist',
                  return_value=(EAPIResponseCode.not_found, 'Folder not exist'))
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
@@ -177,10 +165,7 @@ async def test_get_files_when_no_namefolder_should_return_403(test_async_client_
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200,
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_file.get_parent_label',
                  return_value="Folder")
     mocker.patch('app.routers.v1.api_file.separate_rel_path',
@@ -204,10 +189,7 @@ async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_a
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200,
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_file.get_parent_label',
                  return_value="Folder")
     mocker.patch('app.routers.v1.api_file.separate_rel_path',
@@ -231,14 +213,11 @@ async def test_get_files_when_neo4j_broke_should_return_500(test_async_client_au
                  return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.get_zone',
                  return_value="zone")
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200,
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_file.get_parent_label',
                  return_value="Folder")
     mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('fake_user/fake_folder', "fake_user"))
+                 return_value=('testuser/fake_folder', "testuser"))
     mocker.patch('app.routers.v1.api_file.check_folder_exist',
                  return_value=(EAPIResponseCode.success, ''))
     httpx_mock.add_response(
@@ -260,19 +239,16 @@ async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker)
                         "labels":["File"],
                         "archived":False,
                         "project_code": project_code,
-                        "display_path": "fake_user/fake_file"
+                        "display_path": "testuser/fake_file"
                      },
                      "folder_file_geid":{
                          "labels": ["Folder"],
                          "archived": False,
                          "project_code": project_code,
-                         "display_path": "fake_user/fake_folder"
+                         "display_path": "testuser/fake_folder"
                      }
                  }))
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200,
-                               'project_code': project_code,
-                               'uploader': 'fake_user'})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
     assert res.status_code == 200
     res_json = res.json()
@@ -316,7 +292,7 @@ async def test_query_file_by_geid_get_trashfile(test_async_client_auth, mocker):
                          "labels": ["TrashFile"],
                          "archived": False,
                          "project_code": project_code,
-                         "display_path": "fake_user/fake_file"
+                         "display_path": "testuser/fake_file"
                      }
                  }))
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
@@ -337,7 +313,7 @@ async def test_query_file_by_geid_when_file_is_archived(test_async_client_auth, 
                          "labels": ["File"],
                          "archived": True,
                          "project_code": project_code,
-                         "display_path": "fake_user/fake_file"
+                         "display_path": "testuser/fake_file"
                      }
                  }))
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
@@ -358,23 +334,16 @@ async def test_query_file_by_geid_without_permission(test_async_client_auth, moc
                          "labels": ["File"],
                          "archived": False,
                          "project_code": project_code,
-                         "display_path": "fake_user/fake_file"
+                         "display_path": "testuser/fake_file"
                      },
                      "folder_file_geid": {
                          "labels": ["Folder"],
                          "archived": False,
                          "project_code": project_code,
-                         "display_path": "fake_user/fake_folder"
+                         "display_path": "testuser/fake_folder"
                      }
                  }))
-    mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={'error_msg': "Permission Denied",
-                               'code': EAPIResponseCode.forbidden,
-                               'result': "Contributor"})
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=False)
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
-    assert res.status_code == 200
-    res_json = res.json()
-    result = res_json.get('result')
-    for entity in result:
-        assert entity["status"] == "Permission Denied"
-        assert entity["result"] == []
+    assert res.status_code == 403
+    assert res.json()["error_msg"].lower() == "Permission Denied".lower()
