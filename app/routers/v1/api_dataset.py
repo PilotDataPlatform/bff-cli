@@ -36,7 +36,7 @@ class APIDataset:
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(f"User request with identity: {self.current_identity}")
-        user_datasets = query_node_has_relation_for_user(username, 'Dataset')
+        user_datasets = await query_node_has_relation_for_user(username, 'Dataset')
         self._logger.info(f"Getting user datasets: {user_datasets}")
         self._logger.info(f"Number of datasets: {len(user_datasets)}")
         dataset_list = []
@@ -62,7 +62,7 @@ class APIDataset:
             return self.current_identity
         self._logger.info("API list_datasets".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
-        node = get_node({"code": dataset_code}, 'Dataset')
+        node = await get_node({"code": dataset_code}, 'Dataset')
         self._logger.info(f"Getting user dataset node: {node}")
         if not node:
             api_response.code = EAPIResponseCode.not_found
@@ -80,7 +80,7 @@ class APIDataset:
         dataset_query_event = {
             'dataset_geid': node_geid,
             }
-        versions = self.db.get_dataset_versions(dataset_query_event)
+        versions = await self.db.get_dataset_versions(dataset_query_event)
         dataset_detail = {'general_info': node, 'version_detail': versions, 'version_no': len(versions)}
         api_response.result = dataset_detail
         api_response.code = EAPIResponseCode.success

@@ -12,11 +12,16 @@ async def test_list_dataset_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 @pytest.mark.asyncio
-async def test_list_dataset_should_successed(test_async_client_auth, mocker):
-    mocker.patch('app.routers.v1.api_dataset.query_node_has_relation_for_user',\
-         return_value=[{"end_node" :{"code": "testdataset"}}])
+async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock):
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/relations/query',
+        json=[{"end_node": {"code": "testdataset"}}],
+        status_code=200
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
+    print(res)
     print(f"RESPONSE: {res.json()}")
     res_json = res.json()
     assert res_json.get('code') == 200
@@ -26,9 +31,13 @@ async def test_list_dataset_should_successed(test_async_client_auth, mocker):
     assert dataset_code in datasets
 
 @pytest.mark.asyncio
-async def test_list_empty_dataset(test_async_client_auth,mocker):
-    mocker.patch('app.routers.v1.api_dataset.query_node_has_relation_for_user',\
-         return_value=[])
+async def test_list_empty_dataset(test_async_client_auth, httpx_mock):
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/relations/query',
+        json=[],
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
     res_json = res.json()
@@ -43,17 +52,20 @@ async def test_get_dataset_detail_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required" 
 
 @pytest.mark.asyncio
-async def test_get_dataset_detail_should_successed(test_async_client_auth, mocker):
+async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx_mock, mocker):
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_dataset.get_node',\
-        return_value = {
-            "labels": ["Dataset"],
-            "global_entity_id": "fake_geid",
-            "creator": "testuser",
-            "modality": [],
-            "code": "test0111"
-            }
-        )
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
+        json=[{
+                "labels": ["Dataset"],
+                "global_entity_id": "fake_geid",
+                "creator": "testuser",
+                "modality": [],
+                "code": "test0111"
+            }],
+        status_code=200,
+    )
     mocker.patch('app.routers.v1.api_dataset.RDConnection.get_dataset_versions',\
         mock_get_dataset_versions)
     res = await test_async_client_auth.get(test_dataset_detailed_api, headers=header)
@@ -68,34 +80,40 @@ async def test_get_dataset_detail_should_successed(test_async_client_auth, mocke
     assert _version_no == 1
 
 @pytest.mark.asyncio
-async def test_get_dataset_detail_no_access(test_async_client_auth, mocker):
+async def test_get_dataset_detail_no_access(test_async_client_auth, httpx_mock):
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_dataset.get_node',\
-        return_value = {
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
+        json=[{
             "labels": ["Dataset"],
             "global_entity_id": "fake_geid",
             "creator": "fakeuser",
             "modality": [],
             "code": "test0111"
-            }
-        )
+        }],
+        status_code=200,
+    )
     res = await test_async_client_auth.get(test_dataset_detailed_api, headers=header)    
     res_json = res.json()
     assert res_json.get('code') == 403
     assert res_json.get('error_msg') == "Permission Denied"
 
 @pytest.mark.asyncio
-async def test_get_dataset_detail_not_exist(test_async_client_auth, mocker):
+async def test_get_dataset_detail_not_exist(test_async_client_auth, httpx_mock):
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_dataset.get_node',\
-        return_value = {
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
+        json=[{
             "labels": ["None"],
             "global_entity_id": "fake_geid",
             "creator": "testuser",
             "modality": [],
             "code": "test0111"
-            }
-        )
+        }],
+        status_code=200,
+    )
     res = await test_async_client_auth.get(test_dataset_detailed_api, headers=header)
     res_json = res.json()
     assert res_json.get('code') == 404

@@ -25,7 +25,7 @@ def instrument_app(app):
     trace.set_tracer_provider(tracer_provider)
 
     FastAPIInstrumentor.instrument_app(app)
-    SQLAlchemyInstrumentor().instrument(engine=engine, service=namespace)
+    SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine, service=namespace)
     HTTPXClientInstrumentor().instrument()
     AsyncPGInstrumentor().instrument()
 

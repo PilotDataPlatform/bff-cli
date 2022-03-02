@@ -43,7 +43,7 @@ class APIManifest:
                         'role': _user_role,
                         'project_code': project_code,
                         'zone': ConfigClass.GREEN_ZONE_LABEL}
-            permission = check_permission(permission_event)
+            permission = await check_permission(permission_event)
             self._logger.info(f"Permission check event: {permission_event}")
             self._logger.info(f"Permission check result: {permission}")
             error_msg = permission.get('error_msg', '')
@@ -54,10 +54,10 @@ class APIManifest:
                 return api_response.json_response()
             mani_project_event = {"project_code": project_code}
             self._logger.info("Getiting project manifests")
-            manifests = self.db.get_manifest_name_from_project_in_db(mani_project_event)
+            manifests = await self.db.get_manifest_name_from_project_in_db(mani_project_event)
             self._logger.info(f"Manifest in project check result: {manifests}")
             self._logger.info("Getting attributes for manifests")
-            manifest_list = self.db.get_attributes_in_manifest_in_db(manifests)
+            manifest_list = await self.db.get_attributes_in_manifest_in_db(manifests)
             api_response.result = manifest_list
             api_response.code = EAPIResponseCode.success
             return api_response.json_response()
@@ -95,7 +95,7 @@ class APIManifest:
                             'role': _user_role,
                             'project_code': project_code,
                             'zone': zone}
-            permission = check_permission(permission_event)
+            permission = await check_permission(permission_event)
             self._logger.info(f"Permission check event: {permission_event}")
             self._logger.info(f"Permission check result: {permission}")
             error_msg = permission.get('error_msg', '')
@@ -113,7 +113,7 @@ class APIManifest:
             api_response.result = str(e)
             return api_response.json_response()
         self._logger.info(f"Getting info for file: {file_name} IN {project_code}")
-        file_node = query_file_in_project(project_code, file_name, zone_type)
+        file_node = await query_file_in_project(project_code, file_name, zone_type)
         if not file_node:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
             api_response.code = EAPIResponseCode.not_found
@@ -128,7 +128,7 @@ class APIManifest:
         attributes = manifests.get("attributes", {})
         mani_project_event = {"project_code": project_code, "manifest_name": manifest_name}
         self._logger.info(f"Getting manifest from project event: {mani_project_event}")
-        manifest_info = self.db.get_manifest_name_from_project_in_db(mani_project_event)
+        manifest_info = await self.db.get_manifest_name_from_project_in_db(mani_project_event)
         self._logger.info(f"Manifest information: {manifest_info}")
         if not manifest_info:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
@@ -143,7 +143,7 @@ class APIManifest:
                             "attributes": attributes,
                             "username": _username,
                             "project_role": project_role}
-        response = attach_manifest_to_file(annotation_event)
+        response = await attach_manifest_to_file(annotation_event)
         self._logger.info(f"Attach manifest result: {response}")
         if not response:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
@@ -179,7 +179,7 @@ class APIManifest:
                     'role': _user_role,
                     'project_code': project_code,
                     'zone': ConfigClass.GREEN_ZONE_LABEL}
-        permission = check_permission(permission_event)
+        permission = await check_permission(permission_event)
         self._logger.info(f"Permission check event: {permission_event}")
         self._logger.info(f"Permission check result: {permission}")
         error_msg = permission.get('error_msg', '')
@@ -190,14 +190,14 @@ class APIManifest:
             return api_response.json_response()
         manifest_event = {"project_code": project_code,
                           "manifest_name": manifest_name}
-        manifest = self.db.get_manifest_name_from_project_in_db(manifest_event)
+        manifest = await self.db.get_manifest_name_from_project_in_db(manifest_event)
         self._logger.info(f"Matched manifest in database: {manifest}")
         if not manifest:
             api_response.code = EAPIResponseCode.not_found
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             return api_response.json_response()
         else:
-            result = self.db.get_attributes_in_manifest_in_db(manifest)[0]
+            result = await self.db.get_attributes_in_manifest_in_db(manifest)[0]
             api_response.code = EAPIResponseCode.success
             api_response.result = result
             return api_response.json_response()

@@ -10,14 +10,14 @@ class RDConnection:
         db = DBConnection()
         self.db_session = db.session
 
-    def get_manifest_name_from_project_in_db(self, event: dict)-> list:
+    async def get_manifest_name_from_project_in_db(self, event: dict)-> list:
         self._logger.info("get_manifest_name_from_project_in_db".center(80, '-'))
         self._logger.info(f"Received event: {event}")
         project_code = event.get('project_code')
         manifest_name = event.get('manifest_name', None)
         try:
             if manifest_name:
-                m = self.db_session.query(DataManifestModel.name,
+                m = await self.db_session.query(DataManifestModel.name,
                                     DataManifestModel.id)\
                     .filter_by(project_code=project_code, name=manifest_name)\
                     .first()
@@ -28,7 +28,7 @@ class RDConnection:
                     manifest = [{'name': m[0], 'id': m[1]}]
                     return manifest
             else:
-                manifests = self.db_session.query(DataManifestModel.name,
+                manifests = await self.db_session.query(DataManifestModel.name,
                                             DataManifestModel.id)\
                     .filter_by(project_code=project_code)\
                     .all()
@@ -42,7 +42,7 @@ class RDConnection:
             self._logger.error(f"ERROR get_manifest_name_from_project_in_db: {e}")
             raise e
     
-    def get_attributes_in_manifest_in_db(self, manifests: list) -> dict:
+    async def get_attributes_in_manifest_in_db(self, manifests: list) -> dict:
         self._logger.info("get_attributes_in_manifest_in_db".center(80, '-'))
         self._logger.info(f"Received event: {manifests}")
         manifest_list = []
@@ -50,7 +50,7 @@ class RDConnection:
                 manifest_id = manifest.get('id')
                 manifest_list.append(manifest_id)
         id_list = set(manifest_list)
-        attributes = self.db_session.query(DataAttributeModel.name,
+        attributes = await self.db_session.query(DataAttributeModel.name,
                                     DataAttributeModel.type,
                                     DataAttributeModel.optional,
                                     DataAttributeModel.value,
@@ -69,12 +69,12 @@ class RDConnection:
         return manifest_attributes
 
 
-    def get_dataset_versions(self, event):
+    async def get_dataset_versions(self, event):
         self._logger.info("get_dataset_versions".center(80, '-'))
         self._logger.info(f'Query event: {event}')
         dataset_geid = event.get('dataset_geid')
         dataset_versions = []
-        versions = self.db_session.query(DatasetVersionModel.dataset_code,
+        versions = await self.db_session.query(DatasetVersionModel.dataset_code,
                                     DatasetVersionModel.dataset_geid,
                                     DatasetVersionModel.version,
                                     DatasetVersionModel.created_by,

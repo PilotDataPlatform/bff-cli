@@ -35,7 +35,7 @@ class APIProject:
             return self.current_identity
         self._logger.info("API list_project".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
-        project_list = get_user_projects(user_role, username)
+        project_list = await get_user_projects(user_role, username)
         self._logger.info(f"Getting user projects: {project_list}")
         self._logger.info(f"Number of projects: {len(project_list)}")
         api_response.result = project_list
@@ -68,7 +68,7 @@ class APIProject:
             self._logger.info(f"User platform role: {role}")
         else:
             self._logger.info(f"User platform role: {role}")
-            project_role, code = get_project_role(user_id, project_code)
+            project_role, code = await get_project_role(user_id, project_code)
             self._logger.info(f"User project role: {project_role}, {code}")
             if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
@@ -81,9 +81,9 @@ class APIProject:
                 api_response.result = project_role
                 return api_response.json_response()
         for file in data.data:
-            void_check_file_in_zone(data, file, project_code)
+            await void_check_file_in_zone(data, file, project_code)
         session_id = request.headers.get("Session-ID")
-        result = transfer_to_pre(data, project_code, session_id)
+        result = await transfer_to_pre(data, project_code, session_id)
 
         trans_payload = {
             "current_folder_node": data.current_folder_node,
@@ -135,7 +135,7 @@ class APIProject:
                             'role': role,
                             'project_code': project_code,
                             'zone': zone_type}
-        permission = check_permission(permission_event)
+        permission = await check_permission(permission_event)
         self._logger.info(f"Permission check event: {permission_event}")
         self._logger.info(f"Permission check result: {permission}")
         error_msg = permission.get('error_msg', '')
@@ -157,7 +157,7 @@ class APIProject:
             'folder_name': folder.split('/')[-1],
             'folder_relative_path': '/'.join(folder.split('/')[0:-1])
         }
-        response = http_query_node_zone(folder_check_event)
+        response = await http_query_node_zone(folder_check_event)
         self._logger.info(f"Folder check event: {folder_check_event}")
         self._logger.info(f"Folder check response: {response.text}")
         if response.status_code != 200:

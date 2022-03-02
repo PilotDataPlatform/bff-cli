@@ -9,16 +9,16 @@ from ..models.base_models import APIResponse, EAPIResponseCode
 
 api_response = APIResponse()
 
-def get_project_role(user_id, project_code):
+async def get_project_role(user_id, project_code):
     query_payload = {"code": project_code}
-    project = get_node(query_payload, 'Container')
+    project = await get_node(query_payload, 'Container')
     if not project:
         error_msg = customized_error_template(
             ECustomizedError.PROJECT_NOT_FOUND)
         code = EAPIResponseCode.not_found
         return error_msg, code
     project_id = project.get("id")
-    role_check_result = get_user_role(user_id, project_id)
+    role_check_result = await get_user_role(user_id, project_id)
     if role_check_result:
         role = role_check_result.get("r").get('type')
         code = EAPIResponseCode.success
@@ -47,8 +47,8 @@ async def jwt_required(request: Request):
         return api_response.json_response()
     # check if user is existed in neo4j
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query"
-    with httpx.Client() as client:
-        res = client.post(
+    async with httpx.AsyncClient() as client:
+        res = await client.post(
             url=url,
             json={"name": username}
         )
@@ -70,7 +70,7 @@ async def jwt_required(request: Request):
     return {"code": 200, "user_id": user_id, "username": username, "role": role, "token": token}
 
 
-def check_permission(event: dict):
+async def check_permission(event: dict):
     """
     event = {'user_id': user_id,
              'username': username,
@@ -83,8 +83,8 @@ def check_permission(event: dict):
     role = event.get('role')
     project_code = event.get('project_code')
     zone = event.get('zone')
-    project_role, code = get_project_role(user_id, project_code)
-    user_info = get_node({'name': username}, 'User')
+    project_role, code = await get_project_role(user_id, project_code)
+    user_info = await get_node({'name': username}, 'User')
     user_status = user_info.get('status')
     if user_status != 'active':
         permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
@@ -120,7 +120,7 @@ def check_permission(event: dict):
     return permission
 
 
-def void_check_file_in_zone(data, file, project_code):
+async def void_check_file_in_zone(data, file, project_code):
     payload = {"type": data.type,
                "zone": data.zone,
                "file_relative_path": file.get('resumable_relative_path') + '/' +
@@ -128,8 +128,8 @@ def void_check_file_in_zone(data, file, project_code):
                "project_code": project_code
                }
     try:
-        with httpx.Client() as client:
-            result = client.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
+        async with httpx.AsyncClient() as client:
+            result = await client.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
         result = result.json()
     except Exception as e:
         api_response.error_msg = f"EntityInfo service  error: {e}"
@@ -164,7 +164,7 @@ def validate_upload_event(zone, data_type=None):
         return error_msg
 
 
-def transfer_to_pre(data, project_code, session_id):
+async def transfer_to_pre(data, project_code, session_id):
     try:
         payload = {
             "current_folder_node": data.current_folder_node,
@@ -178,8 +178,8 @@ def transfer_to_pre(data, project_code, session_id):
             "Session-ID": session_id
         }
         url = select_url_by_zone(data.zone)
-        with httpx.Client() as client:
-            result = client.post(url, headers=headers, json=payload)
+        async with httpx.AsyncClient() as client:
+            result = await client.post(url, headers=headers, json=payload)
         return result
     except Exception as e:
         api_response.error_msg = f"Upload service  error: {e}"

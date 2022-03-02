@@ -40,7 +40,7 @@ class APIFile:
         self._logger.info(f"Received information geid: {geid_list}")
         self._logger.info(f"User request with identity: {self.current_identity}")
         response_list = []
-        located_geid, query_result = batch_query_node_by_geid(geid_list)
+        located_geid, query_result = await batch_query_node_by_geid(geid_list)
         for global_entity_id in geid_list:
             self._logger.info(f'Query geid: {global_entity_id}')
             if global_entity_id not in located_geid:
@@ -72,7 +72,7 @@ class APIFile:
                                     'role': role,
                                     'project_code': project_code,
                                     'zone': zone}
-                permission = check_permission(permission_event)
+                permission = await check_permission(permission_event)
                 self._logger.info(f"Permission check event: {permission_event}")
                 self._logger.info(f"Permission check result: {permission}")
                 error_msg = permission.get('error_msg', '')
@@ -126,7 +126,7 @@ class APIFile:
                             'role': role,
                             'project_code': project_code,
                             'zone': zone}
-        permission = check_permission(permission_event)
+        permission = await check_permission(permission_event)
         self._logger.info(f"Permission check event: {permission_event}")
         self._logger.info(f"Permission check result: {permission}")
         error_msg = permission.get('error_msg', '')
@@ -161,7 +161,7 @@ class APIFile:
                                 'name': folder_name,
                                 'folder_relative_path': rel_path}
         if source_type == 'Folder':
-            code, error_msg = check_folder_exist(zone, project_code, folder)
+            code, error_msg = await check_folder_exist(zone, project_code, folder)
             self._logger.info(f"Check folder exist payload: 'zone':{zone}, 'project_code':{project_code}, 'folder_name':{folder_name}, 'rel_path':{rel_path}")
             self._logger.info(f"Check folder exist response: {code}, {error_msg}")
             self._logger.debug(
@@ -192,8 +192,8 @@ class APIFile:
         self._logger.info(f"Query file/folder payload: {payload}")
         self._logger.info(f"Query file/folder API: {url}")
         try:
-            with httpx.Client() as client:
-                res = client.post(url, json=payload)
+            async with httpx.AsyncClient() as client:
+                res = await client.post(url, json=payload)
             res = res.json()
             query_result = []
             for f in res:

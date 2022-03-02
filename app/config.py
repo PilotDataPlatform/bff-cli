@@ -43,7 +43,7 @@ class Settings(BaseSettings):
 
     def __init__(self):
         super().__init__()
-        self.SQLALCHEMY_DATABASE_URI = f"postgresql://{self.RDS_USER}:{self.RDS_PWD}@{self.RDS_HOST}/{self.RDS_DBNAME}"
+        self.SQLALCHEMY_DATABASE_URI = f"postgresql+asyncpg://{self.RDS_USER}:{self.RDS_PWD}@{self.RDS_HOST}/{self.RDS_DBNAME}"
 
 
     class Config:
@@ -60,8 +60,8 @@ class Settings(BaseSettings):
         ):
             return (
                 init_settings,
-                load_vault_settings,
                 env_settings,
+                load_vault_settings,
                 file_secret_settings,
             )
 

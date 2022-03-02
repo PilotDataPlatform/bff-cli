@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import app.routers.v1.api_kg
+import asyncio
 import pytest
 
 from fastapi.testclient import TestClient
@@ -9,6 +10,24 @@ from app.config import ConfigClass
 from app.resources.dependencies import jwt_required
 from run import app
 from app.routers.v1.api_kg import APIProject
+from starlette.config import environ
+# from testcontainers.postgres import PostgresContainer
+
+
+# @pytest.fixture(scope='session')
+# def db_postgres():
+#     with PostgresContainer("postgres:9.5") as postgres:
+#         yield postgres.get_connection_url().replace('+psycopg2', '+asyncpg')
+
+
+# @pytest_asyncio.fixture
+# async def engine(db_postgres):
+#     engine = create_async_engine(db_postgres)
+#     yield engine
+#     await engine.dispose()
+
+environ['NEO4J_SERVICE'] = 'http://neo4j_service'
+
 
 @pytest.fixture
 def test_client():
@@ -25,8 +44,8 @@ def test_async_client_auth():
     '''
         Create client with mock auth token
     '''
-    client = TestAsyncClient(app)
     app.dependency_overrides[jwt_required] = overide_jwt_required
+    client = TestAsyncClient(app)
     return client
 
 
@@ -75,6 +94,25 @@ async def overide_member_jwt_required(request: Request):
 
 class HTTPAuthorizationCredentials(BaseModel):
     credentials: str = 'fake_token'
+
+
+@pytest.fixture
+def mock_query__node_has_relation_with_admin(httpx_mock):
+    httpx_mock.add_response(
+        method='POST',
+        url='http://10.3.7.216:5062/v1/neo4j/nodes/Container/query',
+        json=[{"node": "fake_node"}],
+        status_code=200,
+    )
+
+
+@pytest.fixture(scope='session')
+def event_loop(request):
+    """Create an instance of the default event loop for each test case."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+    asyncio.set_event_loop_policy(None)
 
 
 

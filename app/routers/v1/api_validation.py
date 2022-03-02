@@ -58,7 +58,7 @@ class APIValidation:
                             "manifest_name": manifest_name,
                             "attributes": attributes}
         self._logger.info(f"Validation event: {validation_event}")                    
-        manifest_info = self.db.get_manifest_name_from_project_in_db(validation_event)
+        manifest_info = await self.db.get_manifest_name_from_project_in_db(validation_event)
         self._logger.info(f"manifest_info: {manifest_info}")  
         if not manifest_info:
             api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
@@ -66,7 +66,7 @@ class APIValidation:
             return api_response.json_response()
         validation_event["manifest"] = manifest_info
         validator = ManifestValidator()
-        attribute_validation_error_msg = validator.has_valid_attributes(validation_event)
+        attribute_validation_error_msg = await validator.has_valid_attributes(validation_event)
         if attribute_validation_error_msg:
             api_response.result = attribute_validation_error_msg
             api_response.code = EAPIResponseCode.bad_request
