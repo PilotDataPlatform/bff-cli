@@ -5,6 +5,7 @@ import time
 from tests.helper import EAPIResponseCode
 from app.models.project_models import POSTProjectFile
 from app.resources.dependencies import *
+from app.resources.error_handler import APIException
 from app.config import ConfigClass
 
 project_code = "test_project"
@@ -33,7 +34,7 @@ async def test_jwt_required_should_return_successed(httpx_mock):
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
         method='GET',
-        url=f'http://{ConfigClass.AUTH_SERVICE}v1/users?username=test_user&status=active&exact=true',
+        url=f'{ConfigClass.AUTH_SERVICE}/v1/admin/user?username=test_user',
         json={ "result": {
             "id": 1,
             "role": "admin"
@@ -50,9 +51,10 @@ async def test_jwt_required_should_return_successed(httpx_mock):
 async def test_jwt_required_without_token_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
     mock_request._headers = {}
-    test_result = await jwt_required(mock_request)
-    response = test_result.__dict__
-    assert response['status_code'] == 401
+    with pytest.raises(APIException) as e:
+        test_result = await jwt_required(mock_request)
+        assert e.value.status_code == 401
+        assert e.value.error_msg == "Token required"
 
 
 @pytest.mark.asyncio
@@ -80,7 +82,7 @@ async def test_jwt_required_with_auth_error_should_return_forbidden(httpx_mock):
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
         method='GET',
-        url='http://10.3.7.217:5061/v1/users?username=test_user&status=active&exact=true',
+        url=f'{ConfigClass.AUTH_SERVICE}/v1/admin/user?username=test_user',
         json={ "result": {
         }},
         status_code=500,
@@ -102,7 +104,7 @@ async def test_jwt_required_with_username_not_in_token_should_return_not_found(h
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
         method='GET',
-        url='http://10.3.7.217:5061/v1/users?username=test_user&status=active&exact=true',
+        url=f'{ConfigClass.AUTH_SERVICE}/v1/admin/user?username=test_user',
         json={ "result": None},
         status_code=404,
     )
