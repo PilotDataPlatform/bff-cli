@@ -137,13 +137,15 @@ class APIProject:
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
         folder_check_event = {
-            'namespace': zone_type,
-            'display_path': folder,
-            'project_code': project_code,
-            'folder_name': folder.split('/')[-1],
-            'folder_relative_path': '/'.join(folder.split('/')[0:-1])
-        }
-        response = http_query_node_zone(folder_check_event)
+                "query": {
+                            "folder_relative_path": '/'.join(folder.split('/')[0:-1]),
+                            "display_path": folder,
+                            "name": folder.split('/')[-1],
+                            "project_code": project_code,
+                            "archived": False,
+                            "labels": ['Folder', zone_type]}
+                    }
+        response = query_node(folder_check_event)
         self._logger.info(f"Folder check event: {folder_check_event}")
         self._logger.info(f"Folder check response: {response.text}")
         if response.status_code != 200:

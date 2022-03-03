@@ -139,21 +139,36 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
             }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
-    mocker.patch('app.routers.v1.api_manifest.query_file_in_project',
+    mocker.patch('app.routers.v1.api_manifest.query_node',
                  return_value={
-                     "code": 200,
-                     "error_msg": "",
-                     "result": [
-                         {
-                             "labels": [
-                                 "Greenroom",
-                                 "File"
-                             ],
-                             "global_entity_id": "fake_geid",
-                             "uploader": "amyguindoc14"
-                         }
-                     ]
-                 })
+            "code": 200,
+            "error_msg": "",
+            "result": [
+                {
+                    "id": 1234,
+                    "labels": [
+                        "Folder",
+                        "Core"
+                    ],
+                    "global_entity_id": "geid",
+                    "display_path": "fake_user/fake_file",
+                    "project_code": project_code,
+                    "operator": "fake_user",
+                    "tags": [],
+                    "folder_level": 1,
+                    "archived": False,
+                    "list_priority": 10,
+                    "folder_relative_path": "fake_user",
+                    "time_lastmodified": "2021-11-19T20:33:52",
+                    "uploader": "fake_user",
+                    "name": "fake_file",
+                    "time_created": "2021-11-19T20:33:52"
+                }
+            ],
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1
+        })
     mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
                  mock_get_manifest_name_from_project_in_db)
     mocker.patch('app.routers.v1.api_manifest.attach_manifest_to_file',
@@ -182,8 +197,15 @@ async def test_attach_attributes_wrong_file_should_return_404(test_async_client_
             }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
-    mocker.patch('app.routers.v1.api_manifest.query_file_in_project',
-                 return_value=None)
+    mocker.patch('app.routers.v1.api_manifest.query_node',
+                 return_value={
+            "code": 200,
+            "error_msg": "",
+            "result": [],
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1
+        })
     res = await test_async_client_auth.post(test_manifest_attach_api, headers=header, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 404
@@ -203,21 +225,36 @@ async def test_attach_attributes_wrong_name_should_return_400(test_async_client_
             }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
-    mocker.patch('app.routers.v1.api_manifest.query_file_in_project',
+    mocker.patch('app.routers.v1.api_manifest.query_node',
                  return_value={
-                     "code": 200,
-                     "error_msg": "",
-                     "result": [
-                         {
-                             "labels": [
-                                 "Greenroom",
-                                 "File"
-                             ],
-                             "global_entity_id": "fake_geid",
-                             "uploader": "amyguindoc14"
-                         }
-                     ]
-                 })
+            "code": 200,
+            "error_msg": "",
+            "result": [
+                {
+                    "id": 1234,
+                    "labels": [
+                        "Folder",
+                        "Core"
+                    ],
+                    "global_entity_id": "geid",
+                    "display_path": "fake_user/fake_file",
+                    "project_code": project_code,
+                    "operator": "fake_user",
+                    "tags": [],
+                    "folder_level": 1,
+                    "archived": False,
+                    "list_priority": 10,
+                    "folder_relative_path": "fake_user",
+                    "time_lastmodified": "2021-11-19T20:33:52",
+                    "uploader": "fake_user",
+                    "name": "fake_file",
+                    "time_created": "2021-11-19T20:33:52"
+                }
+            ],
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1
+        })
     mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
                  mock_get_manifest_name_from_project_in_db)
     res = await test_async_client_auth.post(test_manifest_attach_api, headers=header, json=payload)
@@ -257,21 +294,36 @@ async def test_fail_to_attach_attributes_return_404(test_async_client_auth, mock
     }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
-    mocker.patch('app.routers.v1.api_manifest.query_file_in_project',
+    mocker.patch('app.routers.v1.api_manifest.query_node',
                  return_value={
-                     "code": 200,
-                     "error_msg": "",
-                     "result": [
-                         {
-                             "labels": [
-                                 "Greenroom",
-                                 "File"
-                             ],
-                             "global_entity_id": "fake_geid",
-                             "uploader": "amyguindoc14"
-                         }
-                     ]
-                 })
+            "code": 200,
+            "error_msg": "",
+            "result": [
+                {
+                    "id": 1234,
+                    "labels": [
+                        "Folder",
+                        "Core"
+                    ],
+                    "global_entity_id": "geid",
+                    "display_path": "fake_user/fake_file",
+                    "project_code": project_code,
+                    "operator": "fake_user",
+                    "tags": [],
+                    "folder_level": 1,
+                    "archived": False,
+                    "list_priority": 10,
+                    "folder_relative_path": "fake_user",
+                    "time_lastmodified": "2021-11-19T20:33:52",
+                    "uploader": "fake_user",
+                    "name": "fake_file",
+                    "time_created": "2021-11-19T20:33:52"
+                }
+            ],
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1
+        })
     mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
                  mock_get_manifest_name_from_project_in_db)
     mocker.patch('app.routers.v1.api_manifest.attach_manifest_to_file',

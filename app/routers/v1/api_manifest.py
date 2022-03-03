@@ -9,7 +9,8 @@ from ...resources. error_handler import customized_error_template, ECustomizedEr
 from logger import LoggerFactory
 
 router = APIRouter()
-
+_API_TAG = 'V1 manifest'
+_API_NAMESPACE = "api_manifest"
 
 @cbv(router)
 class APIManifest:
@@ -92,13 +93,22 @@ class APIManifest:
             api_response.result = str(e)
             return api_response.json_response()
         self._logger.info(f"Getting info for file: {file_name} IN {project_code}")
-        file_node = query_file_in_project(project_code, file_name, zone_type)
+        # file_node = query_file_in_project(project_code, file_name, zone_type)
+        file_info = {"query": {
+                "name": file_name.split('/')[-1],
+                "display_path": file_name,
+                "archived": False,
+                "project_code": project_code,
+                "labels": ['File', zone_type]}}
+        file_response = query_node(file_info)
+        self._logger.info(f"Query result: {file_response}")
+        file_node = file_response.get('result')
+        self._logger.info(f"line 106: {file_node}")
         if not file_node:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         else:
-            file_node = file_node.get('result')
             global_entity_id = file_node[0].get('global_entity_id')
             file_owner = file_node[0].get('uploader')
         self._logger.info(f"Globale entity id for {file_name}: {global_entity_id}")

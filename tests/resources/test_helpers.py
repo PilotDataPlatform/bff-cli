@@ -5,22 +5,6 @@ from tests.helper import EAPIResponseCode
 from requests.models import Response
 
 
-def test_get_node_by_geid_successed(httpx_mock):
-    httpx_mock.add_response(
-        method='GET',
-        url='http://neo4j_service/v1/neo4j/nodes/geid/fake_geid',
-        json=[{"node": "fake_node"}],
-        status_code=200,
-    )
-    result = get_node_by_geid("fake_geid")
-    assert result[0]["node"] == "fake_node"
-
-
-def test_get_node_by_geid_failed():
-    result = get_node_by_geid("fake_geid")
-    assert result == None
-
-
 def test_batch_query_node_by_geid_successed(httpx_mock):
     geid_list = ["fake_geid"]
     httpx_mock.add_response(
@@ -34,53 +18,20 @@ def test_batch_query_node_by_geid_successed(httpx_mock):
     assert query_node == {'fake_geid': {'global_entity_id': 'fake_geid'}}
 
 
-def test_query_file_in_project_successed(httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "result": {"global_entity_id": "fake_geid"}
-            },
-        status_code=200,
-    )
-    result = query_file_in_project("test_project", "testfolder/testfile")
-    assert result['code'] == 200
-
-
-def test_query_file_in_project_return_empty(httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "result": None
-        },
-        status_code=200,
-    )
-    result = query_file_in_project("test_project", "testfolder/testfile")
-    assert result == []
-
-
-def test_query_file_in_project_return_failed():
-    result = query_file_in_project("test_project", "testfolder/testfile")
-    assert result == []
-
-
 def test_get_node_successed(httpx_mock):
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v1/neo4j/nodes/Container/query',
-        json=[{
+        json={
             "code": 200,
-            "result": {}
-        }],
+            "result": [{}]
+        },
         status_code=200,
     )
     result = get_node(123, "Container")
     assert result == {
         "code": 200,
-        "result": {}
+        "result": [{}]
     }
 
 
@@ -138,7 +89,7 @@ def test_attach_manifest_to_file_failed(httpx_mock):
     assert result == None
 
 
-def test_http_query_node_zone(httpx_mock):
+def test_query_node(httpx_mock):
     event = {
         'project_code': 'project_code',
         'namespace': 'gr',
@@ -153,14 +104,8 @@ def test_http_query_node_zone(httpx_mock):
         json={"node": "fake_node"},
         status_code=200,
     )
-    result = http_query_node_zone(event)
+    result = query_node(event)
     assert result.json() == {"node": "fake_node"}
-
-
-@pytest.mark.parametrize("test_source, expect_result", [("folder", "Folder"), ("container", "Container"), ("File", None)])
-def test_get_parent_label(test_source, expect_result):
-    result = get_parent_label(test_source)
-    assert result == expect_result
 
 
 def test_separate_rel_path_with_namefolder():
@@ -184,18 +129,7 @@ def test_verify_list_event(test_source, test_folder, expect_result):
     assert error_msg == expect_result
 
 
-@pytest.mark.parametrize("test_zone, folder, expect_result",
-                         [("gr", "test_user/folder", ''),
-                          ("zone", "test_user/folder", 'mock_error'),
-                          ("cr", "test_user/not_exist_folder", 'Folder not exist')])
-def test_check_folder_exist(mocker, test_zone, folder, expect_result):
-    mocker.patch.object(app.resources.helpers,
-                        "http_query_node_zone", mock_http_query_node_zone)
-    code, error_msg = check_folder_exist(test_zone, "test_project", folder)
-    assert error_msg == expect_result
-
-
-def mock_http_query_node_zone(arg1):
+def mock_query_node(arg1):
     mock_response = Response()
     if arg1['namespace'] == 'gr':
         mock_response.status_code = 200

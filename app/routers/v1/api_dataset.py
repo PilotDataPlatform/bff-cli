@@ -4,8 +4,8 @@ from ...models.dataset_models import *
 from ...models.base_models import EAPIResponseCode
 from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.database_service import RDConnection
-from ...resources.dependencies import jwt_required, get_node
-from app.resources.helpers import get_user_datasets
+from ...resources.dependencies import jwt_required
+from app.resources.helpers import get_node
 from logger import LoggerFactory
 
 
@@ -37,7 +37,8 @@ class APIDataset:
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(f"User request with identity: {self.current_identity}")
-        dataset_list = get_user_datasets(username)
+        payload = {"creator": username}
+        dataset_list = get_node(payload, 'Dataset')
         self._logger.info(f"Getting user datasets: {dataset_list}")
         self._logger.info(f"Number of datasets: {len(dataset_list)}")
         api_response.result = dataset_list
