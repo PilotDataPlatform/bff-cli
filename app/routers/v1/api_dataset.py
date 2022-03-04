@@ -6,6 +6,8 @@ from ...resources.error_handler import catch_internal, customized_error_template
 from ...resources.database_service import RDConnection
 from ...resources.dependencies import jwt_required, query_node_has_relation_for_user, get_node
 from logger import LoggerFactory
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.commons.data_providers.database import DBConnection
 
 
 router = APIRouter()
@@ -16,6 +18,7 @@ _API_NAMESPACE = "api_dataset"
 @cbv(router)
 class APIDataset:
     current_identity: dict = Depends(jwt_required)
+    db_connection = DBConnection
 
     def __init__(self):
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
@@ -50,7 +53,7 @@ class APIDataset:
                 response_model=DatasetDetailResponse,
                 summary="Get dataset detail based on the dataset code")
     @catch_internal(_API_NAMESPACE)
-    async def get_dataset(self, dataset_code):
+    async def get_dataset(self, dataset_code, db_session: AsyncSession = Depends(db_connection.get_db)):
         '''
         Get the dataset detail by dataset code
         '''
@@ -80,7 +83,7 @@ class APIDataset:
         dataset_query_event = {
             'dataset_geid': node_geid,
             }
-        versions = await self.db.get_dataset_versions(dataset_query_event)
+        versions = await self.db.get_dataset_versions(dataset_query_event, db_session)
         dataset_detail = {'general_info': node, 'version_detail': versions, 'version_no': len(versions)}
         api_response.result = dataset_detail
         api_response.code = EAPIResponseCode.success

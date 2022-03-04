@@ -1,5 +1,4 @@
 from ..commons.data_providers.data_models import DataManifestModel, DataAttributeModel, DatasetVersionModel
-from ..commons.data_providers.database import DBConnection
 from logger import LoggerFactory
 from sqlalchemy.future import select
 
@@ -8,18 +7,16 @@ class RDConnection:
     
     def __init__(self):
         self._logger = LoggerFactory("Helpers").get_logger()
-        db = DBConnection()
-        self.db_session = db.session
 
 
-    async def get_manifest_name_from_project_in_db(self, event: dict)-> list:
+    async def get_manifest_name_from_project_in_db(self, event: dict, db)-> list:
         self._logger.info("get_manifest_name_from_project_in_db".center(80, '-'))
         self._logger.info(f"Received event: {event}")
         project_code = event.get('project_code')
         manifest_name = event.get('manifest_name', None)
         try:
             if manifest_name:
-                m = await self.db_session.execute(select(DataManifestModel).filter_by(project_code=project_code, name=manifest_name))
+                m = await db.execute(select(DataManifestModel).filter_by(project_code=project_code, name=manifest_name))
                 self._logger.info(f"QUERY db RESULT: {m}")
                 m_result = m.scalars().first()
                 self._logger.info(f"QUERY RESULT: {m_result.project_code}")
@@ -29,7 +26,7 @@ class RDConnection:
                     manifest = [{'name': m_result.name, 'id': m_result.id}]
                     return manifest
             else:
-                manifests = await self.db_session.execute(select(DataManifestModel).filter_by(project_code=project_code))
+                manifests = await db.execute(select(DataManifestModel).filter_by(project_code=project_code))
                 self._logger.info(f"QUERY db RESULT: {manifests}")
                 manifests_result = manifests.scalars().all()
                 self._logger.info(f"QUERY RESULT: {manifests_result}")
@@ -43,7 +40,7 @@ class RDConnection:
             raise e
 
 
-    async def get_attributes_in_manifest_in_db(self, manifests: list) -> dict:
+    async def get_attributes_in_manifest_in_db(self, manifests: list, db) -> dict:
         self._logger.info("get_attributes_in_manifest_in_db".center(80, '-'))
         self._logger.info(f"Received event: {manifests}")
         manifest_list = []
@@ -51,7 +48,7 @@ class RDConnection:
                 manifest_id = manifest.get('id')
                 manifest_list.append(manifest_id)
         id_list = set(manifest_list)
-        results = await self.db_session.execute(select(DataAttributeModel).filter(DataAttributeModel.manifest_id.in_(id_list)))
+        results = await db.execute(select(DataAttributeModel).filter(DataAttributeModel.manifest_id.in_(id_list)))
         self._logger.debug(f"Result of attributes are {results}")
         attributes = results.scalars().all()
         self._logger.info(f"attributes is {attributes}")
@@ -68,12 +65,12 @@ class RDConnection:
         return manifest_attributes
 
 
-    async def get_dataset_versions(self, event):
+    async def get_dataset_versions(self, event, db):
         self._logger.info("get_dataset_versions".center(80, '-'))
         self._logger.info(f'Query event: {event}')
         dataset_geid = event.get('dataset_geid')
         dataset_versions = []
-        results = await self.db_session.execute(select(DatasetVersionModel).filter_by(dataset_geid=dataset_geid))
+        results = await db.execute(select(DatasetVersionModel).filter_by(dataset_geid=dataset_geid))
         versions = results.scalars().all()
         self._logger.info(f"Query result: {versions}")
         if not versions:
