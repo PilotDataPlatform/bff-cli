@@ -122,7 +122,7 @@ class APIProject:
         """
         api_response = GetProjectFolderResponse()
         username = self.current_identity["username"]
-        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info("API get_project_folder".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
         error_msg = ""
@@ -131,11 +131,13 @@ class APIProject:
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
 
+        project_role = get_project_role(self.current_identity, project_code)
         accessing_folder = folder.split('/')[0]
-        if username != accessing_folder:
-            api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-            api_response.code = EAPIResponseCode.forbidden
-            return api_response.json_response()
+        if not project_role in ["admin", "platform-admin"]:
+            if username != accessing_folder:
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                return api_response.json_response()
         folder_check_event = {
             'namespace': zone_type,
             'display_path': folder,
