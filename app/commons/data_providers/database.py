@@ -34,7 +34,9 @@ class DBConnection:
     def __init__(self):
         self.session = SessionLocal()
 
-    async def get_db(self):
-        async with SessionLocal() as session:
-            yield session
-        await AsyncSession.close()
+    def get_db(self):
+        db = self.session
+        try:
+            yield db
+        finally:
+            db.close()

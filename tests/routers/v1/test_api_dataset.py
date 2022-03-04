@@ -120,7 +120,7 @@ async def test_get_dataset_detail_not_exist(test_async_client_auth, httpx_mock):
     assert res_json.get('error_msg') == "Cannot found given dataset code"
 
 
-def mock_get_dataset_versions(arg1, arg2):
+async def mock_get_dataset_versions(arg1, arg2):
     mock_dataset_version = [
         {
             "dataset_code": dataset_code

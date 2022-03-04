@@ -172,7 +172,7 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(test_async
 
 
 @pytest.mark.asyncio
-async def test_get_files_when_no_namefolder_should_return_403(test_async_client_auth, mocker, httpx_mock):
+async def test_get_files_when_only_namefolder_should_return_403(test_async_client_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
              "zone": "cr",
              "folder": "fake_folder",

@@ -197,7 +197,10 @@ class APIManifest:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             return api_response.json_response()
         else:
-            result = await self.db.get_attributes_in_manifest_in_db(manifest)[0]
+            self._logger.info(f"Start get attributes......")
+            db_result = await self.db.get_attributes_in_manifest_in_db(manifest)
+            result = db_result[0]
+            self._logger.debug(f"Attributes result {result}")
             api_response.code = EAPIResponseCode.success
             api_response.result = result
             return api_response.json_response()

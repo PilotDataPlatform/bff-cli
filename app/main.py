@@ -18,7 +18,7 @@ from app.commons.data_providers.database import engine
 
 
 def instrument_app(app):
-    if not ConfigClass.OPEN_TELEMETRY_ENABLED:
+    if not False:
         return
 
     tracer_provider = TracerProvider(resource=Resource.create({SERVICE_NAME: namespace}))

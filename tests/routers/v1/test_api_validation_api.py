@@ -160,13 +160,13 @@ async def test_validate_env_with_decryption_error_should_return_400(test_async_c
     assert response.get('code') == 400
 
 
-def mock_has_valid_attributes(arg1, arg2):
+async def mock_has_valid_attributes(arg1, arg2):
     if arg2.get("manifest_name", "") == "Manifest":
         return "mock error"
     return ""
 
 
-def mock_get_manifest_name_from_project_in_db(arg1, arg2):
+async def mock_get_manifest_name_from_project_in_db(arg1, arg2):
     if arg2.get("manifest_name", "") == "Manifest1":
         return ""
     result = [{'name': "fake_manifest", 'id': 1}]
