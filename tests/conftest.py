@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-import app.routers.v1.api_kg
 import asyncio
 import pytest
 import pytest_asyncio
@@ -10,7 +9,7 @@ from datetime import datetime
 from sqlalchemy import over, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.schema import CreateSchema, CreateTable
+from sqlalchemy.schema import CreateTable
 from sqlalchemy.orm import sessionmaker
 from testcontainers.postgres import PostgresContainer
 from async_asgi_testclient import TestClient as TestAsyncClient
@@ -45,7 +44,6 @@ async def engine(db_postgres):
     await engine.dispose()
 
 
-
 @pytest_asyncio.fixture
 async def test_async_client(db_postgres, engine):
     app = create_app()
@@ -65,6 +63,8 @@ async def test_async_client_auth(db_postgres, engine):
     app = create_app()
     mock_session = sessionmaker(
         autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
+
+
     async def override_get_db():
         db = mock_session()
         try:
@@ -177,6 +177,7 @@ async def override_member_jwt_required(request: Request):
         "role": "contributor",
         "token": "fake token"
     }
+
 
 class HTTPAuthorizationCredentials(BaseModel):
     credentials: str = 'fake_token'

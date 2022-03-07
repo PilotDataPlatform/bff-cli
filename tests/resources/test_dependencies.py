@@ -1,6 +1,5 @@
 import pytest
 import jwt
-import app.resources.dependencies
 import time
 from tests.helper import EAPIResponseCode
 from app.models.project_models import POSTProjectFile

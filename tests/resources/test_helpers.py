@@ -1,7 +1,6 @@
 import pytest
 import app.resources.helpers
 from app.resources.helpers import *
-from tests.helper import EAPIResponseCode
 from requests.models import Response
 
 

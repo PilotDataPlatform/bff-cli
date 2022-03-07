@@ -66,8 +66,6 @@ async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx
             }],
         status_code=200,
     )
-    # mocker.patch('app.routers.v1.api_dataset.RDConnection.get_dataset_versions',\
-    #     mock_get_dataset_versions)
     res = await test_async_client_auth.get(test_dataset_detailed_api, headers=header)
     res_json = res.json()
     assert res_json.get('code') == 200

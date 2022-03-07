@@ -1,8 +1,4 @@
-from sre_constants import IN
 import pytest
-from unittest.mock import patch
-from app.models.error_model import HPCError
-from tests.helper import EAPIResponseCode
 
 
 @pytest.mark.asyncio
@@ -15,7 +11,7 @@ async def test_hpc_auth_should_return_200(test_async_client, httpx_mock):
     httpx_mock.add_response(
         method='POST',
         url='http://service_hpc/v1/hpc/auth',
-        json={"result":{"token": "fake-token"}},
+        json={"result": {"token": "fake-token"} },
         status_code=200,
     )
     header = {'Authorization': 'fake token'}

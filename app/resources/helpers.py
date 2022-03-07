@@ -1,7 +1,6 @@
 import json
 import httpx
 from ..config import ConfigClass
-from ..resources. error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import EAPIResponseCode
 from logger import LoggerFactory
 
