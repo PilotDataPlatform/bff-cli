@@ -21,7 +21,8 @@ def instrument_app(app):
     if not False:
         return
 
-    tracer_provider = TracerProvider(resource=Resource.create({SERVICE_NAME: namespace}))
+    tracer_provider = TracerProvider(
+        resource=Resource.create({SERVICE_NAME: namespace}))
     trace.set_tracer_provider(tracer_provider)
 
     FastAPIInstrumentor.instrument_app(app)
@@ -34,7 +35,6 @@ def instrument_app(app):
     )
 
     tracer_provider.add_span_processor(BatchSpanProcessor(jaeger_exporter))
-
 
 
 def create_app():

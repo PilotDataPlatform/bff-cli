@@ -17,10 +17,12 @@ class RDConnection:
         try:
             if manifest_name:
                 m = await db.execute(select(DataManifestModel).filter_by(project_code=project_code, name=manifest_name))
-                self._logger.info(f"QUERY db RESULT: {m}")
+                self._logger.info(f"QUERY db RESULT: {type(m)}")
                 m_result = m.scalars().first()
-                self._logger.info(f"QUERY RESULT: {m_result.project_code}")
+                # self._logger.info(f"QUERY RESULT: {m_result.name}")
                 if not m_result:
+                    self._logger.debug(f"{m_result}")
+                    self._logger.debug("not m_result")
                     return []
                 else:
                     manifest = [{'name': m_result.name, 'id': m_result.id}]

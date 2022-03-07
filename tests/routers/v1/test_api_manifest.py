@@ -17,15 +17,12 @@ async def test_get_attributes_without_token(test_async_client):
 
 
 @pytest.mark.asyncio
-async def test_get_attributes_should_return_200(test_async_client_auth, mocker):
+async def test_get_attributes_should_return_200(test_async_client_auth, mocker,
+                                                create_db_manifest):
     payload = {'project_code': project_code}
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.check_permission',
                  return_value={'code': 200})
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_attributes_in_manifest_in_db',
-                 mock_get_attributes_in_manifest_in_db)
     res = await test_async_client_auth.get(test_api, headers=header, query_string=payload)
     res_json = res.json()
     assert res_json.get('code') == 200
@@ -70,22 +67,19 @@ async def test_export_attributes_without_token(test_async_client):
 
 
 @pytest.mark.asyncio
-async def test_export_attributes_should_return_200(test_async_client_auth, mocker):
+async def test_export_attributes_should_return_200(test_async_client_auth, mocker,
+                                                   create_db_manifest):
     param = {'project_code': project_code,
              'manifest_name': 'fake_manifest'}
     headers = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.check_permission',
                  return_value={'code': 200})
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_attributes_in_manifest_in_db',
-                 mock_get_attributes_in_manifest_in_db)
     res = await test_async_client_auth.get(test_export_api, headers=headers, query_string=param)
     res_json = res.json()
     assert res_json.get('code') == 200
     assert res_json.get('result').get('manifest_name') == "fake_manifest"
     attribute_len = len(res_json.get('result')["attributes"])
-    assert attribute_len == 1
+    assert attribute_len == 2
 
 
 @pytest.mark.asyncio
@@ -102,14 +96,13 @@ async def test_export_attributes_no_access(test_async_client_auth, mocker):
 
 
 @pytest.mark.asyncio
-async def test_export_attributes_not_exist_should_return_404(test_async_client_auth, mocker):
+async def test_export_attributes_not_exist_should_return_404(test_async_client_auth, mocker,
+                                                             create_db_manifest):
     param = {'project_code': project_code,
              'manifest_name': 'Manifest1'}
     headers = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.check_permission',
                  return_value={'code': 200})
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
     res = await test_async_client_auth.get(test_export_api, headers=headers, query_string=param)
     res_json = res.json()
     assert res_json.get('code') == 404
@@ -129,8 +122,6 @@ async def test_export_attributes_project_not_exist_should_return_404(test_async_
     assert res_json.get('code') == 404
     assert res_json.get('error_msg') == "Project not found"
 
-# test attach manifest to file
-
 
 @pytest.mark.asyncio
 async def test_attach_attributes_without_token_should_return_401(test_async_client):
@@ -149,9 +140,10 @@ async def test_attach_attributes_without_token_should_return_401(test_async_clie
 
 
 @pytest.mark.asyncio
-async def test_attach_attributes_should_return_200(test_async_client_auth, mocker, httpx_mock):
+async def test_attach_attributes_should_return_200(test_async_client_auth, mocker,
+                                                   httpx_mock, create_db_manifest):
     payload = {"manifest_json": {
-        "manifest_name": "fake manifest",
+        "manifest_name": "fake_manifest",
         "project_code": project_code,
         "attributes": {"fake_attribute": "a1"},
         "file_name": "fake_file",
@@ -179,8 +171,6 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
         },
         status_code=200,
     )
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
     httpx_mock.add_response(
         method='POST',
         url='http://fileinfo_service/v1/files/attributes/attach',
@@ -203,7 +193,7 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
 @pytest.mark.asyncio
 async def test_attach_attributes_wrong_file_should_return_404(test_async_client_auth, httpx_mock, mocker):
     payload = {"manifest_json": {
-        "manifest_name": "fake manifest",
+        "manifest_name": "fake_manifest",
         "project_code": project_code,
         "attributes": {"fake_attribute": "a1"},
         "file_name": "fake_wrong_file",
@@ -230,7 +220,8 @@ async def test_attach_attributes_wrong_file_should_return_404(test_async_client_
 
 
 @pytest.mark.asyncio
-async def test_attach_attributes_wrong_name_should_return_400(test_async_client_auth, httpx_mock, mocker):
+async def test_attach_attributes_wrong_name_should_return_400(test_async_client_auth,
+                                                              httpx_mock, mocker, create_db_manifest):
     payload = {"manifest_json": {
         "manifest_name": "Manifest1",
         "project_code": project_code,
@@ -261,8 +252,6 @@ async def test_attach_attributes_wrong_name_should_return_400(test_async_client_
         },
         status_code=200,
     )
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
     res = await test_async_client_auth.post(test_manifest_attach_api, headers=header, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 400
@@ -291,9 +280,10 @@ async def test_attach_attributes_no_access_should_return_403(test_async_client_a
 
 
 @pytest.mark.asyncio
-async def test_fail_to_attach_attributes_return_404(test_async_client_auth, httpx_mock, mocker):
+async def test_fail_to_attach_attributes_return_404(test_async_client_auth, httpx_mock,
+                                                    mocker, create_db_manifest):
     payload = {"manifest_json": {
-        "manifest_name": "fake manifest",
+        "manifest_name": "fake_manifest",
         "project_code": project_code,
         "attributes": {"fake_attribute": "wrong name"},
         "file_name": "fake_file",
@@ -322,8 +312,6 @@ async def test_fail_to_attach_attributes_return_404(test_async_client_auth, http
         },
         status_code=200,
     )
-    mocker.patch('app.routers.v1.api_manifest.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
     mocker.patch('app.routers.v1.api_manifest.attach_manifest_to_file',
                  return_value=None)
     res = await test_async_client_auth.post(test_manifest_attach_api, headers=header, json=payload)
@@ -331,20 +319,3 @@ async def test_fail_to_attach_attributes_return_404(test_async_client_auth, http
     assert res_json.get('code') == 404
     error = res_json.get('error_msg')
     assert error == 'File Not Exist'
-
-
-async def mock_get_manifest_name_from_project_in_db(arg1, arg2):
-    if arg2.get("manifest_name", "") == "Manifest1":
-        return ""
-    result = [{'name': "fake_manifest", 'id': 1}]
-    return result
-
-
-async def mock_get_attributes_in_manifest_in_db(arg1, arg2):
-    return [
-        {
-            'manifest_name': 'fake_manifest',
-            'attributes': [{"name": "fake_attribute", "type": "type", "optional": True,
-                            "value": ""}]
-        }
-    ]

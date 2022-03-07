@@ -67,11 +67,11 @@ class ManifestValidator:
             if key not in valid_attributes:
                 return customized_error_template(ECustomizedError.INVALID_ATTRIBUTE) % key
 
-    async def has_valid_attributes(self, event):
+    async def has_valid_attributes(self, event, db_session):
         _logger.info(f"received event: {event}")
         attributes = event.get('attributes')
         manifest = event.get('manifest')
-        exist_manifest = await self.db.get_attributes_in_manifest_in_db(manifest)
+        exist_manifest = await self.db.get_attributes_in_manifest_in_db(manifest, db_session)
         _logger.info(f"existing manifest: {exist_manifest}")
         exist_attributes = exist_manifest[0].get('attributes')
         _name_error = self.validate_attribute_name(attributes, exist_attributes)

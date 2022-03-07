@@ -203,7 +203,6 @@ class APIManifest:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             return api_response.json_response()
         else:
-            self._logger.info(f"Start get attributes......")
             db_result = await self.db.get_attributes_in_manifest_in_db(manifest, db_session)
             result = db_result[0]
             self._logger.debug(f"Attributes result {result}")

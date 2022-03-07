@@ -52,7 +52,7 @@ async def test_get_dataset_detail_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required" 
 
 @pytest.mark.asyncio
-async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx_mock, mocker):
+async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx_mock, mocker, create_db_dataset_metrics):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
@@ -66,8 +66,8 @@ async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx
             }],
         status_code=200,
     )
-    mocker.patch('app.routers.v1.api_dataset.RDConnection.get_dataset_versions',\
-        mock_get_dataset_versions)
+    # mocker.patch('app.routers.v1.api_dataset.RDConnection.get_dataset_versions',\
+    #     mock_get_dataset_versions)
     res = await test_async_client_auth.get(test_dataset_detailed_api, headers=header)
     res_json = res.json()
     assert res_json.get('code') == 200

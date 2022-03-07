@@ -1,4 +1,5 @@
 # from sqlalchemy import create_engine
+import pdb
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -6,9 +7,11 @@ from sqlalchemy.orm import sessionmaker
 from ...config import ConfigClass
 from logger import LoggerFactory
 
-SQLALCHEMY_DATABASE_URL = ConfigClass.SQLALCHEMY_DATABASE_URI
+SQLALCHEMY_DATABASE_URL = ConfigClass.RDS_DB_URI
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL)
+print(ConfigClass.RDS_DB_URI)
+engine = create_async_engine(ConfigClass.RDS_DB_URI)
+print(engine.url)
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 

@@ -27,22 +27,17 @@ async def test_invalidate_gid_should_return_400(test_async_client_auth, test_inp
 
 
 @pytest.mark.asyncio
-async def test_validate_attribute_should_return_200(test_async_client_auth, mocker):
+async def test_validate_attribute_should_return_200(test_async_client_auth, mocker,
+                                                    create_db_manifest):
     payload = {
         "manifest_json": {
             "manifest_name": "fake_manifest",
-            "project_code": "test_project",
+            "project_code": "cli",
             "attributes": {
-                "attr1": "a1",
-                "attr2": "Test manifest text value",
-                "attr3": "t1"
+                "fake_attribute": "1"
             }
         }
     }
-    mocker.patch('app.routers.v1.api_validation.RDConnection.get_manifest_name_from_project_in_db',
-             mock_get_manifest_name_from_project_in_db)
-    mocker.patch('app.routers.v1.api_validation.ManifestValidator.has_valid_attributes',
-                 mock_has_valid_attributes)
     res = await test_async_client_auth.post(test_validate_manifest_api, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 200
@@ -50,11 +45,12 @@ async def test_validate_attribute_should_return_200(test_async_client_auth, mock
 
 
 @pytest.mark.asyncio
-async def test_validate_attribute_with_manifest_not_found_return_404(test_async_client_auth, mocker):
+async def test_validate_attribute_with_manifest_not_found_return_404(test_async_client_auth, mocker,
+                                                                     create_db_manifest):
     payload = {
         "manifest_json": {
             "manifest_name": "Manifest1",
-            "project_code": "test_project",
+            "project_code": "cli",
             "attributes": {
                 "attr1": "a1",
                 "attr2": "Test manifest text value",
@@ -62,8 +58,6 @@ async def test_validate_attribute_with_manifest_not_found_return_404(test_async_
             }
         }
     }
-    mocker.patch('app.routers.v1.api_validation.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
     res = await test_async_client_auth.post(test_validate_manifest_api, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 404
@@ -71,11 +65,12 @@ async def test_validate_attribute_with_manifest_not_found_return_404(test_async_
 
 
 @pytest.mark.asyncio
-async def test_invalidate_attribute_should_return_400(test_async_client_auth, mocker):
+async def test_invalidate_attribute_should_return_400(test_async_client_auth, mocker,
+                                                      create_db_manifest):
     payload = {
         "manifest_json": {
-            "manifest_name": "Manifest",
-            "project_code": "test_project",
+            "manifest_name": "fake_manifest",
+            "project_code": "cli",
             "attributes": {
                 "attr1": "a1",
                 "attr2": "Test manifest text value",
@@ -83,14 +78,10 @@ async def test_invalidate_attribute_should_return_400(test_async_client_auth, mo
             }
         }
     }
-    mocker.patch('app.routers.v1.api_validation.RDConnection.get_manifest_name_from_project_in_db',
-                 mock_get_manifest_name_from_project_in_db)
-    mocker.patch('app.routers.v1.api_validation.ManifestValidator.has_valid_attributes',
-                 mock_has_valid_attributes)
     res = await test_async_client_auth.post(test_validate_manifest_api, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 400
-    assert res_json.get('result') == 'mock error'
+    assert res_json.get('result') == 'Invalid Attribute attr1'
 
 
 @pytest.mark.asyncio
@@ -158,16 +149,3 @@ async def test_validate_env_with_decryption_error_should_return_400(test_async_c
 
     assert response.get('result') == 'Invalid'
     assert response.get('code') == 400
-
-
-async def mock_has_valid_attributes(arg1, arg2):
-    if arg2.get("manifest_name", "") == "Manifest":
-        return "mock error"
-    return ""
-
-
-async def mock_get_manifest_name_from_project_in_db(arg1, arg2):
-    if arg2.get("manifest_name", "") == "Manifest1":
-        return ""
-    result = [{'name': "fake_manifest", 'id': 1}]
-    return result

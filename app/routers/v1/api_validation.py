@@ -52,7 +52,7 @@ class APIValidation:
                                 db_session: AsyncSession = Depends(db_connection.get_db)):
         """Validate the manifest based on the project"""
         self._logger.info("API validate_manifest".center(80, '-'))
-        self._logger.info(f"DB URI: {ConfigClass.SQLALCHEMY_DATABASE_URI}")
+        self._logger.info(f"DB URI: {ConfigClass.RDS_DB_URI}")
         api_response = ManifestValidateResponse()
         manifests = request_payload.manifest_json
         manifest_name = manifests["manifest_name"]
@@ -70,7 +70,7 @@ class APIValidation:
             return api_response.json_response()
         validation_event["manifest"] = manifest_info
         validator = ManifestValidator()
-        attribute_validation_error_msg = await validator.has_valid_attributes(validation_event)
+        attribute_validation_error_msg = await validator.has_valid_attributes(validation_event, db_session)
         if attribute_validation_error_msg:
             api_response.result = attribute_validation_error_msg
             api_response.code = EAPIResponseCode.bad_request
