@@ -12,6 +12,7 @@ from ...resources.database_service import RDConnection
 from ...models.validation_models import *
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.commons.data_providers.database import DBConnection
+from app.resources.error_handler import customized_error_template, ECustomizedError
 
 router = APIRouter()
 

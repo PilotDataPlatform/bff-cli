@@ -5,6 +5,7 @@ import json
 import jwt as pyjwt
 from ..config import ConfigClass
 import httpx
+from app.resources.error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import APIResponse, EAPIResponseCode
 
 api_response = APIResponse()
