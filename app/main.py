@@ -18,7 +18,7 @@ from app.commons.data_providers.database import engine
 
 
 def instrument_app(app):
-    if not False:
+    if not ConfigClass.OPEN_TELEMETRY_ENABLED:
         return
 
     tracer_provider = TracerProvider(
@@ -35,7 +35,6 @@ def instrument_app(app):
     )
 
     tracer_provider.add_span_processor(BatchSpanProcessor(jaeger_exporter))
-
 
 def create_app():
     """
@@ -56,5 +55,4 @@ def create_app():
         allow_headers=["*"],
     )
     api_registry(app)
-    instrument_app(app)
     return app
