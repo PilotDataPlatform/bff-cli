@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from logger import LoggerFactory
 from ...commons.data_providers.database import DBConnection
-from ...resources.error_handler import catch_internal
+from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.helpers import *
 from ...resources.validation_service import ManifestValidator, decryption
 from ...resources.database_service import RDConnection

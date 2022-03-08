@@ -68,6 +68,8 @@ async def jwt_required(request: Request):
 
 def get_project_role(current_identity, project_code):
     role = None
+    _logger.info('get_project_role'.center(80,'='))
+    _logger.info(f'Received identity: {current_identity}, project_code: {project_code}')
     if current_identity["role"] == "admin":
         role = "platform_admin"
     else:
@@ -98,8 +100,10 @@ def has_permission(current_identity, project_code, resource, zone, operation):
             "zone": zone,
             "operation": operation,
         }
+        _logger.info(f"Permission payload: {payload}")
         with httpx.Client() as client:
             response = client.get(ConfigClass.AUTH_SERVICE + "/v1/authorize", params=payload)
+        _logger.info(f"Permission response: {response.text}")
         if response.status_code != 200:
             error_msg = f"Error calling authorize API - {response.json()}"
             raise APIException(status_code=response.status_code, error_msg=error_msg)
@@ -159,6 +163,7 @@ def validate_upload_event(zone, data_type=None):
 
 def transfer_to_pre(data, project_code, session_id):
     try:
+        _logger.info("transfer_to_pre".center(80, '-'))
         payload = {
             "current_folder_node": data.current_folder_node,
             "project_code": project_code,
@@ -171,6 +176,8 @@ def transfer_to_pre(data, project_code, session_id):
             "Session-ID": session_id
         }
         url = select_url_by_zone(data.zone)
+        _logger.info(f'url: {url}')
+        _logger.info(f'payload: {payload}')
         with httpx.Client() as client:
             result = client.post(url, headers=headers, json=payload)
         return result

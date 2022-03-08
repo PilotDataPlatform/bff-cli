@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.project_models import *
 from logger import LoggerFactory
-from ...resources.error_handler import catch_internal
+from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.dependencies import *
 from ...resources.helpers import *
 
@@ -27,13 +27,13 @@ class APIProject:
         '''
         Get the project list that user have access to
         '''
+        self._logger.info("API list_project".center(80, '-'))
         api_response = ProjectListResponse()
         try:
             username = self.current_identity['username']
             user_role = self.current_identity['role']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_project".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         project_list = get_user_projects(self.current_identity)
         self._logger.info(f"Getting user projects: {project_list}")
@@ -56,7 +56,7 @@ class APIProject:
             user_id = self.current_identity["user_id"]
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info("API project_file_preupload".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         error = validate_upload_event(data.zone, data.type)
         if error:
@@ -68,8 +68,9 @@ class APIProject:
             self._logger.info(f"User platform role: {role}")
         else:
             self._logger.info(f"User platform role: {role}")
-            project_role, code = get_project_role(user_id, project_code)
-            self._logger.info(f"User project role: {project_role}, {code}")
+            project_role = get_project_role(self.current_identity, project_code)
+            self._logger.info(f"User project role: {project_role}")
+
             if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
@@ -93,9 +94,8 @@ class APIProject:
             "data": data.data,
             "job_type": data.job_type
         }
-
-        url = select_url_by_zone(data.zone)
-        self._logger.info(f"Transfer to pre url: {url}")
+        # url = select_url_by_zone(data.zone)
+        # self._logger.info(f"Transfer to pre url: {url}")
         self._logger.info(f"Transfer to pre payload: {trans_payload}")
         self._logger.info(f"Transfer to pre result: {result}")
         self._logger.info(f"Transfer to pre result: {result.status_code}")
@@ -126,15 +126,17 @@ class APIProject:
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
         error_msg = ""
-        if not has_permission(self.current_identity, project_code, "file", zone.lower(), "view"):
+        permission = has_permission(self.current_identity, project_code, "file", zone.lower(), "view")
+        self._logger.info(f"permission: {permission}")
+        if not permission:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
-
         project_role = get_project_role(self.current_identity, project_code)
-        accessing_folder = folder.split('/')[0]
-        if not project_role in ["admin", "platform-admin"]:
-            if username != accessing_folder:
+        name_folder = folder.split('/')[0]
+        # verify the name folder access permission
+        if zone_type == ConfigClass.GREEN_ZONE_LABEL and not project_role in ["admin", "platform-admin"]:
+            if username != name_folder:
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()

@@ -79,7 +79,7 @@ async def test_upload_files_with_invalid_upload_event_should_return_400(test_asy
 
 
 @pytest.mark.asyncio
-async def test_upload_for_project_member_should_return_200(test_async_client_project_member_auth, mocker):
+async def test_upload_for_project_member_should_return_403(test_async_client_project_member_auth, mocker):
     payload = {
         "operator": "test_user",
         "upload_message": "test",
@@ -96,7 +96,7 @@ async def test_upload_for_project_member_should_return_200(test_async_client_pro
     mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
                  return_value={})
     mocker.patch('app.routers.v1.api_project.get_project_role',
-                 return_value=('User not in the project', 400))
+                 return_value='User not in the project')
     header = {'Authorization': 'fake token'}
     response = await test_async_client_project_member_auth.post(test_get_project_file_api, headers=header, json=payload)
     res_json = response.json()
@@ -123,9 +123,10 @@ async def test_upload_for_contributor_into_core_should_return_403(test_async_cli
     mocker.patch('app.routers.v1.api_project.void_check_file_in_zone',
                  return_value={})
     mocker.patch('app.routers.v1.api_project.get_project_role',
-                 return_value=("contributor", 200))
+                 return_value="contributor")
     header = {'Authorization': 'fake token'}
     response = await test_async_client_project_member_auth.post(test_get_project_file_api, headers=header, json=payload)
+    print(response)
     res_json = response.json()
     print(res_json)
     assert res_json.get('code') == 403

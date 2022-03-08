@@ -85,6 +85,7 @@ class APIManifest:
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
             project_role = get_project_role(current_identity, project_code)
+            self._logger.info(f"project_role: {project_role}")
             zone_type = get_zone(zone)
         except KeyError as e:
             self._logger.error(f"Missing information error: {str(e)}")
@@ -93,7 +94,6 @@ class APIManifest:
             api_response.result = str(e)
             return api_response.json_response()
         self._logger.info(f"Getting info for file: {file_name} IN {project_code}")
-        # file_node = query_file_in_project(project_code, file_name, zone_type)
         file_info = {"query": {
                 "name": file_name.split('/')[-1],
                 "display_path": file_name,
@@ -102,7 +102,7 @@ class APIManifest:
                 "labels": ['File', zone_type]}}
         file_response = query_node(file_info)
         self._logger.info(f"Query result: {file_response}")
-        file_node = file_response.get('result')
+        file_node = file_response.json().get('result')
         self._logger.info(f"line 106: {file_node}")
         if not file_node:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
@@ -157,10 +157,13 @@ class APIManifest:
             _user_id = current_identity["user_id"]
         except (AttributeError, TypeError):
             return current_identity
-        self._logger.info("API attach_manifest".center(80, '-'))
+        self._logger.info("API export_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {current_identity}")
         zone = ConfigClass.GREEN_ZONE_LABEL.lower()
-        if not has_permission(current_identity, project_code, "file_attribute_template", zone, "export"):
+        # CLI user need to export/view attribute first, so that they could attach attribute 
+        permission = has_permission(current_identity, project_code, "file_attribute_template", zone, "view")
+        self._logger.info(f"User permission: {permission}")
+        if not permission:
             api_response.error_msg = "Permission denied"
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()

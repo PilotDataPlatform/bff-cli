@@ -140,7 +140,7 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_manifest.query_node',
-                 return_value={
+                 json={
             "code": 200,
             "error_msg": "",
             "result": [
@@ -186,7 +186,7 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
     assert result.get('operation_status') == 'SUCCEED'
 
 @pytest.mark.asyncio
-async def test_attach_attributes_wrong_file_should_return_404(test_async_client_auth, mocker):
+async def test_attach_attributes_wrong_file_should_return_404(test_async_client_auth, mocker, httpx_mock):
     payload = {"manifest_json": {
                 "manifest_name": "fake manifest",
                 "project_code": project_code,
@@ -197,15 +197,16 @@ async def test_attach_attributes_wrong_file_should_return_404(test_async_client_
             }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
-    mocker.patch('app.routers.v1.api_manifest.query_node',
-                 return_value={
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v2/neo4j/nodes/query',
+        json={
             "code": 200,
-            "error_msg": "",
-            "result": [],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        })
+            "result": []
+        },
+        status_code=200,
+    )
+
     res = await test_async_client_auth.post(test_manifest_attach_api, headers=header, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 404
@@ -226,7 +227,7 @@ async def test_attach_attributes_wrong_name_should_return_400(test_async_client_
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_manifest.query_node',
-                 return_value={
+                 json={
             "code": 200,
             "error_msg": "",
             "result": [
@@ -295,7 +296,7 @@ async def test_fail_to_attach_attributes_return_404(test_async_client_auth, mock
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
     mocker.patch('app.routers.v1.api_manifest.query_node',
-                 return_value={
+                 json={
             "code": 200,
             "error_msg": "",
             "result": [

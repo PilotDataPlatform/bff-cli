@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.file_models import QueryDataInfoResponse, QueryDataInfo, GetProjectFileListResponse
 from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError, EAPIResponseCode
-from ...resources.dependencies import jwt_required, has_permission
+from ...resources.dependencies import jwt_required, has_permission, get_project_role
 from ...resources.helpers import batch_query_node_by_geid, verify_list_event, separate_rel_path, get_zone, query_node, query_relation
 from ...config import ConfigClass
 from logger import LoggerFactory
@@ -105,8 +105,10 @@ class APIFile:
             file_response.error_msg = error_msg
             file_response.code = code
             return file_response.json_response()
-        zone_label = [get_zone(zone)]
-        if not has_permission(self.current_identity, project_code, "file", zone, "view"):
+        zone_label = get_zone(zone)
+        permission = has_permission(self.current_identity, project_code, "file", zone, "view")
+        self._logger.warn(f"permission: {permission}")
+        if not permission:
             file_response.error_msg = "Permission denied"
             file_response.code = EAPIResponseCode.forbidden
             return file_response.json_response()
@@ -135,7 +137,7 @@ class APIFile:
             parent_attribute = {'code': project_code}
             parent_label = [parent_type]
         else:
-            parent_label = [parent_type, zone_label[0]]
+            parent_label = [parent_type, zone_label]
             parent_attribute = {'project_code': project_code,
                                 'name': folder_name,
                                 'folder_relative_path': rel_path}
@@ -147,7 +149,7 @@ class APIFile:
                             "name": folder.split('/')[-1],
                             "project_code": project_code,
                             "archived": False,
-                            "labels": ['Folder', zone_label[0]]}
+                            "labels": ['Folder', zone_label]}
                     }
             self._logger.info(f"Query node: {folder_check_event}")
             self._logger.info(f"Check folder exist payload: 'zone':{zone}, 'project_code':{project_code}, 'folder_name':{folder_name}, 'rel_path':{rel_path}")
@@ -156,23 +158,25 @@ class APIFile:
             folder_response = query_node(folder_check_event)
             res = folder_response.json().get('result')
             self._logger.info(f"Check folder exist response: {code}, '{error_msg}', '{res}'")
+            project_role = get_project_role(self.current_identity, project_code)
             if not res:
                 file_response.error_msg = 'Folder not exist'
                 file_response.code = EAPIResponseCode.forbidden
                 self._logger.error(f'Returning error: {EAPIResponseCode.forbidden}, {error_msg}')
                 return file_response.json_response()
-            elif username and not rel_path and folder_name != username:
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
-                                   f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
-                return file_response.json_response()
-            elif username and rel_path and rel_path.split('/')[0] != username:
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
-                                   f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
-                return file_response.json_response()
+            if zone_label == ConfigClass.GREEN_ZONE_LABEL and not project_role in ["admin", "platform-admin"]:
+                if username and not rel_path and folder_name != username:
+                    file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    file_response.code = EAPIResponseCode.forbidden
+                    self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
+                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                    return file_response.json_response()
+                elif username and rel_path and rel_path.split('/')[0] != username:
+                    file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    file_response.code = EAPIResponseCode.forbidden
+                    self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
+                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                    return file_response.json_response()
         payload = {
             "start_label": parent_label,
             "start_params": parent_attribute,
