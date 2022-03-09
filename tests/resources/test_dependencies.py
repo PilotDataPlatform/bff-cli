@@ -1,6 +1,5 @@
 import pytest
 import jwt
-import app.resources.dependencies
 import time
 from tests.helper import EAPIResponseCode
 from app.models.project_models import POSTProjectFile
@@ -28,23 +27,6 @@ async def test_jwt_required_should_return_successed(httpx_mock):
             "id": 1,
             "role": "admin"
         }},
-        status_code=200,
-    )
-    httpx_mock.add_response(
-        method='POST',
-        url=f'{ConfigClass.NEO4J_SERVICE}/v1/neo4j/nodes/User/query',
-        json={"result": [
-            {
-                'id': 9857,
-                'labels': ['User'], 
-                'global_entity_id': 'fake-geid', 
-                'role': 'admin', 
-                'last_login': '2022-03-01T14:51:48.198524', 
-                'name': 'testuser', 
-                'username': 'testuser', 
-                'status': 'active'
-            }
-            ]},
         status_code=200,
     )
     test_result = await jwt_required(mock_request)
