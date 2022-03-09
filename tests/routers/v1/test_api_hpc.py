@@ -1,7 +1,7 @@
 import pytest
+pytestmark = pytest.mark.asyncio
 
 
-@pytest.mark.asyncio
 async def test_hpc_auth_should_return_200(test_async_client, httpx_mock):
     payload = {
             "token_issuer": 'host',
@@ -11,7 +11,7 @@ async def test_hpc_auth_should_return_200(test_async_client, httpx_mock):
     httpx_mock.add_response(
         method='POST',
         url='http://service_hpc/v1/hpc/auth',
-        json={"result": {"token": "fake-token"} },
+        json={"result": {"token": "fake-token"}},
         status_code=200,
     )
     header = {'Authorization': 'fake token'}
@@ -22,7 +22,6 @@ async def test_hpc_auth_should_return_200(test_async_client, httpx_mock):
     assert response.get('error_msg') == ""
 
 
-@pytest.mark.asyncio
 async def test_hpc_auth_with_error_token_should_return_200(test_async_client, httpx_mock):
     payload = {
         "token_issuer": 'host',
@@ -44,16 +43,15 @@ async def test_hpc_auth_with_error_token_should_return_200(test_async_client, ht
         'error_msg') == "Cannot authorized HPC: Cannot authorized HPC"
 
 
-@pytest.mark.asyncio
 async def test_submit_hpc_job_should_return_200(test_async_client, httpx_mock):
     payload = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token",
-        "job_info": { "job": {
+        "job_info": {"job": {
             "name": "unit_test",
             "account": "sc-users"},
-            "script": "sleep 300" }
+            "script": "sleep 300"}
     }
     test_api = "/v1/hpc/job"
     httpx_mock.add_response(
@@ -71,7 +69,6 @@ async def test_submit_hpc_job_should_return_200(test_async_client, httpx_mock):
     assert response.get('result') == {"job_id": 15178}
 
 
-@pytest.mark.asyncio
 async def test_submit_hpc_job_without_script_should_return_400(test_async_client):
     payload = {
         "host": "http://host",
@@ -88,7 +85,6 @@ async def test_submit_hpc_job_without_script_should_return_400(test_async_client
     assert response.get('result') == {}
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_job_success_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -119,7 +115,6 @@ async def test_hpc_get_job_success_should_return_200(test_async_client, httpx_mo
     assert result.get('job_state') == "COMPLETED"
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_job_wrong_id_should_return_404(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -140,7 +135,6 @@ async def test_hpc_get_job_wrong_id_should_return_404(test_async_client, httpx_m
     assert response.get('error_msg') == "Job ID not found"
 
 
-@pytest.mark.asyncio
 async def test_hpc_list_nodes_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -167,7 +161,6 @@ async def test_hpc_list_nodes_should_return_200(test_async_client, httpx_mock):
     assert exp_node2 in result
 
 
-@pytest.mark.asyncio
 async def test_hpc_list_nodes_without_protocal_should_return_404(test_async_client, httpx_mock):
     params = {
         "host": "http",
@@ -182,7 +175,6 @@ async def test_hpc_list_nodes_without_protocal_should_return_404(test_async_clie
     assert response.get('error_msg') == "HPC protocal required"
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_node_with_node_name_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -208,7 +200,6 @@ async def test_hpc_get_node_with_node_name_should_return_200(test_async_client, 
     assert  exp_node1 in result
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_node_without_node_name_should_return_404(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -231,7 +222,6 @@ async def test_hpc_get_node_without_node_name_should_return_404(test_async_clien
     assert response.get('error_msg') == 'Node name not found'
 
 
-@pytest.mark.asyncio
 async def test_hpc_list_partitions_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -258,7 +248,6 @@ async def test_hpc_list_partitions_should_return_200(test_async_client, httpx_mo
     assert exp_partition2 in result
 
 
-@pytest.mark.asyncio
 async def test_hpc_list_partitions_without_protocal_should_return_400(test_async_client, mocker):
     params = {
         "host": "http",
@@ -273,7 +262,6 @@ async def test_hpc_list_partitions_without_protocal_should_return_400(test_async
     assert response.get('error_msg') == "HPC protocal required"
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_partition_by_name_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
@@ -299,7 +287,6 @@ async def test_hpc_get_partition_by_name_should_return_200(test_async_client, ht
     assert exp_partition1 in result
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_partition_by_name_without_protocal_should_return_400(test_async_client, mocker):
     params = {
         "host": "http",

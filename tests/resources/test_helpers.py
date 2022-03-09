@@ -1,10 +1,24 @@
 import pytest
 import app.resources.helpers
-from app.resources.helpers import *
+from app.resources.helpers import get_user_role
+from app.resources.helpers import query__node_has_relation_with_admin
+from app.resources.helpers import query_node_has_relation_for_user
+from app.resources.helpers import get_node_by_geid
+from app.resources.helpers import batch_query_node_by_geid
+from app.resources.helpers import query_file_in_project
+from app.resources.helpers import get_node
+from app.resources.helpers import get_user_projects
+from app.resources.helpers import attach_manifest_to_file
+from app.resources.helpers import http_query_node_zone
+from app.resources.helpers import get_parent_label
+from app.resources.helpers import separate_rel_path
+from app.resources.helpers import verify_list_event
+from app.resources.helpers import check_folder_exist
 from requests.models import Response
 
+pytestmark = pytest.mark.asyncio
 
-@pytest.mark.asyncio
+
 async def test_get_user_role_successed(httpx_mock):
     httpx_mock.add_response(
         method='GET',
@@ -32,13 +46,12 @@ async def test_get_user_role_successed(httpx_mock):
     result = await get_user_role(1, 1086)
     assert result["r"] == {"type": "own"}
 
-@pytest.mark.asyncio
+
 async def test_get_user_role_failed():
     result = await get_user_role(1, 1086)
-    assert result == None
+    assert result is None
 
 
-@pytest.mark.asyncio
 async def test_query__node_has_relation_with_admin_successed(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -55,13 +68,11 @@ async def test_query__node_has_relation_with_admin_successed(httpx_mock):
     assert result[0]["global_entity_id"] == "fake_geid"
 
 
-@pytest.mark.asyncio
 async def test_query__node_has_relation_with_admin_failed(httpx_mock):
     result = await query__node_has_relation_with_admin()
     assert result == []
 
 
-@pytest.mark.asyncio
 async def test_query_node_has_relation_for_user_successed(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -88,13 +99,11 @@ async def test_query_node_has_relation_for_user_successed(httpx_mock):
     assert result[0]["r"] == {"type": "admin", "status": "active"}
 
 
-@pytest.mark.asyncio
 async def test_query_node_has_relation_for_user_failed():
     result = await query_node_has_relation_for_user("test_user", "Container")
     assert result == []
 
 
-@pytest.mark.asyncio
 async def test_get_node_by_geid_successed(httpx_mock):
     httpx_mock.add_response(
         method='GET',
@@ -111,13 +120,11 @@ async def test_get_node_by_geid_successed(httpx_mock):
     assert result[0]["id"] == 4376
 
 
-@pytest.mark.asyncio
 async def test_get_node_by_geid_failed():
     result = await get_node_by_geid("fake_geid")
-    assert result == None
+    assert result is None
 
 
-@pytest.mark.asyncio
 async def test_batch_query_node_by_geid_successed(httpx_mock):
     geid_list = ["fake_geid"]
     httpx_mock.add_response(
@@ -131,7 +138,6 @@ async def test_batch_query_node_by_geid_successed(httpx_mock):
     assert query_node == {'fake_geid': {'global_entity_id': 'fake_geid'}}
 
 
-@pytest.mark.asyncio
 async def test_query_file_in_project_successed(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -146,7 +152,6 @@ async def test_query_file_in_project_successed(httpx_mock):
     assert result['code'] == 200
 
 
-@pytest.mark.asyncio
 async def test_query_file_in_project_return_empty(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -161,13 +166,11 @@ async def test_query_file_in_project_return_empty(httpx_mock):
     assert result == []
 
 
-@pytest.mark.asyncio
 async def test_query_file_in_project_return_failed():
     result = await query_file_in_project("test_project", "testfolder/testfile")
     assert result == []
 
 
-@pytest.mark.asyncio
 async def test_get_node_successed(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -185,7 +188,6 @@ async def test_get_node_successed(httpx_mock):
     }
 
 
-@pytest.mark.asyncio
 async def test_get_node_with_response_json_as_none(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -194,16 +196,14 @@ async def test_get_node_with_response_json_as_none(httpx_mock):
         status_code=200,
     )
     result = await get_node(123, "Container")
-    assert result == None
+    assert result is None
 
 
-@pytest.mark.asyncio
 async def test_get_node_by_code_failed():
     result = await get_node(123, "Container")
-    assert result == None
+    assert result is None
 
 
-@pytest.mark.asyncio
 async def test_get_user_admin_projects_successed(mocker):
     mocker.patch.object(app.resources.helpers,
                         "query__node_has_relation_with_admin", mock_query__node_has_relation_with_admin)
@@ -212,7 +212,6 @@ async def test_get_user_admin_projects_successed(mocker):
     assert result[0]['code'] == 123
 
 
-@pytest.mark.asyncio
 async def test_get_user_project_user_projects_successed(mocker):
     mocker.patch.object(app.resources.helpers,
                         "query_node_has_relation_for_user", mock_query_node_has_relation_for_user)
@@ -221,7 +220,6 @@ async def test_get_user_project_user_projects_successed(mocker):
     assert result[0]['code'] == 123
 
 
-@pytest.mark.asyncio
 async def test_attach_manifest_to_file_successed(httpx_mock):
     event = {
         'project_code':'project_code',
@@ -249,7 +247,6 @@ async def test_attach_manifest_to_file_successed(httpx_mock):
     }
 
 
-@pytest.mark.asyncio
 async def test_attach_manifest_to_file_failed(httpx_mock):
     event = {
         'project_code': 'project_code',
@@ -266,10 +263,9 @@ async def test_attach_manifest_to_file_failed(httpx_mock):
         status_code=400,
     )
     result = await attach_manifest_to_file(event)
-    assert result == None
+    assert result is None
 
 
-@pytest.mark.asyncio
 async def test_http_query_node_zone(httpx_mock):
     event = {
         'project_code': 'project_code',
@@ -318,7 +314,6 @@ def test_verify_list_event(test_source, test_folder, expect_result):
     assert error_msg == expect_result
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("test_zone, folder, expect_result",
                          [("gr", "test_user/folder", ''),
                           ("zone", "test_user/folder", 'mock_error'),

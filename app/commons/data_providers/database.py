@@ -1,5 +1,3 @@
-# from sqlalchemy import create_engine
-import pdb
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,9 +7,7 @@ from logger import LoggerFactory
 
 SQLALCHEMY_DATABASE_URL = ConfigClass.RDS_DB_URI
 
-print(ConfigClass.RDS_DB_URI)
 engine = create_async_engine(ConfigClass.RDS_DB_URI)
-print(engine.url)
 SessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
@@ -24,7 +20,7 @@ class SingletonMetaClass(type):
           .__init__(name,bases,dict)
         original_new = cls.__new__
         def my_new(cls,*args,**kwds):
-            if cls.instance == None:
+            if cls.instance is None:
                 cls.instance = \
                   original_new(cls,*args,**kwds)
             return cls.instance
@@ -32,8 +28,7 @@ class SingletonMetaClass(type):
         cls.__new__ = staticmethod(my_new)
 
     
-class DBConnection:
-    __metaclass__ = SingletonMetaClass
+class DBConnection(metaclass=SingletonMetaClass):
 
     async def get_db():
         db = SessionLocal()

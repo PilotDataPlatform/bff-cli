@@ -1,10 +1,11 @@
 import pytest
 from pytest_httpx import HTTPXMock
 
+pytestmark = pytest.mark.asyncio
 test_file_exist_api = "/v1/project/test_project/file/exist"
 project_code = "test_project"
 
-@pytest.mark.asyncio
+
 async def test_file_exist_should_return_200(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {
         "project_code": project_code,
@@ -26,7 +27,6 @@ async def test_file_exist_should_return_200(test_async_client_auth, mocker, http
     assert res_json["display_path"] == param["file_relative_path"]
 
 
-@pytest.mark.asyncio
 async def test_file_exist_without_token_should_return_200(test_async_client):
     param = {
         "project_code": project_code,

@@ -1,15 +1,13 @@
 import pytest
 from pytest_httpx import HTTPXMock
 from tests.helper import EAPIResponseCode
+pytestmark = pytest.mark.asyncio
 
 test_query_geid_api = "/v1/query/geid"
 test_get_file_api = "/v1/test_project/files/query"
 project_code = "test_project"
 
-# test get file/folder api in ptoject/folder
 
-
-@pytest.mark.asyncio
 async def test_get_name_folders_in_project_should_return_200(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {
         "project_code": project_code,
@@ -19,7 +17,7 @@ async def test_get_name_folders_in_project_should_return_200(test_async_client_a
     }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_file.check_permission',
-                 return_value={"code": 200, 
+                 return_value={"code": 200,
                                'project_code': project_code,
                                'uploader': 'fake_user'})
     httpx_mock.add_response(
@@ -53,7 +51,6 @@ async def test_get_name_folders_in_project_should_return_200(test_async_client_a
     assert 'test_file' in name_folders
 
 
-@pytest.mark.asyncio
 async def test_get_files_in_folder_should_return_200(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {
         "project_code": project_code,
@@ -104,7 +101,6 @@ async def test_get_files_in_folder_should_return_200(test_async_client_auth, moc
     assert 'test_file' in files
 
 
-@pytest.mark.asyncio
 async def test_get_folder_without_token(test_async_client):
     param = {
         "project_code": project_code,
@@ -118,7 +114,6 @@ async def test_get_folder_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
 async def test_get_files_in_folder_without_folder_name_should_return_400(test_async_client_auth, mocker):
     param = {"project_code": project_code,
                 "zone": "gr",
@@ -131,7 +126,6 @@ async def test_get_files_in_folder_without_folder_name_should_return_400(test_as
     assert res_json.get('error_msg') == "missing folder name"
 
 
-@pytest.mark.asyncio
 async def test_get_files_without_permission_should_return_403(test_async_client_auth, mocker):
     param = {"project_code": project_code,
                 "zone": "cr",
@@ -148,7 +142,6 @@ async def test_get_files_without_permission_should_return_403(test_async_client_
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
 async def test_get_files_when_folder_does_not_exist_should_return_403(test_async_client_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
              "zone": "gr",
@@ -171,7 +164,6 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(test_async
     assert res_json.get('error_msg') == 'Folder not exist'
 
 
-@pytest.mark.asyncio
 async def test_get_files_when_only_namefolder_should_return_403(test_async_client_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
              "zone": "cr",
@@ -195,7 +187,6 @@ async def test_get_files_when_only_namefolder_should_return_403(test_async_clien
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
 async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_async_client_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
              "zone": "cr",
@@ -219,7 +210,6 @@ async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_a
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
 async def test_get_files_when_neo4j_broke_should_return_500(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {"project_code": project_code,
              "zone": "cr",
@@ -246,7 +236,6 @@ async def test_get_files_when_neo4j_broke_should_return_500(test_async_client_au
     assert res.status_code == 500
 
 
-@pytest.mark.asyncio
 async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker, httpx_mock):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     header = {'Authorization': 'fake token'}
@@ -284,9 +273,8 @@ async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker,
     assert len(result) == 2
     for entity in result:
         assert entity["geid"] in payload['geid']
-    
 
-@pytest.mark.asyncio
+
 async def test_query_file_by_geid_wiht_token(test_async_client):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     res = await test_async_client.post(test_query_geid_api, json=payload)
@@ -295,7 +283,6 @@ async def test_query_file_by_geid_wiht_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
 async def test_query_file_by_geid_when_file_not_found(test_async_client_auth, httpx_mock):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     header = {'Authorization': 'fake token'}
@@ -316,7 +303,6 @@ async def test_query_file_by_geid_when_file_not_found(test_async_client_auth, ht
         assert entity["result"] == []
 
 
-@pytest.mark.asyncio
 async def test_query_file_by_geid_get_trashfile(test_async_client_auth, httpx_mock):
     payload = {'geid': ["file_geid"]}
     header = {'Authorization': 'fake token'}
@@ -344,7 +330,6 @@ async def test_query_file_by_geid_get_trashfile(test_async_client_auth, httpx_mo
         assert entity["result"] == []
 
 
-@pytest.mark.asyncio
 async def test_query_file_by_geid_when_file_is_archived(test_async_client_auth, httpx_mock):
     payload = {'geid': ["file_geid"]}
     header = {'Authorization': 'fake token'}
@@ -372,7 +357,6 @@ async def test_query_file_by_geid_when_file_is_archived(test_async_client_auth, 
         assert entity["result"] == []
 
 
-@pytest.mark.asyncio
 async def test_query_file_by_geid_without_permission(test_async_client_auth, httpx_mock, mocker):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     header = {'Authorization': 'fake token'}

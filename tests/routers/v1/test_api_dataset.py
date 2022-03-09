@@ -3,15 +3,16 @@ import pytest
 test_dataset_api = "/v1/datasets"
 dataset_code = "testdataset"
 test_dataset_detailed_api = "/v1/dataset/testdataset"
+pytestmark = pytest.mark.asyncio
 
-@pytest.mark.asyncio
+
 async def test_list_dataset_without_token(test_async_client):
     res = await test_async_client.get(test_dataset_api)
     res_json = res.json()
     assert res_json.get('code') == 401
     assert res_json.get('error_msg') == "Token required"
 
-@pytest.mark.asyncio
+
 async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -21,8 +22,6 @@ async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock)
     )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
-    print(res)
-    print(f"RESPONSE: {res.json()}")
     res_json = res.json()
     assert res_json.get('code') == 200
     datasets = []
@@ -30,7 +29,7 @@ async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock)
         datasets.append(d.get('code'))
     assert dataset_code in datasets
 
-@pytest.mark.asyncio
+
 async def test_list_empty_dataset(test_async_client_auth, httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -44,14 +43,14 @@ async def test_list_empty_dataset(test_async_client_auth, httpx_mock):
     assert res_json.get('code') == 200
     assert res_json.get('result') == []
 
-@pytest.mark.asyncio
+
 async def test_get_dataset_detail_without_token(test_async_client):
     res = await test_async_client.get(test_dataset_detailed_api)
     res_json = res.json()
     assert res_json.get('code') == 401
     assert res_json.get('error_msg') == "Token required" 
 
-@pytest.mark.asyncio
+
 async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx_mock, mocker, create_db_dataset_metrics):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
@@ -77,7 +76,7 @@ async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx
     _version_no = result.get("version_no")
     assert _version_no == 1
 
-@pytest.mark.asyncio
+
 async def test_get_dataset_detail_no_access(test_async_client_auth, httpx_mock):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
@@ -97,7 +96,7 @@ async def test_get_dataset_detail_no_access(test_async_client_auth, httpx_mock):
     assert res_json.get('code') == 403
     assert res_json.get('error_msg') == "Permission Denied"
 
-@pytest.mark.asyncio
+
 async def test_get_dataset_detail_not_exist(test_async_client_auth, httpx_mock):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(

@@ -61,8 +61,8 @@ class Settings(BaseSettings):
             file_secret_settings,
         ):
             return (
-                env_settings,
                 load_vault_settings,
+                env_settings,
                 init_settings,
                 file_secret_settings,
             )
@@ -76,5 +76,3 @@ def get_settings():
 
 ConfigClass = get_settings()
 
-
-print(ConfigClass.RDS_DB_URI)

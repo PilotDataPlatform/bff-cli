@@ -1,13 +1,13 @@
 import pytest
 from tests.helper import EAPIResponseCode
 
+pytestmark = pytest.mark.asyncio
 test_api = "/v1/manifest"
 test_export_api = "/v1/manifest/export"
 test_manifest_attach_api = "/v1/manifest/attach"
 project_code = "cli"
 
 
-@pytest.mark.asyncio
 async def test_get_attributes_without_token(test_async_client):
     payload = {'project_code': project_code}
     res = await test_async_client.get(test_api, query_string=payload)
@@ -16,7 +16,6 @@ async def test_get_attributes_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
 async def test_get_attributes_should_return_200(test_async_client_auth, mocker,
                                                 create_db_manifest):
     payload = {'project_code': project_code}
@@ -29,7 +28,6 @@ async def test_get_attributes_should_return_200(test_async_client_auth, mocker,
     assert len(res_json.get('result')) >= 1
 
 
-@pytest.mark.asyncio
 async def test_get_attributes_no_access_should_return_403(test_async_client_auth, mocker):
     payload = {'project_code': project_code}
     headers = {'Authorization': 'fake token'}
@@ -41,7 +39,6 @@ async def test_get_attributes_no_access_should_return_403(test_async_client_auth
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
 async def test_get_attributes_project_not_exist_should_return_404(test_async_client_auth, mocker):
     payload = {'project_code': 't1000'}
     headers = {'Authorization': 'fake token'}
@@ -56,7 +53,6 @@ async def test_get_attributes_project_not_exist_should_return_404(test_async_cli
 
 
 # Test export manifest
-@pytest.mark.asyncio
 async def test_export_attributes_without_token(test_async_client):
     param = {'project_code': project_code,
              'manifest_name': 'Manifest1'}
@@ -66,7 +62,6 @@ async def test_export_attributes_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
 async def test_export_attributes_should_return_200(test_async_client_auth, mocker,
                                                    create_db_manifest):
     param = {'project_code': project_code,
@@ -82,7 +77,6 @@ async def test_export_attributes_should_return_200(test_async_client_auth, mocke
     assert attribute_len == 2
 
 
-@pytest.mark.asyncio
 async def test_export_attributes_no_access(test_async_client_auth, mocker):
     param = {'project_code': project_code,
              'manifest_name': 'fake_manifest'}
@@ -95,7 +89,6 @@ async def test_export_attributes_no_access(test_async_client_auth, mocker):
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
 async def test_export_attributes_not_exist_should_return_404(test_async_client_auth, mocker,
                                                              create_db_manifest):
     param = {'project_code': project_code,
@@ -109,7 +102,6 @@ async def test_export_attributes_not_exist_should_return_404(test_async_client_a
     assert res_json.get('error_msg') == 'Manifest Not Exist Manifest1'
 
 
-@pytest.mark.asyncio
 async def test_export_attributes_project_not_exist_should_return_404(test_async_client_auth, mocker):
     param = {'project_code': 't1000', 'manifest_name': 'fake_manifest'}
     headers = {'Authorization': 'fake token'}
@@ -123,7 +115,6 @@ async def test_export_attributes_project_not_exist_should_return_404(test_async_
     assert res_json.get('error_msg') == "Project not found"
 
 
-@pytest.mark.asyncio
 async def test_attach_attributes_without_token_should_return_401(test_async_client):
     payload = {"manifest_json": {
         "manifest_name": "fake manifest",
@@ -139,7 +130,6 @@ async def test_attach_attributes_without_token_should_return_401(test_async_clie
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
 async def test_attach_attributes_should_return_200(test_async_client_auth, mocker,
                                                    httpx_mock, create_db_manifest):
     payload = {"manifest_json": {
@@ -190,7 +180,6 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
     assert result.get('operation_status') == 'SUCCEED'
 
 
-@pytest.mark.asyncio
 async def test_attach_attributes_wrong_file_should_return_404(test_async_client_auth, httpx_mock, mocker):
     payload = {"manifest_json": {
         "manifest_name": "fake_manifest",
@@ -219,7 +208,6 @@ async def test_attach_attributes_wrong_file_should_return_404(test_async_client_
     assert error == 'File Not Exist'
 
 
-@pytest.mark.asyncio
 async def test_attach_attributes_wrong_name_should_return_400(test_async_client_auth,
                                                               httpx_mock, mocker, create_db_manifest):
     payload = {"manifest_json": {
@@ -259,7 +247,6 @@ async def test_attach_attributes_wrong_name_should_return_400(test_async_client_
     assert error == 'Manifest Not Exist Manifest1'
 
 
-@pytest.mark.asyncio
 async def test_attach_attributes_no_access_should_return_403(test_async_client_auth, mocker):
     payload = {"manifest_json": {
         "manifest_name": "fake manifest",
@@ -279,7 +266,6 @@ async def test_attach_attributes_no_access_should_return_403(test_async_client_a
     assert error == 'Permission Denied'
 
 
-@pytest.mark.asyncio
 async def test_fail_to_attach_attributes_return_404(test_async_client_auth, httpx_mock,
                                                     mocker, create_db_manifest):
     payload = {"manifest_json": {

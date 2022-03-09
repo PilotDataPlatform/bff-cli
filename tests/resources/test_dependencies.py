@@ -1,14 +1,19 @@
 import pytest
 import jwt
 import time
-from tests.helper import EAPIResponseCode
+from fastapi import Request
 from app.models.project_models import POSTProjectFile
-from app.resources.dependencies import *
+from app.resources.dependencies import get_project_role
+from app.resources.dependencies import jwt_required
+from app.resources.dependencies import check_permission
+from app.resources.dependencies import void_check_file_in_zone
+from app.resources.dependencies import validate_upload_event
+from app.resources.dependencies import transfer_to_pre
 
+pytestmark = pytest.mark.asyncio
 project_code = "test_project"
 
 
-@pytest.mark.asyncio
 async def test_get_project_role_successed_should_project_role_and_200(mocker, httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -35,13 +40,10 @@ async def test_get_project_role_successed_should_project_role_and_200(mocker, ht
         status_code=200,
     )
     role, code = await get_project_role(123, project_code)
-    print(role)
-    print(code)
     assert role == "collaborator"
-    assert code == EAPIResponseCode.success
+    assert code.value == 200
 
 
-@pytest.mark.asyncio
 async def test_get_project_role_with_project_not_found_should_return_404(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -51,10 +53,9 @@ async def test_get_project_role_with_project_not_found_should_return_404(httpx_m
     )
     error_msg, code = await get_project_role("fake_id", "fake_code")
     assert error_msg == "Project not found"
-    assert code == EAPIResponseCode.not_found
+    assert code.value == 404
 
 
-@pytest.mark.asyncio
 async def test_get_project_role_with_user_not_found_should_return_403(httpx_mock):
     httpx_mock.add_response(
         method='POST',
@@ -75,10 +76,9 @@ async def test_get_project_role_with_user_not_found_should_return_403(httpx_mock
     )
     error_msg, code = await get_project_role(123, project_code)
     assert error_msg == 'User not in the project'
-    assert code == EAPIResponseCode.forbidden
+    assert code.value == 403
 
 
-@pytest.mark.asyncio
 async def test_jwt_required_should_return_successed(httpx_mock):
     mock_request = Request(scope={"type":"http"})
     encoded_jwt = jwt.encode(
@@ -101,7 +101,6 @@ async def test_jwt_required_should_return_successed(httpx_mock):
     assert test_result["username"] == "test_user"
 
 
-@pytest.mark.asyncio
 async def test_jwt_required_without_token_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
     mock_request._headers = {}
@@ -110,7 +109,6 @@ async def test_jwt_required_without_token_should_return_unauthorized():
     assert response['status_code'] == 401
 
 
-@pytest.mark.asyncio
 async def test_jwt_required_with_token_expired_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
     encoded_jwt = jwt.encode(
@@ -121,7 +119,6 @@ async def test_jwt_required_with_token_expired_should_return_unauthorized():
     assert response['status_code'] == 401
 
 
-@pytest.mark.asyncio
 async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock):
     mock_request = Request(scope={"type": "http"})
     encoded_jwt = jwt.encode(
@@ -138,7 +135,6 @@ async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock)
     assert response['status_code'] == 403
 
 
-@pytest.mark.asyncio
 async def test_jwt_required_with_user_not_in_neo4j_should_return_not_found(httpx_mock):
     mock_request = Request(scope={"type": "http"})
     encoded_jwt = jwt.encode(
@@ -155,7 +151,6 @@ async def test_jwt_required_with_user_not_in_neo4j_should_return_not_found(httpx
     assert response['status_code'] == 404
 
 
-@pytest.mark.asyncio
 async def test_jwt_required_with_username_not_in_token_should_return_not_found(httpx_mock):
     mock_request = Request(scope={"type": "http"})
     encoded_jwt = jwt.encode(
@@ -177,7 +172,6 @@ async def test_jwt_required_with_username_not_in_token_should_return_not_found(h
     assert response['status_code'] == 404
 
 
-@pytest.mark.asyncio
 async def test_check_permission_should_return_correct_permission(httpx_mock):
     event = {'user_id': 1,
              'username': "test_user",
@@ -222,7 +216,6 @@ async def test_check_permission_should_return_correct_permission(httpx_mock):
     assert result == {'project_role': 'admin', 'project_code': 'test_project'}
 
 
-@pytest.mark.asyncio
 async def test_void_check_file_in_zone_should_return_bad_request(httpx_mock):
     mock_post_model = POSTProjectFile
     mock_post_model.type = "type"
@@ -243,7 +236,6 @@ async def test_void_check_file_in_zone_should_return_bad_request(httpx_mock):
     assert response['status_code'] == 400
 
 
-@pytest.mark.asyncio
 async def test_void_check_file_in_zone_with_external_service_error_should_return_forbidden():
     mock_post_model = POSTProjectFile
     mock_post_model.type = "type"
@@ -268,7 +260,6 @@ def test_validate_upload_event_should_return_invalid_zone():
     assert result == "Invalid Zone"
 
 
-@pytest.mark.asyncio
 async def test_transfer_to_pre_success(httpx_mock):
     mock_post_model = POSTProjectFile
     mock_post_model.current_folder_node = "current_folder_node"
@@ -287,7 +278,6 @@ async def test_transfer_to_pre_success(httpx_mock):
     assert result.json() == {}
 
 
-@pytest.mark.asyncio
 async def test_transfer_to_pre_with_external_service_fail():
     mock_post_model = POSTProjectFile
     mock_post_model.current_folder_node = "current_folder_node"

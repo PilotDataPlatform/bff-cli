@@ -3,10 +3,9 @@ import asyncio
 import pytest
 import pytest_asyncio
 import os
-import pdb
 
 from datetime import datetime
-from sqlalchemy import over, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.schema import CreateTable
@@ -28,7 +27,6 @@ from app.commons.data_providers.database import Base as DatasetBase
 
 os.environ['RDS_DB_URI'] = "test_container_uri"
 RDS_SCHEMA_DEFAULT = os.environ['RDS_SCHEMA_DEFAULT']
-print("test_rds")
 
 
 @pytest.fixture(scope='session')
@@ -63,7 +61,6 @@ async def test_async_client_auth(db_postgres, engine):
     app = create_app()
     mock_session = sessionmaker(
         autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
-
 
     async def override_get_db():
         db = mock_session()
