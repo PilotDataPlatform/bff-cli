@@ -6,7 +6,7 @@ from fastapi import Request
 from logger import LoggerFactory
 
 from app.resources.error_handler import APIException
-
+from app.resources.helpers import get_node
 from ..config import ConfigClass
 from ..models.base_models import APIResponse, EAPIResponseCode
 from .helpers import *
@@ -54,6 +54,20 @@ async def jwt_required(request: Request):
         api_response.error_msg = f"Auth service: User {username} does not exist."
         return api_response.json_response()
 
+    data = {
+            "username": username,
+            'name': username
+            }
+    label = 'User'
+    res = get_node(data, label)
+    if not res:
+        api_response.code = EAPIResponseCode.not_found
+        api_response.error_msg = f"Auth service: User {username} does not exist."
+        return api_response.json_response()
+    else:
+        result = res[0]
+        if not result.get('status') == 'active':
+            raise APIException(error_msg="Invalid user", status_code=EAPIResponseCode.unauthorized.value)
     user_id = user['id']
     role = user['role']
     return {
