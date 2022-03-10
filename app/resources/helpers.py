@@ -6,58 +6,22 @@ from logger import LoggerFactory
 
 _logger = LoggerFactory("Helpers").get_logger()
 
+
 def get_zone(namespace):
     return {ConfigClass.GREEN_ZONE_LABEL.lower(): ConfigClass.GREEN_ZONE_LABEL,
             ConfigClass.CORE_ZONE_LABEL.lower(): ConfigClass.CORE_ZONE_LABEL
             }.get(namespace.lower(), ConfigClass.GREEN_ZONE_LABEL.lower())
 
 
-async def get_user_role(user_id, project_id):
-    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations"
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get(
-            url=url,
-            params={"start_id": user_id,
-                    "end_id": project_id})
-        _res = json.loads(res.text)[0]
-        return _res
-    except Exception:
-        return None
+async def get_user_datasets(username):
+    async with httpx.AsyncClient() as client:
+        payload = {
+            "creator": username,
+        }
+        res = await client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Dataset/query", json=payload)
+    return res.json()
 
 
-async def query__node_has_relation_with_admin(label='Container'):
-    _logger.info("query__node_has_relation_with_admin".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query"
-    _logger.info(f"Requesting API: {url}")
-    data = {'is_all': 'true'}
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.post(url=url, json=data)
-        project = res.json()
-        return project
-    except Exception:
-        return []
-
-async def query_node_has_relation_for_user(username, label='Container'):
-    _logger.info("query_node_has_relation_for_user".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/query"
-    data = {
-        'start_label': 'User',
-        'start_params': {'name': username},
-        'end_label': label
-    }
-    _logger.info(f"Requesting API: {url}")
-    _logger.info(f'Query payload: {data}')
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.post(url=url, json=data)
-        _logger.info(f'Query response: {res.text}')
-        res = res.json()
-        return res
-    except Exception:
-        return []
-    
 async def get_node_by_geid(geid):
     _logger.info("get_node_by_geid".center(80, '-'))
     url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/geid/{geid}"
@@ -152,24 +116,20 @@ async def get_node(post_data, label):
     except Exception:
         return None
 
-async def get_user_projects(user_role, username):
+async def get_user_projects(current_identity):
     _logger.info("get_user_projects".center(80, '-'))
-    _logger.info(f'Current username: {username}')
     projects_list = []
-    if user_role == "admin":
-        project_candidate = await query__node_has_relation_with_admin()
-    else:
-        projects = await query_node_has_relation_for_user(username)
-        project_candidate = []
-        for p in projects:
-            _logger.info(f"Found project status: {p['r']}")
-            if p['r'].get('status', 'hibernated') == 'active':
-                project_candidate.append(p['end_node'])
-            else:
-                _logger.info(f"Disabled project: {p['end_node']}")
-        _logger.info(f'Found projects: {project_candidate}')
-    _logger.info(f"Number of candidates: {len(project_candidate)}")
-    for p in project_candidate:
+
+    payload = {}
+
+    if current_identity["role"] != "admin":
+        roles = current_identity["realm_roles"]
+        project_codes = list(set(i.split("-")[0] for i in roles))
+        payload["code__in"] = project_codes
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container/query", json=payload)
+    for p in response.json():
         res_projects = {'name': p.get('name'),
                         'code': p.get('code'),
                         'id': p.get('id'),

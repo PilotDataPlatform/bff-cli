@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from .api_registry import api_registry
 from opentelemetry import trace
@@ -13,6 +14,7 @@ from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from app.namespace import namespace
 from app.config import ConfigClass
 from app.commons.data_providers.database import engine
+from app.resources.error_handler import APIException
 
 
 def instrument_app(app) -> None:
@@ -52,5 +54,13 @@ def create_app():
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.exception_handler(APIException)
+    async def http_exception_handler(request: Request, exc: APIException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content=exc.content,
+        )
+
     api_registry(app)
     return app

@@ -5,94 +5,44 @@ from fastapi import Request
 from app.models.project_models import POSTProjectFile
 from app.resources.dependencies import get_project_role
 from app.resources.dependencies import jwt_required
-from app.resources.dependencies import check_permission
+from app.resources.dependencies import has_permission
 from app.resources.dependencies import void_check_file_in_zone
 from app.resources.dependencies import validate_upload_event
 from app.resources.dependencies import transfer_to_pre
+from app.resources.error_handler import APIException
+from app.config import ConfigClass
 
 pytestmark = pytest.mark.asyncio
 project_code = "test_project"
 
 
-async def test_get_project_role_successed_should_project_role_and_200(mocker, httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Container/query',
-        json=[{
-            "id": 1078,
-            "global_entity_id": "fake_geid",
-            "code": "test_project",
-            "name": "test_project"
-        }],
-        status_code=200,
-    )
-    httpx_mock.add_response(
-        method='GET',
-        url='http://neo4j_service/v1/neo4j/relations?start_id=123&end_id=1078',
-        json=[
-            {
-                "r": {
-                    "type": "collaborator",
-                    "status": "active"
-                }
-            }
-        ],
-        status_code=200,
-    )
-    role, code = await get_project_role(123, project_code)
+def test_get_project_role_successed_should_project_role_and_200(mocker):
+    identity = {"role": "member", "realm_roles": [f"{project_code}-collaborator"]}
+    role = get_project_role(identity, project_code)
     assert role == "collaborator"
-    assert code.value == 200
 
 
-async def test_get_project_role_with_project_not_found_should_return_404(httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Container/query',
-        json=[],
-        status_code=200,
-    )
-    error_msg, code = await get_project_role("fake_id", "fake_code")
-    assert error_msg == "Project not found"
-    assert code.value == 404
-
-
-async def test_get_project_role_with_user_not_found_should_return_403(httpx_mock):
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Container/query',
-        json=[{
-            "id": 1078,
-            "global_entity_id": "fake_geid",
-            "code": "test_project",
-            "name": "test_project"
-        }],
-        status_code=200,
-    )
-    httpx_mock.add_response(
-        method='GET',
-        url='http://neo4j_service/v1/neo4j/relations?start_id=123&end_id=1078',
-        json=[],
-        status_code=200,
-    )
-    error_msg, code = await get_project_role(123, project_code)
-    assert error_msg == 'User not in the project'
-    assert code.value == 403
+def test_get_project_role_with_project_not_found_should_return_404(mocker):
+    identity = {"role": "member", "realm_roles": []}
+    role = get_project_role(identity, "fake_code")
+    assert role == None
 
 
 async def test_jwt_required_should_return_successed(httpx_mock):
     mock_request = Request(scope={"type":"http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()+3}, key="unittest" ,algorithm="HS256").decode('utf-8')
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()+3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[
-            {
-                "id": 1,
-                "role": "admin"
-            }
-        ],
+        method='GET',
+        url=f'http://service_auth/v1/admin/user?username=test_user',
+        json={ "result": {
+            "id": 1,
+            "role": "admin"
+        }},
         status_code=200,
     )
     test_result = await jwt_required(mock_request)
@@ -104,15 +54,19 @@ async def test_jwt_required_should_return_successed(httpx_mock):
 async def test_jwt_required_without_token_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
     mock_request._headers = {}
-    test_result = await jwt_required(mock_request)
-    response = test_result.__dict__
-    assert response['status_code'] == 401
+    with pytest.raises(APIException) as e:
+        test_result = await jwt_required(mock_request)
+        assert e.value.status_code == 401
+        assert e.value.error_msg == "Token required"
 
 
 async def test_jwt_required_with_token_expired_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()-3}, key="unittest", algorithm="HS256").decode('utf-8')
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()-3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     test_result = await jwt_required(mock_request)
     response = test_result.__dict__
@@ -121,13 +75,17 @@ async def test_jwt_required_with_token_expired_should_return_unauthorized():
 
 async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock):
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()+3}, key="unittest", algorithm="HS256").decode('utf-8')
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()+3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json="mock internal error",
+        method='GET',
+        url='http://service_auth/v1/admin/user?username=test_user',
+        json={ "result": {
+        }},
         status_code=500,
     )
     test_result = await jwt_required(mock_request)
@@ -135,85 +93,24 @@ async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock)
     assert response['status_code'] == 403
 
 
-async def test_jwt_required_with_user_not_in_neo4j_should_return_not_found(httpx_mock):
-    mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": "test_user", "exp": time.time()+3}, key="unittest", algorithm="HS256").decode('utf-8')
-    mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[],
-        status_code=200,
-    )
-    test_result = await jwt_required(mock_request)
-    response = test_result.__dict__
-    assert response['status_code'] == 404
-
-
 async def test_jwt_required_with_username_not_in_token_should_return_not_found(httpx_mock):
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode(
-        {"preferred_username": None, "exp": time.time()+3}, key="unittest", algorithm="HS256").decode('utf-8')
+
+    encoded_jwt = jwt.encode({
+        "realm_access": {"roles": ["platform_admin"]},
+        "preferred_username": "test_user",
+        "exp": time.time()+3
+    }, key="unittest" ,algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[
-            {
-                "id": 1,
-                "role": "admin"
-            }
-        ],
-        status_code=200,
+        method='GET',
+        url='http://service_auth/v1/admin/user?username=test_user',
+        json={ "result": None},
+        status_code=404,
     )
     test_result = await jwt_required(mock_request)
     response = test_result.__dict__
-    assert response['status_code'] == 404
-
-
-async def test_check_permission_should_return_correct_permission(httpx_mock):
-    event = {'user_id': 1,
-             'username': "test_user",
-             'role': "admin",
-             'project_code': project_code,
-             'zone': "gr"}
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Container/query',
-        json=[{
-            "id": 1078,
-            "global_entity_id": "fake_geid",
-            "code": "test_project",
-            "name": "test_project"
-        }],
-        status_code=200,
-    )
-    httpx_mock.add_response(
-        method='GET',
-        url='http://neo4j_service/v1/neo4j/relations?start_id=1&end_id=1078',
-        json=[
-            {
-                "r": {
-                    "type": "admin",
-                    "status": "active"
-                }
-            }
-        ],
-        status_code=200,
-    )
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/User/query',
-        json=[{
-            "global_entity_id": "fake_geid",
-            "status": "active",
-            "name": "test_user"
-        }],
-        status_code=200,
-    )
-    result = await check_permission(event)
-    assert result == {'project_role': 'admin', 'project_code': 'test_project'}
+    assert response['status_code'] == 403
 
 
 async def test_void_check_file_in_zone_should_return_bad_request(httpx_mock):

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.manifest_models import *
 from ...resources.error_handler import catch_internal
-from ...resources.dependencies import jwt_required, check_permission
+from ...resources.dependencies import jwt_required, has_permission, get_project_role
 from ...resources.helpers import *
 from ...resources.database_service import RDConnection
 from ...resources. error_handler import customized_error_template, ECustomizedError
@@ -39,22 +39,13 @@ class APIManifest:
         self._logger.info("API list_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {current_identity}")
         self._logger.info(f"User request information: project_code: {project_code},")
-        self._logger.info(f"VAULT CRT: {ConfigClass.RDS_PWD}")
-        self._logger.info(f"VAULT CRT: {ConfigClass.RDS_HOST}")
         try:
-            permission_event = {'user_id': _user_id,
-                        'username': _username,
-                        'role': _user_role,
-                        'project_code': project_code,
-                        'zone': ConfigClass.GREEN_ZONE_LABEL}
-            permission = await check_permission(permission_event)
-            self._logger.info(f"Permission check event: {permission_event}")
-            self._logger.info(f"Permission check result: {permission}")
-            error_msg = permission.get('error_msg', '')
-            if error_msg:
-                api_response.error_msg = error_msg
-                api_response.code = permission.get('code')
-                api_response.result = permission.get('result')
+            zone = ConfigClass.GREEN_ZONE_LABEL
+            permission = await has_permission(
+                current_identity, project_code, "file_attribute_template", zone.lower(), "view")
+            if not permission:
+                api_response.error_msg = "Permission denied"
+                api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
             mani_project_event = {"project_code": project_code}
             self._logger.info("Getiting project manifests")
@@ -95,21 +86,13 @@ class APIManifest:
             project_code = manifests['project_code']
             file_name = manifests['file_name']
             zone = manifests['zone']
-            permission_event = {'user_id': _user_id,
-                            'username': _username,
-                            'role': _user_role,
-                            'project_code': project_code,
-                            'zone': zone}
-            permission = await check_permission(permission_event)
-            self._logger.info(f"Permission check event: {permission_event}")
-            self._logger.info(f"Permission check result: {permission}")
-            error_msg = permission.get('error_msg', '')
-            if error_msg:
-                api_response.error_msg = error_msg
-                api_response.code = permission.get('code')
-                api_response.result = permission.get('result')
+            permission = await has_permission(
+                current_identity, project_code, "file_attribute_template", zone, "attach")
+            if not permission:
+                api_response.error_msg = "Permission denied"
+                api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
-            project_role = permission.get('project_role')
+            project_role = get_project_role(current_identity, project_code)
             zone_type = get_zone(zone)
         except KeyError as e:
             self._logger.error(f"Missing information error: {str(e)}")
@@ -176,23 +159,12 @@ class APIManifest:
             return current_identity
         self._logger.info("API attach_manifest".center(80, '-'))
         self._logger.info(f"User request with identity: {current_identity}")
-        permission_check_event = {'user_role': _user_role,
-                                  'username': _username,
-                                  'project_code': project_code}
-        self._logger.info(f"Permission check event: {permission_check_event}")
-        permission_event = {'user_id': _user_id,
-                    'username': _username,
-                    'role': _user_role,
-                    'project_code': project_code,
-                    'zone': ConfigClass.GREEN_ZONE_LABEL}
-        permission = await check_permission(permission_event)
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        error_msg = permission.get('error_msg', '')
-        if error_msg:
-            api_response.error_msg = error_msg
-            api_response.code = permission.get('code')
-            api_response.result = permission.get('result')
+        zone = ConfigClass.GREEN_ZONE_LABEL.lower()
+        permission = await has_permission(
+            current_identity, project_code, "file_attribute_template", zone, "export")
+        if not permission:
+            api_response.error_msg = "Permission denied"
+            api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
         manifest_event = {"project_code": project_code,
                           "manifest_name": manifest_name}

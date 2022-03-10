@@ -1,34 +1,20 @@
-from .helpers import *
-from fastapi import Request
 import time
-import json
+
+import httpx
 import jwt as pyjwt
+from fastapi import Request
+from logger import LoggerFactory
+
+from app.resources.error_handler import APIException
+
 from ..config import ConfigClass
 import httpx
 from app.resources.error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import APIResponse, EAPIResponseCode
+from .helpers import *
 
 api_response = APIResponse()
-
-async def get_project_role(user_id, project_code):
-    query_payload = {"code": project_code}
-    project = await get_node(query_payload, 'Container')
-    if not project:
-        error_msg = customized_error_template(
-            ECustomizedError.PROJECT_NOT_FOUND)
-        code = EAPIResponseCode.not_found
-        return error_msg, code
-    project_id = project.get("id")
-    role_check_result = await get_user_role(user_id, project_id)
-    if role_check_result:
-        role = role_check_result.get("r").get('type')
-        code = EAPIResponseCode.success
-        return role, code
-    else:
-        error_msg = customized_error_template(
-            ECustomizedError.USER_NOT_IN_PROJECT)
-        code = EAPIResponseCode.forbidden
-        return error_msg, code
+_logger = LoggerFactory("Dependencies").get_logger()
 
 
 async def jwt_required(request: Request):
@@ -36,89 +22,94 @@ async def jwt_required(request: Request):
     if token:
         token = token.replace("Bearer ", "")
     else:
-        api_response.code = EAPIResponseCode.unauthorized
-        api_response.error_msg = "Token required"
-        return api_response.json_response()
+        raise APIException(error_msg="Token required", status_code=EAPIResponseCode.unauthorized.value)
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
+    realm_roles = payload["realm_access"]["roles"]
     exp = payload.get('exp')
     if time.time() - exp > 0:
         api_response.code = EAPIResponseCode.unauthorized
         api_response.error_msg = "Token expired"
         return api_response.json_response()
-    # check if user is existed in neo4j
-    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/User/query"
-    async with httpx.AsyncClient() as client:
-        res = await client.post(
-            url=url,
-            json={"name": username}
-        )
-    if res.status_code != 200:
-        api_response.code = EAPIResponseCode.forbidden
-        api_response.error_msg = "Neo4j service: " + json.loads(res.text)
-        return api_response.json_response()
-    users = res.json()
-    if not users:
-        api_response.code = EAPIResponseCode.not_found
-        api_response.error_msg = f"Neo4j service: User {username} does not exist."
-        return api_response.json_response()
-    user_id = users[0]['id']
-    role = users[0]['role']
     if username is None:
         api_response.code = EAPIResponseCode.not_found
         api_response.error_msg = "User not found"
         return api_response.json_response()
-    return {"code": 200, "user_id": user_id, "username": username, "role": role, "token": token}
+
+    # check if user is existed in keycloak
+    async with httpx.AsyncClient() as client:
+        payload = {
+            "username": username,
+        }
+        res = await client.get(ConfigClass.AUTH_SERVICE + "/v1/admin/user", params=payload)
+    if res.status_code != 200:
+        api_response.code = EAPIResponseCode.forbidden
+        api_response.error_msg = "Auth Service: " + str(res.json())
+        return api_response.json_response()
+
+    user = res.json()["result"]
+    if not user:
+        api_response.code = EAPIResponseCode.not_found
+        api_response.error_msg = f"Auth service: User {username} does not exist."
+        return api_response.json_response()
+
+    user_id = user['id']
+    role = user['role']
+    return {
+        "code": 200,
+        "user_id": user_id,
+        "username": username,
+        "role": role,
+        "token": token,
+        "realm_roles": realm_roles
+    }
 
 
-async def check_permission(event: dict):
-    """
-    event = {'user_id': user_id,
-             'username': username,
-             'role': role,
-             'project_code': project_code,
-             'zone': zone}
-    """
-    user_id = event.get('user_id')
-    username = event.get('username')
-    role = event.get('role')
-    project_code = event.get('project_code')
-    zone = event.get('zone')
-    project_role, code = await get_project_role(user_id, project_code)
-    user_info = await get_node({'name': username}, 'User')
-    user_status = user_info.get('status')
-    if user_status != 'active':
-        permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
-                      'code': code,
-                      'result': f"User status: {user_status}"}
-    elif role == "admin" and code != EAPIResponseCode.not_found:
-        project_role = 'admin'
-        permission = {'project_role': project_role}
-    elif project_role == 'User not in the project':
-        permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
-                      'code': code,
-                      'result': project_role}
-        return permission
-    elif code == EAPIResponseCode.not_found:
-        permission = {'error_msg': customized_error_template(ECustomizedError.PROJECT_NOT_FOUND),
-                      'code': code,
-                      'result': {}}
-        return permission
+def get_project_role(current_identity, project_code):
+    role = None
+    if current_identity["role"] == "admin":
+        role = "platform_admin"
     else:
-        permission = {'project_role': project_role}
-    if project_role != 'admin' and zone.lower() == ConfigClass.GREEN_ZONE_LABEL.lower():
-        permission['project_code'] = project_code
-        permission['uploader'] = username
-    elif project_role != 'contributor' and zone.lower() == ConfigClass.CORE_ZONE_LABEL.lower():
-        permission['project_code'] = project_code
-    elif project_role == 'admin':
-        permission['project_code'] = project_code
+        possible_roles = [project_code + "-" +
+                          i for i in ["admin", "contributor", "collaborator"]]
+        for realm_role in current_identity["realm_roles"]:
+            # if this is a role for the correct project
+            if realm_role in possible_roles:
+                role = realm_role.replace(project_code + "-", "")
+    return role
+
+
+async def has_permission(current_identity, project_code, resource, zone, operation):
+    if current_identity["role"] == "admin":
+        role = "platform_admin"
     else:
-        permission = {'error_msg': customized_error_template(ECustomizedError.PERMISSION_DENIED),
-                      'code': EAPIResponseCode.forbidden,
-                      'result': {}}
-        return permission
-    return permission
+        if not project_code:
+            _logger.info("No project code and not a platform admin, permission denied")
+            return False
+        role = get_project_role(current_identity, project_code)
+        if not role:
+            _logger.info("Unable to get project role in permissions check, user might not belong to project")
+            return False
+    try:
+        payload = {
+            "role": role,
+            "resource": resource,
+            "zone": zone,
+            "operation": operation,
+        }
+        async with httpx.AsyncClient() as client:
+            response = await client.get(ConfigClass.AUTH_SERVICE + "/v1/authorize", params=payload)
+        if response.status_code != 200:
+            error_msg = f"Error calling authorize API - {response.json()}"
+            raise APIException(status_code=response.status_code, error_msg=error_msg)
+        if response.json()["result"].get("has_permission"):
+            return True
+        else:
+            return False
+    except Exception as e:
+        error_msg = str(e)
+        _logger.info(f"Exception on authorize call: {error_msg}")
+        raise APIException(status_code=EAPIResponseCode.internal_error, error_msg=error_msg)
 
 
 async def void_check_file_in_zone(data, file, project_code):

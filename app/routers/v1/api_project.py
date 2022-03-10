@@ -35,7 +35,7 @@ class APIProject:
             return self.current_identity
         self._logger.info("API list_project".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
-        project_list = await get_user_projects(user_role, username)
+        project_list = await get_user_projects(self.current_identity)
         self._logger.info(f"Getting user projects: {project_list}")
         self._logger.info(f"Number of projects: {len(project_list)}")
         api_response.result = project_list
@@ -67,18 +67,19 @@ class APIProject:
         if role == "admin":
             self._logger.info(f"User platform role: {role}")
         else:
-            self._logger.info(f"User platform role: {role}")
-            project_role, code = await get_project_role(user_id, project_code)
-            self._logger.info(f"User project role: {project_role}, {code}")
+            self._logger.info(f"LINE 70 User platform role: {role}")
+            project_role = get_project_role(self.current_identity, project_code)
+            self._logger.info(f"User project role: {project_role}")
             if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role
                 return api_response.json_response()
-            elif project_role == 'User not in the project':
+            elif not project_role:
+                self._logger.debug(f"Not project role")
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
-                api_response.result = project_role
+                api_response.result = 'User not in the project'
                 return api_response.json_response()
         for file in data.data:
             await void_check_file_in_zone(data, file, project_code)
@@ -121,35 +122,25 @@ class APIProject:
         Get folder in project
         """
         api_response = GetProjectFolderResponse()
-        try:
-            role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
-            user_name = self.current_identity['username']
-        except (AttributeError, TypeError):
-            return self.current_identity
-        self._logger.info("API list_folder".center(80, '-'))
+        username = self.current_identity["username"]
+        self._logger.info("API get_project_folder".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
-        permission_event = {'user_id': user_id,
-                            'username': user_name,
-                            'role': role,
-                            'project_code': project_code,
-                            'zone': zone_type}
-        permission = await check_permission(permission_event)
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        error_msg = permission.get('error_msg', '')
-        if error_msg:
-            api_response.error_msg = error_msg
-            api_response.code = permission.get('code')
-            api_response.result = permission.get('result')
-            return api_response.json_response()
-        uploader = permission.get('uploader', '')
-        accessing_folder = folder.split('/')[0]
-        if uploader and uploader != accessing_folder:
+        error_msg = ""
+        permission = await has_permission(
+            self.current_identity, project_code, "file", zone.lower(), "view")
+        if not permission:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
+
+        project_role = get_project_role(self.current_identity, project_code)
+        accessing_folder = folder.split('/')[0]
+        if not project_role in ["admin", "platform-admin"]:
+            if username != accessing_folder:
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                return api_response.json_response()
         folder_check_event = {
             'namespace': zone_type,
             'display_path': folder,

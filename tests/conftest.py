@@ -158,11 +158,12 @@ async def create_db_manifest(engine):
 # Mock for the permission
 async def override_jwt_required(request: Request):
     return {
-        "code": 200, 
-        "user_id": 1, 
-        "username": "testuser", 
-        "role": "admin", 
-        "token": "fake token"
+        "code": 200,
+        "user_id": 1,
+        "username": "testuser",
+        "role": "admin",
+        "token": "fake token",
+        "realm_roles": ["platform-admin"]
     }
 
 
@@ -172,7 +173,8 @@ async def override_member_jwt_required(request: Request):
         "user_id": 1,
         "username": "testuser",
         "role": "contributor",
-        "token": "fake token"
+        "token": "fake token",
+        "realm_roles": ["testproject-contributor"]
     }
 
 
@@ -205,5 +207,7 @@ def mock_settings(monkeypatch, db_postgres):
         ConfigClass, 'DATA_UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')
     monkeypatch.setattr(
         ConfigClass, 'HPC_SERVICE', 'http://service_hpc')
+    monkeypatch.setattr(
+        ConfigClass, 'AUTH_SERVICE', 'http://service_auth')
     monkeypatch.setattr(
         ConfigClass, 'RDS_DB_URI',  f'{db_postgres}?prepared_statement_cache_size=0')

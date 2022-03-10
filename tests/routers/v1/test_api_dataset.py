@@ -1,4 +1,5 @@
 import pytest
+from pytest_httpx import HTTPXMock
 
 test_dataset_api = "/v1/datasets"
 dataset_code = "testdataset"
@@ -13,14 +14,16 @@ async def test_list_dataset_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock):
+async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock: HTTPXMock):
+    header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://neo4j_service/v1/neo4j/relations/query',
-        json=[{"end_node": {"code": "testdataset"}}],
-        status_code=200
+        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
+        json=[
+            {"code": dataset_code},
+        ],
+        status_code=200,
     )
-    header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
     res_json = res.json()
     assert res_json.get('code') == 200
@@ -30,14 +33,15 @@ async def test_list_dataset_should_successed(test_async_client_auth, httpx_mock)
     assert dataset_code in datasets
 
 
-async def test_list_empty_dataset(test_async_client_auth, httpx_mock):
+async def test_list_empty_dataset(test_async_client_auth, httpx_mock: HTTPXMock):
+    header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://neo4j_service/v1/neo4j/relations/query',
-        json=[],
+        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
+        json=[
+        ],
         status_code=200,
     )
-    header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
     res_json = res.json()
     assert res_json.get('code') == 200
