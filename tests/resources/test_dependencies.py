@@ -16,17 +16,6 @@ pytestmark = pytest.mark.asyncio
 project_code = "test_project"
 
 
-def test_get_project_role_successed_should_project_role_and_200(mocker):
-    identity = {"role": "member", "realm_roles": [f"{project_code}-collaborator"]}
-    role = get_project_role(identity, project_code)
-    assert role == "collaborator"
-
-
-def test_get_project_role_with_project_not_found_should_return_404(mocker):
-    identity = {"role": "member", "realm_roles": []}
-    role = get_project_role(identity, "fake_code")
-    assert role == None
-
 
 async def test_jwt_required_should_return_successed(httpx_mock):
     mock_request = Request(scope={"type":"http"})

@@ -1,9 +1,10 @@
+from unittest import result
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.file_models import QueryDataInfoResponse, QueryDataInfo, GetProjectFileListResponse
 from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError, EAPIResponseCode
-from ...resources.dependencies import jwt_required, has_permission
-from ...resources.helpers import batch_query_node_by_geid, verify_list_event, separate_rel_path, get_zone, get_parent_label, check_folder_exist
+from ...resources.dependencies import jwt_required, has_permission, get_project_role
+from ...resources.helpers import batch_query_node_by_geid, verify_list_event, separate_rel_path, get_zone, query_node, query_relation
 from ...config import ConfigClass
 from logger import LoggerFactory
 import httpx
@@ -105,10 +106,9 @@ class APIFile:
             file_response.error_msg = error_msg
             file_response.code = code
             return file_response.json_response()
-        zone_type = get_zone(zone)
-        zone_label = [zone_type]
-        permission = await has_permission(
-            self.current_identity, project_code, "file", zone, "view")
+        zone_label = get_zone(zone)
+        permission = await has_permission(self.current_identity, project_code, "file", zone, "view")
+        self._logger.warn(f"permission: {permission}")
         if not permission:
             file_response.error_msg = "Permission denied"
             file_response.code = EAPIResponseCode.forbidden
@@ -126,7 +126,10 @@ class APIFile:
             child_attribute = {'project_code': project_code,
                                'archived': False}
         self._logger.info(f"Getting child node attribute: {child_attribute}")
-        parent_type = get_parent_label(source_type)
+        parent_type = {
+                        'folder': 'Folder',
+                        'container': 'Container'
+                    }.get(source_type.lower(), None)
         rel_path, folder_name = separate_rel_path(folder)
         self._logger.info(f"Getting parent_type: {parent_type}")
         self._logger.info(f"Getting relative_path: {rel_path}")
@@ -135,53 +138,55 @@ class APIFile:
             parent_attribute = {'code': project_code}
             parent_label = [parent_type]
         else:
-            parent_label = [parent_type, zone_type]
+            parent_label = [parent_type, zone_label]
             parent_attribute = {'project_code': project_code,
                                 'name': folder_name,
                                 'folder_relative_path': rel_path}
         if source_type == 'Folder':
-            code, error_msg = await check_folder_exist(zone, project_code, folder)
+            folder_check_event = {
+                "query": {
+                            "folder_relative_path": '/'.join(folder.split('/')[0:-1]),
+                            "display_path": folder,
+                            "name": folder.split('/')[-1],
+                            "project_code": project_code,
+                            "archived": False,
+                            "labels": ['Folder', zone_label]}
+                    }
+            self._logger.info(f"Query node: {folder_check_event}")
             self._logger.info(f"Check folder exist payload: 'zone':{zone}, 'project_code':{project_code}, 'folder_name':{folder_name}, 'rel_path':{rel_path}")
-            self._logger.info(f"Check folder exist response: {code}, {error_msg}")
-            self._logger.debug(
-                f"username != '': {username != ''}, not rel_path: {not rel_path}, folder != username: {folder != username}")
+            self._logger.debug(f"username != '': {username != ''}, not rel_path: {not rel_path}, folder != username: {folder != username}")
             self._logger.debug(f"username: {username}, rel_path: {rel_path}, folder: {folder}")
-            if error_msg:
-                file_response.error_msg = error_msg
+            folder_response = await query_node(folder_check_event)
+            res = folder_response.json().get('result')
+            self._logger.info(f"Check folder exist response: {code}, '{error_msg}', '{res}'")
+            project_role = get_project_role(self.current_identity, project_code)
+            self._logger.info(f"Project role: {project_role}")
+            if not res:
+                file_response.error_msg = 'Folder not exist'
                 file_response.code = EAPIResponseCode.forbidden
                 self._logger.error(f'Returning error: {EAPIResponseCode.forbidden}, {error_msg}')
                 return file_response.json_response()
-            elif username and not rel_path and folder_name != username:
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
-                                   f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
-                return file_response.json_response()
-            elif username and rel_path and rel_path.split('/')[0] != username:
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
-                                   f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
-                return file_response.json_response()
-        url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/query"
-        payload = {"start_label": parent_label,
-                   "start_params": parent_attribute,
-                   "end_label": zone_label,
-                   "end_params": child_attribute}
-        self._logger.info(f"Query file/folder payload: {payload}")
-        self._logger.info(f"Query file/folder API: {url}")
-        try:
-            async with httpx.AsyncClient() as client:
-                res = await client.post(url, json=payload)
-            res = res.json()
-            query_result = []
-            for f in res:
-                query_result.append(f.get('end_node'))
-            file_response.result = query_result
-            file_response.code = EAPIResponseCode.success
-            return file_response.json_response()
-        except Exception as e:
-            self._logger.error(f"Error query files: {str(e)}")
-            file_response.error_msg = str(e)
-            file_response.code = EAPIResponseCode.internal_error
-            return file_response.json_response()
+            if zone_label == ConfigClass.GREEN_ZONE_LABEL and not project_role in ["admin", "platform-admin"]:
+                if username and not rel_path and folder_name != username:
+                    file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    file_response.code = EAPIResponseCode.forbidden
+                    self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
+                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                    return file_response.json_response()
+                elif username and rel_path and rel_path.split('/')[0] != username:
+                    file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    file_response.code = EAPIResponseCode.forbidden
+                    self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
+                                    f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                    return file_response.json_response()
+        payload = {
+            "start_label": parent_label,
+            "start_params": parent_attribute,
+            "end_label": zone_label,
+            "end_params": child_attribute}
+        self._logger.info(f"Query relation payload: {payload}")
+        query_code, query_result, query_error = await query_relation(payload)
+        file_response.result = query_result
+        file_response.code = query_code
+        file_response.error_msg = query_error
+        return file_response.json_response()

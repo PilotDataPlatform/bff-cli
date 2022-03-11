@@ -38,8 +38,7 @@ async def test_list_empty_dataset(test_async_client_auth, httpx_mock: HTTPXMock)
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
-        json=[
-        ],
+        json=[],
         status_code=200,
     )
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
@@ -73,7 +72,7 @@ async def test_get_dataset_detail_should_successed(test_async_client_auth, httpx
     res_json = res.json()
     assert res_json.get('code') == 200
     result = res_json.get('result')
-    _dataset_info = result.get('general_info')
+    _dataset_info = result.get('general_info')[0]
     assert _dataset_info["creator"] == "testuser"
     _version_info = result.get('version_detail')
     assert _version_info[0]["dataset_code"] == dataset_code

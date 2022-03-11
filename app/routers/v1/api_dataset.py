@@ -4,8 +4,8 @@ from ...models.dataset_models import *
 from ...models.base_models import EAPIResponseCode
 from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.database_service import RDConnection
-from ...resources.dependencies import jwt_required, get_node
-from app.resources.helpers import get_user_datasets
+from ...resources.dependencies import jwt_required
+from app.resources.helpers import get_node
 from logger import LoggerFactory
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.commons.data_providers.database import DBConnection
@@ -40,7 +40,8 @@ class APIDataset:
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(f"User request with identity: {self.current_identity}")
-        dataset_list = await get_user_datasets(username)
+        payload = {"creator": username}
+        dataset_list = await get_node(payload, 'Dataset')
         self._logger.info(f"Getting user datasets: {dataset_list}")
         self._logger.info(f"Number of datasets: {len(dataset_list)}")
         api_response.result = dataset_list
@@ -55,13 +56,12 @@ class APIDataset:
         '''
         Get the dataset detail by dataset code
         '''
-        self._logger.info("API validate_manifest".center(80, '-'))
+        self._logger.info("API get_dataset".center(80, '-'))
         api_response = DatasetDetailResponse()
         try:
             username = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_datasets".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         node = await get_node({"code": dataset_code}, 'Dataset')
         self._logger.info(f"Getting user dataset node: {node}")
@@ -69,19 +69,21 @@ class APIDataset:
             api_response.code = EAPIResponseCode.not_found
             api_response.error_msg = customized_error_template(ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
-        elif node.get('creator') != username:
+        elif node[0].get('creator') != username:
             api_response.code = EAPIResponseCode.forbidden
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             return api_response.json_response()
-        elif 'Dataset' not in node.get('labels'):
+        elif 'Dataset' not in node[0].get('labels'):
             api_response.code = EAPIResponseCode.not_found
             api_response.error_msg = customized_error_template(ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
-        node_geid = node.get('global_entity_id')
+        node_geid = node[0].get('global_entity_id')
         dataset_query_event = {
             'dataset_geid': node_geid,
             }
+        self._logger.info(f"Dataset query: {dataset_query_event}")
         versions = await self.db.get_dataset_versions(dataset_query_event, db_session)
+        self._logger.info(f"Dataset versions: {versions}")
         dataset_detail = {'general_info': node, 'version_detail': versions, 'version_no': len(versions)}
         api_response.result = dataset_detail
         api_response.code = EAPIResponseCode.success

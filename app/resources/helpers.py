@@ -1,4 +1,3 @@
-import json
 import httpx
 from ..config import ConfigClass
 from ..models.base_models import EAPIResponseCode
@@ -11,31 +10,6 @@ def get_zone(namespace):
     return {ConfigClass.GREEN_ZONE_LABEL.lower(): ConfigClass.GREEN_ZONE_LABEL,
             ConfigClass.CORE_ZONE_LABEL.lower(): ConfigClass.CORE_ZONE_LABEL
             }.get(namespace.lower(), ConfigClass.GREEN_ZONE_LABEL.lower())
-
-
-async def get_user_datasets(username):
-    async with httpx.AsyncClient() as client:
-        payload = {
-            "creator": username,
-        }
-        res = await client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Dataset/query", json=payload)
-    return res.json()
-
-
-async def get_node_by_geid(geid):
-    _logger.info("get_node_by_geid".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/geid/{geid}"
-    _logger.info(f'Getting node: {url}')
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.get(url)
-        _logger.info(f'Getting node info: {res.text}')
-        result = res.json()
-    except Exception as e:
-        _logger.error(f'Error getting node by geid: {e}')
-        result = None
-    return result
-
 
 async def batch_query_node_by_geid(geid_list):
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/query/geids"
@@ -56,63 +30,11 @@ async def batch_query_node_by_geid(geid_list):
     return located_geid, query_result
 
 
-async def query_file_in_project(project_code, filename, zone=ConfigClass.GREEN_ZONE_LABEL):
-    _logger.info("query_file_in_project".center(80, '-'))
-    url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    data = {"query": {
-        "name": filename.split('/')[-1],
-        "display_path": filename,
-        "archived": False,
-        "project_code": project_code,
-        "labels": [zone]}}
-    _logger.info(f"Query url: {url}")
-    try:
-        _logger.info(f"Get file info payload: {data}")
-        async with httpx.AsyncClient() as client:
-            res = await client.post(url=url, json=data)
-        _logger.info(f"Query file response: {res.text}")
-        file_res = res.json()
-        _logger.info(f"file response: {file_res}")
-        if file_res.get('code') == 200 and file_res.get('result'):
-            result =  file_res
-        else:
-            result = []
-    except Exception as e:
-        _logger.error(str(e))
-        result = []
-    finally:
-        return result
-
-
-async def get_file_entity_id(project_code, file_name, zone=ConfigClass.GREEN_ZONE_LABEL):
-    res = await query_file_in_project(project_code, file_name, zone)
-    res = res.get('result')
-    if not res:
-        return None
-    else:
-        global_entity_id = res[0].get('global_entity_id')
-        return global_entity_id
-
-
-async def get_file_by_id(file_id):
-    post_data = {"global_entity_id": file_id}
-    try:
-        async with httpx.AsyncClient() as client:
-            response =  await client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/File/query", json=post_data)
-        if not response.json():
-            return None
-        return response.json()[0]
-    except Exception:
-        return None
-
-
 async def get_node(post_data, label):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
-        if not response.json():
-            return None
-        return response.json()[0]
+        return response.json()
     except Exception:
         return None
 
@@ -164,34 +86,14 @@ async def attach_manifest_to_file(event):
         return None
     return response.json()
 
-
-async def http_query_node_zone(folder_event):
-    namespace = folder_event.get('namespace')
-    project_code = folder_event.get('project_code')
-    folder_name = folder_event.get('folder_name')
-    display_path = folder_event.get('display_path')
-    folder_relative_path = folder_event.get('folder_relative_path')
-    zone_label = get_zone(namespace)
-    payload = {
-        "query": {
-            "folder_relative_path": folder_relative_path,
-            "display_path": display_path,
-            "name": folder_name,
-            "project_code": project_code,
-            "archived": False,
-            "labels": ['Folder', zone_label]}
-    }
+async def query_node(payload):
+    _logger.info("query_node")
+    _logger.info(f"query payload: {payload}")
     node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
     async with httpx.AsyncClient() as client:
         response = await client.post(node_query_url, json=payload)
+    _logger.info(f"query response: {response}")
     return response
-
-
-def get_parent_label(source):
-    return {
-        'folder': 'Folder',
-        'container': 'Container'
-    }.get(source.lower(), None)
 
 
 def separate_rel_path(folder_path):
@@ -218,23 +120,23 @@ def verify_list_event(source_type, folder):
     return code, error_msg
 
 
-async def check_folder_exist(zone, project_code, folder):
-    folder_check_event = {
-        'namespace': zone,
-        'project_code': project_code,
-        'display_path': folder,
-        'folder_name': folder.split('/')[-1],
-        'folder_relative_path': '/'.join(folder.split('/')[0:-1])
-    }
-    folder_response = await http_query_node_zone(folder_check_event)
-    res = folder_response.json().get('result')
-    if folder_response.status_code != 200:
-        error_msg = folder_response.json()["error_msg"]
-        code = EAPIResponseCode.internal_error
-    elif res:
-        error_msg = ''
+async def query_relation(payload):
+    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/query"
+    _logger.info(f"Query file/folder payload: {payload}")
+    _logger.info(f"Query file/folder API: {url}")
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post(url, json=payload)
+        res = res.json()
+        query_result = []
+        for f in res:
+            query_result.append(f.get('end_node'))
+        result = query_result
         code = EAPIResponseCode.success
-    else:
-        error_msg = 'Folder not exist'
-        code = EAPIResponseCode.not_found
-    return code, error_msg
+        error_msg = ''
+        return code, result, error_msg
+    except Exception as e:
+        _logger.error(f"Error query files: {str(e)}")
+        error_msg = str(e)
+        code = EAPIResponseCode.internal_error
+        return code, result, error_msg

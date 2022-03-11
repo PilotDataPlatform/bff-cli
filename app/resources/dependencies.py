@@ -6,10 +6,8 @@ from fastapi import Request
 from logger import LoggerFactory
 
 from app.resources.error_handler import APIException
-
 from ..config import ConfigClass
 import httpx
-from app.resources.error_handler import customized_error_template, ECustomizedError
 from ..models.base_models import APIResponse, EAPIResponseCode
 from .helpers import *
 
@@ -67,8 +65,10 @@ async def jwt_required(request: Request):
 
 def get_project_role(current_identity, project_code):
     role = None
+    _logger.info('get_project_role'.center(80,'='))
+    _logger.info(f'Received identity: {current_identity}, project_code: {project_code}')
     if current_identity["role"] == "admin":
-        role = "platform_admin"
+        role = "platform-admin"
     else:
         possible_roles = [project_code + "-" +
                           i for i in ["admin", "contributor", "collaborator"]]
@@ -158,6 +158,7 @@ def validate_upload_event(zone, data_type=None):
 
 async def transfer_to_pre(data, project_code, session_id):
     try:
+        _logger.info("transfer_to_pre".center(80, '-'))
         payload = {
             "current_folder_node": data.current_folder_node,
             "project_code": project_code,

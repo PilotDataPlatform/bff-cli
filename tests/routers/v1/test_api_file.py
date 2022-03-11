@@ -144,9 +144,9 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(test_async
     assert res_json.get('error_msg') == 'Folder not exist'
 
 
-async def test_get_files_when_only_namefolder_should_return_403(test_async_client_auth, mocker, httpx_mock):
+async def test_get_files_when_only_namefolder_should_return_403(test_async_client_project_member_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
-             "zone": "cr",
+             "zone": "gr",
              "folder": "fake_folder",
              "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
@@ -159,15 +159,15 @@ async def test_get_files_when_only_namefolder_should_return_403(test_async_clien
                           "project_code": "test_project", "name": "fake_folder"}]},
         status_code=200,
     )
-    res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
+    res = await test_async_client_project_member_auth.get(test_get_file_api, headers=header, query_string=param)
     res_json = res.json()
     assert res.status_code == 403
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_async_client_auth, mocker, httpx_mock):
+async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_async_client_project_member_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
-             "zone": "cr",
+             "zone": "gr",
              "folder": "fake_admin/fake_folder",
              "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
@@ -180,7 +180,7 @@ async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_a
                           "project_code": "test_project", "name": "fake_folder"}]},
         status_code=200,
     )
-    res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
+    res = await test_async_client_project_member_auth.get(test_get_file_api, headers=header, query_string=param)
     res_json = res.json()
     assert res.status_code == 403
     assert res_json.get('error_msg') == "Permission Denied"
@@ -219,16 +219,17 @@ async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker,
                         "labels":["File"],
                         "archived":False,
                         "project_code": project_code,
-                        "display_path": "testuser/fake_file"
+                        "display_path": "fake_user/fake_file"
                      },
                      "folder_file_geid":{
                          "labels": ["Folder"],
                          "archived": False,
                          "project_code": project_code,
-                         "display_path": "testuser/fake_folder"
+                         "display_path": "fake_user/fake_folder"
                      }
                  }))
-    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
+    mocker.patch('app.routers.v1.api_file.has_permission',
+                 return_value=True)
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
     assert res.status_code == 200
     res_json = res.json()

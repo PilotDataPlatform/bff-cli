@@ -115,6 +115,7 @@ async def test_upload_for_contributor_into_core_should_return_403(test_async_cli
                  return_value={})
     header = {'Authorization': 'fake token'}
     response = await test_async_client_project_member_auth.post(test_get_project_file_api, headers=header, json=payload)
+    print(response)
     res_json = response.json()
     assert res_json.get('code') == 403
     assert res_json.get('error_msg') == 'Permission Denied'
@@ -189,7 +190,7 @@ async def test_get_folder_in_project_should_return_200(test_async_client_auth, m
     mock_response.status_code = 200
     mock_response._content = b'{"result": [{"labels": ["zone", "Folder"], \
         "project_code": "test_project", "name": "fake_folder"}]}'
-    mocker.patch('app.routers.v1.api_project.http_query_node_zone',
+    mocker.patch('app.routers.v1.api_project.query_node',
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_get_project_folder_api, headers=header, query_string=param)
@@ -253,7 +254,7 @@ async def test_get_folder_fail_when_query_node_should_return_500(test_async_clie
     mock_response = Response()
     mock_response.status_code = 400
     mock_response._content = b'{"result": [], "error_msg":"mock error"}'
-    mocker.patch('app.routers.v1.api_project.http_query_node_zone',
+    mocker.patch('app.routers.v1.api_project.query_node',
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_get_project_folder_api, headers=header, query_string=param)
@@ -273,7 +274,7 @@ async def test_get_folder_in_project_with_folder_not_found_should_return_404(tes
     mock_response = Response()
     mock_response.status_code = 200
     mock_response._content = b'{"result": []}'
-    mocker.patch('app.routers.v1.api_project.http_query_node_zone',
+    mocker.patch('app.routers.v1.api_project.query_node',
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_get_project_folder_api, headers=header, query_string=param)
