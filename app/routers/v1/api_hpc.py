@@ -5,7 +5,6 @@ from ...models.error_model import HPCError
 from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import *
-from ...resources.helpers import *
 from ...resources.hpc import submit_hpc_job, get_hpc_job_info
 from ...resources.hpc import get_hpc_nodes, get_hpc_node_by_name, get_hpc_jwt_token
 from ...resources.hpc import get_hpc_partitions, get_hpc_partition_by_name
@@ -35,7 +34,7 @@ class APIProject:
             token_issuer = request_payload.token_issuer
             username = request_payload.username
             password = request_payload.password
-            token = get_hpc_jwt_token(token_issuer, username, password)
+            token = await get_hpc_jwt_token(token_issuer, username, password)
             if token:
                 error = ""
                 code = EAPIResponseCode.success
@@ -70,7 +69,7 @@ class APIProject:
         try:
             self._logger.info(f"SUBMITTING JOB: {request_payload}")
             self._logger.info(f"SUBMITTING JOB: {type(request_payload)}")
-            response = submit_hpc_job(request_payload)
+            response = await submit_hpc_job(request_payload)
             if response:
                 error_msg = ""
                 result = response
@@ -102,7 +101,7 @@ class APIProject:
         result = {}
         try:
         
-            information = get_hpc_job_info(job_id, host, username, token)
+            information = await get_hpc_job_info(job_id, host, username, token)
             if information:
                 error = ""
                 code = EAPIResponseCode.success
@@ -136,7 +135,7 @@ class APIProject:
         api_response = HPCNodesResponse()
         result = {}
         try:
-            information = get_hpc_nodes(host, username, token)
+            information = await get_hpc_nodes(host, username, token)
             if information:
                 error = ""
                 code = EAPIResponseCode.success
@@ -171,7 +170,8 @@ class APIProject:
         api_response = HPCNodeInfoResponse()
         result = {}
         try:
-            information = get_hpc_node_by_name(host, username, token, node_name)
+            information = await get_hpc_node_by_name(
+                host, username, token, node_name)
             if information:
                 error = ""
                 code = EAPIResponseCode.success
@@ -205,7 +205,7 @@ class APIProject:
         api_response = HPCPartitonsResponse()
         result = {}
         try:
-            information = get_hpc_partitions(host, username, token)
+            information = await get_hpc_partitions(host, username, token)
             if information:
                 error = ""
                 code = EAPIResponseCode.success
@@ -239,7 +239,8 @@ class APIProject:
         api_response = HPCPartitionInfoResponse()
         result = {}
         try:
-            information = get_hpc_partition_by_name(host, username, token, partition_name)
+            information = await get_hpc_partition_by_name(
+                host, username, token, partition_name)
             if information:
                 error = ""
                 code = EAPIResponseCode.success

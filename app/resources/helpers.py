@@ -11,13 +11,13 @@ def get_zone(namespace):
             ConfigClass.CORE_ZONE_LABEL.lower(): ConfigClass.CORE_ZONE_LABEL
             }.get(namespace.lower(), ConfigClass.GREEN_ZONE_LABEL.lower())
 
-def batch_query_node_by_geid(geid_list):
+async def batch_query_node_by_geid(geid_list):
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/query/geids"
     payload = {
         "geids": geid_list
     }
-    with httpx.Client() as client:
-        res = client.post(url, json=payload)
+    async with httpx.AsyncClient() as client:
+        res = await client.post(url, json=payload)
     res_json = res.json()
     result = res_json.get('result')
     located_geid = []
@@ -30,15 +30,15 @@ def batch_query_node_by_geid(geid_list):
     return located_geid, query_result
 
 
-def get_node(post_data, label):
+async def get_node(post_data, label):
     try:
-        with httpx.Client() as client:
-            response = client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
+        async with httpx.AsyncClient() as client:
+            response = await client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
         return response.json()
     except Exception:
         return None
 
-def get_user_projects(current_identity):
+async def get_user_projects(current_identity):
     _logger.info("get_user_projects".center(80, '-'))
     projects_list = []
 
@@ -49,8 +49,8 @@ def get_user_projects(current_identity):
         project_codes = list(set(i.split("-")[0] for i in roles))
         payload["code__in"] = project_codes
 
-    with httpx.Client() as client:
-        response = client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container/query", json=payload)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container/query", json=payload)
     for p in response.json():
         res_projects = {'name': p.get('name'),
                         'code': p.get('code'),
@@ -61,7 +61,7 @@ def get_user_projects(current_identity):
     return projects_list
 
 
-def attach_manifest_to_file(event):
+async def attach_manifest_to_file(event):
     project_code = event.get('project_code')
     global_entity_id = event.get('global_entity_id')
     manifest_id = event.get('manifest_id')
@@ -79,20 +79,20 @@ def attach_manifest_to_file(event):
                "username": username}
     _logger.info(f"POSTING: {url}")
     _logger.info(f"PAYLOAD: {payload}")
-    with httpx.Client() as client:
-        response = client.post(url=url, json=payload)
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url=url, json=payload)
     _logger.info(f"RESPONSE: {response.text}")
     if not response.json():
         return None
     return response.json()
 
-def query_node(payload):
+async def query_node(payload):
     _logger.info("query_node")
     _logger.info(f"query payload: {payload}")
     node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    with httpx.Client() as client:
-        response = client.post(node_query_url, json=payload)
-    _logger.info(f"query response: {payload}")
+    async with httpx.AsyncClient() as client:
+        response = await client.post(node_query_url, json=payload)
+    _logger.info(f"query response: {response}")
     return response
 
 
@@ -120,13 +120,13 @@ def verify_list_event(source_type, folder):
     return code, error_msg
 
 
-def query_relation(payload):
+async def query_relation(payload):
     url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/relations/query"
     _logger.info(f"Query file/folder payload: {payload}")
     _logger.info(f"Query file/folder API: {url}")
     try:
-        with httpx.Client() as client:
-            res = client.post(url, json=payload)
+        async with httpx.AsyncClient() as client:
+            res = await client.post(url, json=payload)
         res = res.json()
         query_result = []
         for f in res:

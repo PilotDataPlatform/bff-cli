@@ -7,6 +7,8 @@ from ...resources.helpers import *
 from ...resources.database_service import RDConnection
 from ...resources. error_handler import customized_error_template, ECustomizedError
 from logger import LoggerFactory
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.commons.data_providers.database import DBConnection
 
 router = APIRouter()
 _API_TAG = 'V1 manifest'
@@ -16,6 +18,7 @@ _API_NAMESPACE = "api_manifest"
 class APIManifest:
     _API_TAG = 'V1 Manifest'
     _API_NAMESPACE = "api_manifest"
+    db_connection = DBConnection
 
     def __init__(self):
         self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
@@ -25,7 +28,8 @@ class APIManifest:
                 response_model=ManifestListResponse,
                 summary="Get manifest list by project code (project_code required)")
     @catch_internal(_API_NAMESPACE)
-    async def list_manifest(self, project_code: str, current_identity: dict = Depends(jwt_required)):
+    async def list_manifest(self, project_code: str, current_identity: dict = Depends(jwt_required),
+                            db_session: AsyncSession = Depends(db_connection.get_db)):
         api_response = ManifestListResponse()
         try:
             _username = current_identity['username']
@@ -38,16 +42,18 @@ class APIManifest:
         self._logger.info(f"User request information: project_code: {project_code},")
         try:
             zone = ConfigClass.GREEN_ZONE_LABEL
-            if not has_permission(current_identity, project_code, "file_attribute_template", zone.lower(), "view"):
+            permission = await has_permission(
+                current_identity, project_code, "file_attribute_template", zone.lower(), "view")
+            if not permission:
                 api_response.error_msg = "Permission denied"
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
             mani_project_event = {"project_code": project_code}
             self._logger.info("Getiting project manifests")
-            manifests = self.db.get_manifest_name_from_project_in_db(mani_project_event)
+            manifests = await self.db.get_manifest_name_from_project_in_db(mani_project_event, db_session)
             self._logger.info(f"Manifest in project check result: {manifests}")
             self._logger.info("Getting attributes for manifests")
-            manifest_list = self.db.get_attributes_in_manifest_in_db(manifests)
+            manifest_list = await self.db.get_attributes_in_manifest_in_db(manifests, db_session)
             api_response.result = manifest_list
             api_response.code = EAPIResponseCode.success
             return api_response.json_response()
@@ -62,7 +68,8 @@ class APIManifest:
                  summary="Attach manifest to file")
     @catch_internal(_API_NAMESPACE)
     async def attach_manifest(self, request_payload: ManifestAttachPost,
-                              current_identity: dict = Depends(jwt_required)):
+                              current_identity: dict = Depends(jwt_required),
+                              db_session: AsyncSession = Depends(db_connection.get_db)):
         """CLI will call manifest validation API before attach manifest to file in uploading process"""
         api_response = ManifestAttachResponse()
         try:
@@ -80,7 +87,9 @@ class APIManifest:
             project_code = manifests['project_code']
             file_name = manifests['file_name']
             zone = manifests['zone']
-            if not has_permission(current_identity, project_code, "file_attribute_template", zone, "attach"):
+            permission = await has_permission(
+                current_identity, project_code, "file_attribute_template", zone, "attach")
+            if not permission:
                 api_response.error_msg = "Permission denied"
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
@@ -100,7 +109,7 @@ class APIManifest:
                 "archived": False,
                 "project_code": project_code,
                 "labels": ['File', zone_type]}}
-        file_response = query_node(file_info)
+        file_response = await query_node(file_info)
         self._logger.info(f"Query result: {file_response}")
         file_node = file_response.json().get('result')
         self._logger.info(f"line 106: {file_node}")
@@ -117,7 +126,7 @@ class APIManifest:
         attributes = manifests.get("attributes", {})
         mani_project_event = {"project_code": project_code, "manifest_name": manifest_name}
         self._logger.info(f"Getting manifest from project event: {mani_project_event}")
-        manifest_info = self.db.get_manifest_name_from_project_in_db(mani_project_event)
+        manifest_info = await self.db.get_manifest_name_from_project_in_db(mani_project_event, db_session)
         self._logger.info(f"Manifest information: {manifest_info}")
         if not manifest_info:
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
@@ -132,7 +141,7 @@ class APIManifest:
                             "attributes": attributes,
                             "username": _username,
                             "project_role": project_role}
-        response = attach_manifest_to_file(annotation_event)
+        response = await attach_manifest_to_file(annotation_event)
         self._logger.info(f"Attach manifest result: {response}")
         if not response:
             api_response.error_msg = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
@@ -148,7 +157,8 @@ class APIManifest:
                 summary="Export manifest from project")
     @catch_internal(_API_NAMESPACE)
     async def export_manifest(self, project_code, manifest_name,
-                              current_identity: dict = Depends(jwt_required)):
+                              current_identity: dict = Depends(jwt_required),
+                              db_session: AsyncSession = Depends(db_connection.get_db)):
         """Export manifest from the project"""
         api_response = ManifestExportResponse()
         try:
@@ -161,7 +171,7 @@ class APIManifest:
         self._logger.info(f"User request with identity: {current_identity}")
         zone = ConfigClass.GREEN_ZONE_LABEL.lower()
         # CLI user need to export/view attribute first, so that they could attach attribute 
-        permission = has_permission(current_identity, project_code, "file_attribute_template", zone, "view")
+        permission = await has_permission(current_identity, project_code, "file_attribute_template", zone, "view")
         self._logger.info(f"User permission: {permission}")
         if not permission:
             api_response.error_msg = "Permission denied"
@@ -169,14 +179,16 @@ class APIManifest:
             return api_response.json_response()
         manifest_event = {"project_code": project_code,
                           "manifest_name": manifest_name}
-        manifest = self.db.get_manifest_name_from_project_in_db(manifest_event)
+        manifest = await self.db.get_manifest_name_from_project_in_db(manifest_event, db_session)
         self._logger.info(f"Matched manifest in database: {manifest}")
         if not manifest:
             api_response.code = EAPIResponseCode.not_found
             api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             return api_response.json_response()
         else:
-            result = self.db.get_attributes_in_manifest_in_db(manifest)[0]
+            db_result = await self.db.get_attributes_in_manifest_in_db(manifest, db_session)
+            result = db_result[0]
+            self._logger.debug(f"Attributes result {result}")
             api_response.code = EAPIResponseCode.success
             api_response.result = result
             return api_response.json_response()

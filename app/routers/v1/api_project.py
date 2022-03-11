@@ -35,7 +35,7 @@ class APIProject:
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(f"User request with identity: {self.current_identity}")
-        project_list = get_user_projects(self.current_identity)
+        project_list = await get_user_projects(self.current_identity)
         self._logger.info(f"Getting user projects: {project_list}")
         self._logger.info(f"Number of projects: {len(project_list)}")
         api_response.result = project_list
@@ -67,24 +67,24 @@ class APIProject:
         if role == "admin":
             self._logger.info(f"User platform role: {role}")
         else:
-            self._logger.info(f"User platform role: {role}")
+            self._logger.info(f"LINE 70 User platform role: {role}")
             project_role = get_project_role(self.current_identity, project_code)
             self._logger.info(f"User project role: {project_role}")
-
             if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role
                 return api_response.json_response()
-            elif project_role == 'User not in the project':
+            elif not project_role:
+                self._logger.debug(f"Not project role")
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
-                api_response.result = project_role
+                api_response.result = 'User not in the project'
                 return api_response.json_response()
         for file in data.data:
-            void_check_file_in_zone(data, file, project_code)
+            await void_check_file_in_zone(data, file, project_code)
         session_id = request.headers.get("Session-ID")
-        result = transfer_to_pre(data, project_code, session_id)
+        result = await transfer_to_pre(data, project_code, session_id)
 
         trans_payload = {
             "current_folder_node": data.current_folder_node,
@@ -126,8 +126,8 @@ class APIProject:
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
         error_msg = ""
-        permission = has_permission(self.current_identity, project_code, "file", zone.lower(), "view")
-        self._logger.info(f"permission: {permission}")
+        permission = await has_permission(
+            self.current_identity, project_code, "file", zone.lower(), "view")
         if not permission:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             api_response.code = EAPIResponseCode.forbidden
@@ -149,7 +149,7 @@ class APIProject:
                             "archived": False,
                             "labels": ['Folder', zone_type]}
                     }
-        response = query_node(folder_check_event)
+        response = await query_node(folder_check_event)
         self._logger.info(f"Folder check event: {folder_check_event}")
         self._logger.info(f"Folder check response: {response.text}")
         if response.status_code != 200:

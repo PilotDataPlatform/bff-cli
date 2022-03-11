@@ -1,15 +1,13 @@
 import pytest
 from pytest_httpx import HTTPXMock
 from tests.helper import EAPIResponseCode
+pytestmark = pytest.mark.asyncio
 
 test_query_geid_api = "/v1/query/geid"
 test_get_file_api = "/v1/test_project/files/query"
 project_code = "test_project"
 
-# test get file/folder api in ptoject/folder
 
-
-@pytest.mark.asyncio
 async def test_get_name_folders_in_project_should_return_200(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {
         "project_code": project_code,
@@ -18,16 +16,26 @@ async def test_get_name_folders_in_project_should_return_200(test_async_client_a
         "source_type": 'Container'
     }
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.has_permission',
                  return_value=True)
-    mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('', "fake_user"))
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v1/neo4j/relations/query',
-        json=[{'end_node':{"name": "fake_user"}}],
+        json=[{
+            "end_node": {
+                "name": "test_file"
+            },
+            "p": {
+                "amyguindoc14": {}
+            },
+            "r": {
+                "type": "admin",
+                "status": "active"
+            },
+            "start_node": {
+                "id": 4376
+            }
+        }],
         status_code=200,
     )
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
@@ -38,63 +46,44 @@ async def test_get_name_folders_in_project_should_return_200(test_async_client_a
     name_folders = []
     for f in result:
         name_folders.append(f.get('name'))
-    assert 'fake_user' in name_folders
+    assert 'test_file' in name_folders
 
 
-@pytest.mark.asyncio
 async def test_get_files_in_folder_should_return_200(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {
         "project_code": project_code,
-        "zone": "zone",
+        "zone": "gr",
         "folder": 'testuser/fake_folder',
         "source_type": 'Folder'
     }
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.has_permission',
                  return_value=True)
-    mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('testuser/fake_folder', "testuser"))
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "error_msg": "",
-            "result": [
-                {
-                    "id": 1234,
-                    "labels": [
-                        "Folder",
-                        "Core"
-                    ],
-                    "global_entity_id": "geid",
-                    "display_path": "testuser/fake_folder",
-                    "project_code": project_code,
-                    "operator": "testuser",
-                    "tags": [],
-                    "folder_level": 1,
-                    "archived": False,
-                    "list_priority": 10,
-                    "folder_relative_path": "testuser",
-                    "time_lastmodified": "2021-11-19T20:33:52",
-                    "uploader": "testuser",
-                    "name": "fake_folder",
-                    "time_created": "2021-11-19T20:33:52"
-                }
-            ],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        }
-        ,
+        json={"result": [{"labels": ["zone", "Folder"],
+                          "project_code": "test_project", "name": "fake_folder"}]},
         status_code=200,
     )
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v1/neo4j/relations/query',
-        json=[{'end_node': {"name": "fake_file"}}],
+        json=[{
+            "end_node": {
+                "name": "test_file"
+            },
+            "p": {
+                "amyguindoc14": {}
+            },
+            "r": {
+                "type": "admin",
+                "status": "active"
+            },
+            "start_node": {
+                "id": 4376
+            }
+        }],
         status_code=200,
     )
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
@@ -105,10 +94,9 @@ async def test_get_files_in_folder_should_return_200(test_async_client_auth, moc
     files = []
     for f in result:
         files.append(f.get('name'))
-    assert 'fake_file' in files
+    assert 'test_file' in files
 
 
-@pytest.mark.asyncio
 async def test_get_folder_without_token(test_async_client):
     param = {
         "project_code": project_code,
@@ -122,98 +110,32 @@ async def test_get_folder_without_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
 async def test_get_files_in_folder_without_folder_name_should_return_400(test_async_client_auth, mocker):
     param = {"project_code": project_code,
-                "zone": "zone",
+                "zone": "gr",
                 "folder": "",
                 "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.bad_request, 'missing folder name'))
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
     res_json = res.json()
     assert res.status_code == 400
     assert res_json.get('error_msg') == "missing folder name"
 
 
-@pytest.mark.asyncio
-async def test_get_files_without_permission_should_return_403(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
+async def test_get_files_when_folder_does_not_exist_should_return_403(test_async_client_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
-                "zone": "gr",
-                "folder": "fake_user/fake_folder",
-                "source_type": 'Folder'}
-    header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
-    mocker.patch('app.routers.v1.api_file.has_permission',
-                 return_value=True)
-    httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "error_msg": "",
-            "result": [
-                {
-                    "id": 1234,
-                    "labels": [
-                        "Folder",
-                        "Core"
-                    ],
-                    "global_entity_id": "geid",
-                    "display_path": "fake_user/fake_folder",
-                    "project_code": project_code,
-                    "operator": "fake_user",
-                    "tags": [],
-                    "folder_level": 1,
-                    "archived": False,
-                    "list_priority": 10,
-                    "folder_relative_path": "fake_user",
-                    "time_lastmodified": "2021-11-19T20:33:52",
-                    "uploader": "fake_user",
-                    "name": "fake_folder",
-                    "time_created": "2021-11-19T20:33:52"
-                }
-            ],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        }
-        ,
-        status_code=200,
-    )
-    res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
-    res_json = res.json()
-    assert res.status_code == 403
-    assert res_json.get('error_msg') == "Permission Denied"
-
-
-@pytest.mark.asyncio
-async def test_get_files_when_folder_does_not_exist_should_return_403(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
-    param = {"project_code": project_code,
-             "zone": "zone",
-             "folder": "fake_folder",
+             "zone": "gr",
+             "folder": "fake_user/fake_folder",
              "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.has_permission',
-                 return_value=True)
-    mocker.patch('app.routers.v1.api_file.separate_rel_path',
-                 return_value=('fake_user/fake_folder', "fake_user"))
+                 return_value={"code": 200,
+                               'project_code': project_code,
+                               'uploader': 'fake_user'})
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "error_msg": "",
-            "result": [],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        }
-        ,
+        json={"result": []},
         status_code=200,
     )
     res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
@@ -222,154 +144,61 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(test_async
     assert res_json.get('error_msg') == 'Folder not exist'
 
 
-@pytest.mark.asyncio
-async def test_get_files_when_only_namefolder_should_return_403(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
+async def test_get_files_when_only_namefolder_should_return_403(test_async_client_project_member_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
-             "zone": "zone",
+             "zone": "gr",
              "folder": "fake_folder",
              "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.has_permission',
                  return_value=True)
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "error_msg": "",
-            "result": [
-                {
-                    "id": 1234,
-                    "labels": [
-                        "Folder",
-                        "Core"
-                    ],
-                    "global_entity_id": "geid",
-                    "display_path": "fake_folder",
-                    "project_code": project_code,
-                    "operator": "fake_user",
-                    "tags": [],
-                    "folder_level": 1,
-                    "archived": False,
-                    "list_priority": 10,
-                    "folder_relative_path": "fake_user",
-                    "time_lastmodified": "2021-11-19T20:33:52",
-                    "uploader": "fake_user",
-                    "name": "fake_folder",
-                    "time_created": "2021-11-19T20:33:52"
-                }
-            ],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        }
-        ,
+        json={"result": [{"labels": ["zone", "Folder"],
+                          "project_code": "test_project", "name": "fake_folder"}]},
         status_code=200,
     )
-    res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
+    res = await test_async_client_project_member_auth.get(test_get_file_api, headers=header, query_string=param)
     res_json = res.json()
     assert res.status_code == 403
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
-async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
+async def test_get_files_when_folder_not_belong_to_user_should_return_403(test_async_client_project_member_auth, mocker, httpx_mock):
     param = {"project_code": project_code,
              "zone": "gr",
-             "folder": "fake_user/fake_folder",
+             "folder": "fake_admin/fake_folder",
              "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.has_permission',
-                 return_value=True)
+             return_value=True)
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "error_msg": "",
-            "result": [
-                {
-                    "id": 1234,
-                    "labels": [
-                        "Folder",
-                        "Core"
-                    ],
-                    "global_entity_id": "geid",
-                    "display_path": "fake_user/fake_folder",
-                    "project_code": project_code,
-                    "operator": "fake_user",
-                    "tags": [],
-                    "folder_level": 1,
-                    "archived": False,
-                    "list_priority": 10,
-                    "folder_relative_path": "fake_user",
-                    "time_lastmodified": "2021-11-19T20:33:52",
-                    "uploader": "fake_user",
-                    "name": "fake_folder",
-                    "time_created": "2021-11-19T20:33:52"
-                }
-            ],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        }
-        ,
+        json={"result": [{"labels": ["zone", "Folder"],
+                          "project_code": "test_project", "name": "fake_folder"}]},
         status_code=200,
     )
-    res = await test_async_client_auth.get(test_get_file_api, headers=header, query_string=param)
+    res = await test_async_client_project_member_auth.get(test_get_file_api, headers=header, query_string=param)
     res_json = res.json()
     assert res.status_code == 403
     assert res_json.get('error_msg') == "Permission Denied"
 
 
-@pytest.mark.asyncio
 async def test_get_files_when_neo4j_broke_should_return_500(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
     param = {"project_code": project_code,
-             "zone": "gr",
+             "zone": "cr",
              "folder": "testuser/fake_folder",
              "source_type": 'Folder'}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.verify_list_event',
-                 return_value=(EAPIResponseCode.success, ''))
     mocker.patch('app.routers.v1.api_file.has_permission',
                  return_value=True)
     httpx_mock.add_response(
         method='POST',
         url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "error_msg": "",
-            "result": [
-                {
-                    "id": 1234,
-                    "labels": [
-                        "Folder",
-                        "Core"
-                    ],
-                    "global_entity_id": "geid",
-                    "display_path": "fake_user/fake_folder",
-                    "project_code": project_code,
-                    "operator": "fake_user",
-                    "tags": [],
-                    "folder_level": 1,
-                    "archived": False,
-                    "list_priority": 10,
-                    "folder_relative_path": "fake_user",
-                    "time_lastmodified": "2021-11-19T20:33:52",
-                    "uploader": "fake_user",
-                    "name": "fake_folder",
-                    "time_created": "2021-11-19T20:33:52"
-                }
-            ],
-            "page": 0,
-            "total": 1,
-            "num_of_pages": 1
-        }
-        ,
+        json={"result": [{"labels": ["zone", "Folder"],
+                          "project_code": "test_project", "name": "fake_folder"}]},
         status_code=200,
     )
     httpx_mock.add_response(
@@ -381,8 +210,7 @@ async def test_get_files_when_neo4j_broke_should_return_500(test_async_client_au
     assert res.status_code == 500
 
 
-@pytest.mark.asyncio
-async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker):
+async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker, httpx_mock):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_file.batch_query_node_by_geid',
@@ -409,9 +237,8 @@ async def test_query_file_by_geid_should_get_200(test_async_client_auth, mocker)
     assert len(result) == 2
     for entity in result:
         assert entity["geid"] in payload['geid']
-    
 
-@pytest.mark.asyncio
+
 async def test_query_file_by_geid_wiht_token(test_async_client):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     res = await test_async_client.post(test_query_geid_api, json=payload)
@@ -420,12 +247,17 @@ async def test_query_file_by_geid_wiht_token(test_async_client):
     assert res_json.get('error_msg') == "Token required"
 
 
-@pytest.mark.asyncio
-async def test_query_file_by_geid_when_file_not_found(test_async_client_auth, mocker):
+async def test_query_file_by_geid_when_file_not_found(test_async_client_auth, httpx_mock):
     payload = {'geid': ["file_geid", "folder_file_geid"]}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.batch_query_node_by_geid',
-                 return_value=([], {}))
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/nodes/query/geids',
+        json={
+            "result": []
+        },
+        status_code=200,
+    )
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
     assert res.status_code == 200
     res_json = res.json()
@@ -435,19 +267,25 @@ async def test_query_file_by_geid_when_file_not_found(test_async_client_auth, mo
         assert entity["result"] == []
 
 
-@pytest.mark.asyncio
-async def test_query_file_by_geid_get_trashfile(test_async_client_auth, mocker):
-    payload = {'geid': ["file_geid", "folder_file_geid"]}
+async def test_query_file_by_geid_get_trashfile(test_async_client_auth, httpx_mock):
+    payload = {'geid': ["file_geid"]}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.batch_query_node_by_geid',
-                 return_value=(["file_geid"], {
-                     "file_geid": {
-                         "labels": ["TrashFile"],
-                         "archived": False,
-                         "project_code": project_code,
-                         "display_path": "fake_user/fake_file"
-                     }
-                 }))
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/nodes/query/geids',
+        json={
+            "result": [
+                {
+                    "labels": ["TrashFile"],
+                    "global_entity_id": "file_geid",
+                    "display_path": "testuser/fake_file",
+                    "project_code": project_code,
+                    "archived": False
+                }
+            ]
+        },
+        status_code=200,
+    )
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
     assert res.status_code == 200
     res_json = res.json()
@@ -456,19 +294,25 @@ async def test_query_file_by_geid_get_trashfile(test_async_client_auth, mocker):
         assert entity["result"] == []
 
 
-@pytest.mark.asyncio
-async def test_query_file_by_geid_when_file_is_archived(test_async_client_auth, mocker):
-    payload = {'geid': ["file_geid", "folder_file_geid"]}
+async def test_query_file_by_geid_when_file_is_archived(test_async_client_auth, httpx_mock):
+    payload = {'geid': ["file_geid"]}
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.batch_query_node_by_geid',
-                 return_value=(["file_geid"], {
-                     "file_geid": {
-                         "labels": ["File"],
-                         "archived": True,
-                         "project_code": project_code,
-                         "display_path": "fake_user/fake_file"
-                     }
-                 }))
+    httpx_mock.add_response(
+        method='POST',
+        url='http://neo4j_service/v1/neo4j/nodes/query/geids',
+        json={
+            "result": [
+                {
+                    "labels": ["File"],
+                    "global_entity_id": "file_geid",
+                    "display_path": "testuser/fake_file",
+                    "project_code": project_code,
+                    "archived": True
+                }
+            ]
+        },
+        status_code=200,
+    )
     res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
     assert res.status_code == 200
     res_json = res.json()
@@ -476,32 +320,3 @@ async def test_query_file_by_geid_when_file_is_archived(test_async_client_auth, 
     for entity in result:
         assert entity["result"] == []
 
-
-@pytest.mark.asyncio
-async def test_query_file_by_geid_without_permission(test_async_client_auth, mocker):
-    payload = {'geid': ["file_geid", "folder_file_geid"]}
-    header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.batch_query_node_by_geid',
-                 return_value=(["file_geid", "folder_file_geid"], {
-                     "file_geid": {
-                         "labels": ["File"],
-                         "archived": False,
-                         "project_code": project_code,
-                         "display_path": "fake_user/fake_file"
-                     },
-                     "folder_file_geid": {
-                         "labels": ["Folder"],
-                         "archived": False,
-                         "project_code": project_code,
-                         "display_path": "fake_user/fake_folder"
-                     }
-                 }))
-    mocker.patch('app.routers.v1.api_file.has_permission',
-                 return_value=True)
-    res = await test_async_client_auth.post(test_query_geid_api, headers=header, json=payload)
-    assert res.status_code == 200
-    res_json = res.json()
-    result = res_json.get('result')
-    for entity in result:
-        assert entity["status"] == "Permission Denied"
-        assert entity["result"] == []

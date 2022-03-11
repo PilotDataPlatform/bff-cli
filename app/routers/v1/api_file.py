@@ -41,7 +41,7 @@ class APIFile:
         self._logger.info(f"Received information geid: {geid_list}")
         self._logger.info(f"User request with identity: {self.current_identity}")
         response_list = []
-        located_geid, query_result = batch_query_node_by_geid(geid_list)
+        located_geid, query_result = await batch_query_node_by_geid(geid_list)
         for global_entity_id in geid_list:
             self._logger.info(f'Query geid: {global_entity_id}')
             if global_entity_id not in located_geid:
@@ -68,7 +68,8 @@ class APIFile:
                 zone = ConfigClass.CORE_ZONE_LABEL if ConfigClass.CORE_ZONE_LABEL in labels \
                     else ConfigClass.GREEN_ZONE_LABEL
                 self._logger.info(f'File zone: {zone}')
-                if not has_permission(self.current_identity, project_code, "file", zone.lower(), "view"):
+                permission = await has_permission(self.current_identity, project_code, "file", zone.lower(), "view")
+                if not permission:
                     file_response.error_msg = "Permission denied"
                     file_response.code = EAPIResponseCode.forbidden
                     return file_response.json_response()
@@ -106,7 +107,7 @@ class APIFile:
             file_response.code = code
             return file_response.json_response()
         zone_label = get_zone(zone)
-        permission = has_permission(self.current_identity, project_code, "file", zone, "view")
+        permission = await has_permission(self.current_identity, project_code, "file", zone, "view")
         self._logger.warn(f"permission: {permission}")
         if not permission:
             file_response.error_msg = "Permission denied"
@@ -155,10 +156,11 @@ class APIFile:
             self._logger.info(f"Check folder exist payload: 'zone':{zone}, 'project_code':{project_code}, 'folder_name':{folder_name}, 'rel_path':{rel_path}")
             self._logger.debug(f"username != '': {username != ''}, not rel_path: {not rel_path}, folder != username: {folder != username}")
             self._logger.debug(f"username: {username}, rel_path: {rel_path}, folder: {folder}")
-            folder_response = query_node(folder_check_event)
+            folder_response = await query_node(folder_check_event)
             res = folder_response.json().get('result')
             self._logger.info(f"Check folder exist response: {code}, '{error_msg}', '{res}'")
             project_role = get_project_role(self.current_identity, project_code)
+            self._logger.info(f"Project role: {project_role}")
             if not res:
                 file_response.error_msg = 'Folder not exist'
                 file_response.code = EAPIResponseCode.forbidden
@@ -182,7 +184,8 @@ class APIFile:
             "start_params": parent_attribute,
             "end_label": zone_label,
             "end_params": child_attribute}
-        query_code, query_result, query_error = query_relation(payload)
+        self._logger.info(f"Query relation payload: {payload}")
+        query_code, query_result, query_error = await query_relation(payload)
         file_response.result = query_result
         file_response.code = query_code
         file_response.error_msg = query_error

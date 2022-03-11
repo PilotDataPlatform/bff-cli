@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
 from pydantic import BaseSettings, Extra
-from typing import Dict, Set, List, Any
-from functools import lru_cache
+from typing import Dict, Any
 from common import VaultClient
+from functools import lru_cache
 
 load_dotenv()
 SRV_NAMESPACE = os.environ.get("APP_NAME", "bff_cli")
@@ -40,10 +40,12 @@ class Settings(BaseSettings):
     RDS_USER: str 
     RDS_SCHEMA_DEFAULT: str 
     NEO4J_SERVICE: str
+    RDS_DB_URI: str
 
     def __init__(self):
         super().__init__()
-        self.SQLALCHEMY_DATABASE_URI = f"postgresql://{self.RDS_USER}:{self.RDS_PWD}@{self.RDS_HOST}/{self.RDS_DBNAME}"
+        self.RDS_DB_URI = self.RDS_DB_URI.replace(
+            'postgresql', 'postgresql+asyncpg')
 
 
     class Config:
@@ -59,10 +61,18 @@ class Settings(BaseSettings):
             file_secret_settings,
         ):
             return (
-                init_settings,
                 load_vault_settings,
                 env_settings,
+                init_settings,
                 file_secret_settings,
             )
 
-ConfigClass = Settings()
+
+@lru_cache(1)
+def get_settings():
+    settings = Settings()
+    return settings
+
+
+ConfigClass = get_settings()
+

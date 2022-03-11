@@ -7,12 +7,11 @@ from logger import LoggerFactory
 
 from app.resources.error_handler import APIException
 from ..config import ConfigClass
+import httpx
 from ..models.base_models import APIResponse, EAPIResponseCode
 from .helpers import *
 
 api_response = APIResponse()
-
-
 _logger = LoggerFactory("Dependencies").get_logger()
 
 
@@ -30,18 +29,17 @@ async def jwt_required(request: Request):
         api_response.code = EAPIResponseCode.unauthorized
         api_response.error_msg = "Token expired"
         return api_response.json_response()
-
     if username is None:
         api_response.code = EAPIResponseCode.not_found
         api_response.error_msg = "User not found"
         return api_response.json_response()
 
     # check if user is existed in keycloak
-    with httpx.Client() as client:
+    async with httpx.AsyncClient() as client:
         payload = {
             "username": username,
         }
-        res = client.get(ConfigClass.AUTH_SERVICE + "/v1/admin/user", params=payload)
+        res = await client.get(ConfigClass.AUTH_SERVICE + "/v1/admin/user", params=payload)
     if res.status_code != 200:
         api_response.code = EAPIResponseCode.forbidden
         api_response.error_msg = "Auth Service: " + str(res.json())
@@ -70,7 +68,7 @@ def get_project_role(current_identity, project_code):
     _logger.info('get_project_role'.center(80,'='))
     _logger.info(f'Received identity: {current_identity}, project_code: {project_code}')
     if current_identity["role"] == "admin":
-        role = "platform_admin"
+        role = "platform-admin"
     else:
         possible_roles = [project_code + "-" +
                           i for i in ["admin", "contributor", "collaborator"]]
@@ -81,7 +79,7 @@ def get_project_role(current_identity, project_code):
     return role
 
 
-def has_permission(current_identity, project_code, resource, zone, operation):
+async def has_permission(current_identity, project_code, resource, zone, operation):
     if current_identity["role"] == "admin":
         role = "platform_admin"
     else:
@@ -99,10 +97,8 @@ def has_permission(current_identity, project_code, resource, zone, operation):
             "zone": zone,
             "operation": operation,
         }
-        _logger.info(f"Permission payload: {payload}")
-        with httpx.Client() as client:
-            response = client.get(ConfigClass.AUTH_SERVICE + "/v1/authorize", params=payload)
-        _logger.info(f"Permission response: {response.text}")
+        async with httpx.AsyncClient() as client:
+            response = await client.get(ConfigClass.AUTH_SERVICE + "/v1/authorize", params=payload)
         if response.status_code != 200:
             error_msg = f"Error calling authorize API - {response.json()}"
             raise APIException(status_code=response.status_code, error_msg=error_msg)
@@ -116,7 +112,7 @@ def has_permission(current_identity, project_code, resource, zone, operation):
         raise APIException(status_code=EAPIResponseCode.internal_error, error_msg=error_msg)
 
 
-def void_check_file_in_zone(data, file, project_code):
+async def void_check_file_in_zone(data, file, project_code):
     payload = {"type": data.type,
                "zone": data.zone,
                "file_relative_path": file.get('resumable_relative_path') + '/' +
@@ -124,8 +120,8 @@ def void_check_file_in_zone(data, file, project_code):
                "project_code": project_code
                }
     try:
-        with httpx.Client() as client:
-            result = client.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
+        async with httpx.AsyncClient() as client:
+            result = await client.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
         result = result.json()
     except Exception as e:
         api_response.error_msg = f"EntityInfo service  error: {e}"
@@ -160,7 +156,7 @@ def validate_upload_event(zone, data_type=None):
         return error_msg
 
 
-def transfer_to_pre(data, project_code, session_id):
+async def transfer_to_pre(data, project_code, session_id):
     try:
         _logger.info("transfer_to_pre".center(80, '-'))
         payload = {
@@ -175,10 +171,8 @@ def transfer_to_pre(data, project_code, session_id):
             "Session-ID": session_id
         }
         url = select_url_by_zone(data.zone)
-        _logger.info(f'url: {url}')
-        _logger.info(f'payload: {payload}')
-        with httpx.Client() as client:
-            result = client.post(url, headers=headers, json=payload)
+        async with httpx.AsyncClient() as client:
+            result = await client.post(url, headers=headers, json=payload)
         return result
     except Exception as e:
         api_response.error_msg = f"Upload service  error: {e}"

@@ -1,10 +1,10 @@
 import pytest
 from pytest_httpx import HTTPXMock
 
+pytestmark = pytest.mark.asyncio
 test_lineage_api = "/v1/lineage"
 
 
-@pytest.mark.asyncio
 async def test_create_lineage_should_return_200(test_async_client_auth, httpx_mock: HTTPXMock):
     payload = {
         "project_code": "test_project",
@@ -41,12 +41,9 @@ async def test_create_lineage_should_return_200(test_async_client_auth, httpx_mo
         status_code=200,
     )
     res = await test_async_client_auth.post(test_lineage_api, headers=header, json=payload)
-    res_json = res.json()
-    print(res_json.get('result'))
     assert res.status_code == 200
 
 
-@pytest.mark.asyncio
 async def test_create_lineage_with_internal_error_should_return_500(test_async_client_auth, httpx_mock: HTTPXMock):
     payload = {
         "project_code": "test_project",
@@ -63,7 +60,5 @@ async def test_create_lineage_with_internal_error_should_return_500(test_async_c
         status_code=500,
     )
     res = await test_async_client_auth.post(test_lineage_api, headers=header, json=payload)
-    res_json = res.json()
-    print(res_json.get('result'))
     assert res.status_code == 500
 
