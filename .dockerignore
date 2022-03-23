@@ -14,3 +14,4 @@ kubernetes
 gitlab-ci*
 Dockerfile*
 Jenkinsfile
+*.log
