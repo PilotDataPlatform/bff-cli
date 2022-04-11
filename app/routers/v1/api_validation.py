@@ -1,15 +1,18 @@
+import re
 from logging import error
 from app.models.error_model import InvalidEncryptionError
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from logger import LoggerFactory
 from ...commons.data_providers.database import DBConnection
-from ...resources.error_handler import catch_internal
+from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.helpers import *
 from ...resources.validation_service import ManifestValidator, decryption
 from ...resources.database_service import RDConnection
 from ...models.validation_models import *
-import re
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.commons.data_providers.database import DBConnection
+from app.resources.error_handler import customized_error_template, ECustomizedError
 
 router = APIRouter()
 
@@ -18,6 +21,7 @@ router = APIRouter()
 class APIValidation:
     _API_TAG = 'V1 Validate'
     _API_NAMESPACE = "api_validation"
+    db_connection = DBConnection
 
     def __init__(self):
         self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
@@ -45,10 +49,11 @@ class APIValidation:
                  response_model=ManifestValidateResponse,
                  summary="Validate manifest for project")
     @catch_internal(_API_NAMESPACE)
-    async def validate_manifest(self, request_payload: ManifestValidatePost):
+    async def validate_manifest(self, request_payload: ManifestValidatePost,
+                                db_session: AsyncSession = Depends(db_connection.get_db)):
         """Validate the manifest based on the project"""
         self._logger.info("API validate_manifest".center(80, '-'))
-        self._logger.info(f"DB URI: {ConfigClass.SQLALCHEMY_DATABASE_URI}")
+        self._logger.info(f"DB URI: {ConfigClass.RDS_DB_URI}")
         api_response = ManifestValidateResponse()
         manifests = request_payload.manifest_json
         manifest_name = manifests["manifest_name"]
@@ -58,7 +63,7 @@ class APIValidation:
                             "manifest_name": manifest_name,
                             "attributes": attributes}
         self._logger.info(f"Validation event: {validation_event}")                    
-        manifest_info = self.db.get_manifest_name_from_project_in_db(validation_event)
+        manifest_info = await self.db.get_manifest_name_from_project_in_db(validation_event, db_session)
         self._logger.info(f"manifest_info: {manifest_info}")  
         if not manifest_info:
             api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
@@ -66,7 +71,7 @@ class APIValidation:
             return api_response.json_response()
         validation_event["manifest"] = manifest_info
         validator = ManifestValidator()
-        attribute_validation_error_msg = validator.has_valid_attributes(validation_event)
+        attribute_validation_error_msg = await validator.has_valid_attributes(validation_event, db_session)
         if attribute_validation_error_msg:
             api_response.result = attribute_validation_error_msg
             api_response.code = EAPIResponseCode.bad_request

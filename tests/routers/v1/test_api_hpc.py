@@ -1,19 +1,19 @@
-from sre_constants import IN
 import pytest
-from unittest.mock import patch
-from app.models.error_model import HPCError
-from tests.helper import EAPIResponseCode
+pytestmark = pytest.mark.asyncio
 
 
-@pytest.mark.asyncio
-async def test_hpc_auth_should_return_200(test_async_client, mocker):
+async def test_hpc_auth_should_return_200(test_async_client, httpx_mock):
     payload = {
             "token_issuer": 'host',
             "username": 'username',
             "password": 'password'
             }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_jwt_token',
-                 return_value={"token": "fake-token"})
+    httpx_mock.add_response(
+        method='POST',
+        url='http://service_hpc/v1/hpc/auth',
+        json={"result": {"token": "fake-token"}},
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client.post("/v1/hpc/auth", headers=header, json=payload)
     response = res.json()
@@ -22,15 +22,18 @@ async def test_hpc_auth_should_return_200(test_async_client, mocker):
     assert response.get('error_msg') == ""
 
 
-@pytest.mark.asyncio
-async def test_hpc_auth_with_error_token_should_return_200(test_async_client, mocker):
+async def test_hpc_auth_with_error_token_should_return_200(test_async_client, httpx_mock):
     payload = {
         "token_issuer": 'host',
         "username": 'username',
         "password": 'password'
     }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_jwt_token',
-                 return_value="")
+    httpx_mock.add_response(
+        method='POST',
+        url='http://service_hpc/v1/hpc/auth',
+        json=None,
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client.post("/v1/hpc/auth", headers=header, json=payload)
     response = res.json()
@@ -40,20 +43,24 @@ async def test_hpc_auth_with_error_token_should_return_200(test_async_client, mo
         'error_msg') == "Cannot authorized HPC: Cannot authorized HPC"
 
 
-@pytest.mark.asyncio
-async def test_submit_hpc_job_should_return_200(test_async_client, mocker):
+async def test_submit_hpc_job_should_return_200(test_async_client, httpx_mock):
     payload = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token",
-        "job_info": { "job": {
+        "job_info": {"job": {
             "name": "unit_test",
             "account": "sc-users"},
-            "script": "sleep 300" }
+            "script": "sleep 300"}
     }
     test_api = "/v1/hpc/job"
-    mocker.patch('app.routers.v1.api_hpc.submit_hpc_job',
-                 return_value={"job_id": 15178})
+    httpx_mock.add_response(
+        method='POST',
+        url='http://service_hpc/v1/hpc/job',
+        json={"result": {"job_id": 15178},
+              "code": 200},
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client.post(test_api, headers=header, json=payload)
     response = res.json()
@@ -62,7 +69,6 @@ async def test_submit_hpc_job_should_return_200(test_async_client, mocker):
     assert response.get('result') == {"job_id": 15178}
 
 
-@pytest.mark.asyncio
 async def test_submit_hpc_job_without_script_should_return_400(test_async_client):
     payload = {
         "host": "http://host",
@@ -79,23 +85,26 @@ async def test_submit_hpc_job_without_script_should_return_400(test_async_client
     assert response.get('result') == {}
 
 
-@pytest.mark.asyncio
-async def test_hpc_get_job_success_should_return_200(test_async_client, mocker):
+async def test_hpc_get_job_success_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
     }
-    test_api = "/v1/hpc/job/%s".format('12345')
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_job_info',
-                 return_value={
-                     "job_id": "12345", 
-                     "job_state": "COMPLETED", 
-                     "standard_error": "", 
-                     "standard_input": "", 
-                     "standard_output": ""
-                     }
-                )
+    test_api = "/v1/hpc/job/12345"
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/job/12345?slurm_host=host&username=username&protocol=http',
+        json={"result": {
+            "job_id": "12345",
+            "job_state": "COMPLETED",
+            "standard_error": "",
+            "standard_input": "",
+            "standard_output": ""
+        },
+              "code": 200},
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client.get(test_api, headers=header, query_string=params)
     response = res.json()
@@ -106,18 +115,19 @@ async def test_hpc_get_job_success_should_return_200(test_async_client, mocker):
     assert result.get('job_state') == "COMPLETED"
 
 
-@pytest.mark.asyncio
-async def test_hpc_get_job_wrong_id_should_return_404(test_async_client, mocker):
+async def test_hpc_get_job_wrong_id_should_return_404(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
     }
-    test_api = "/v1/hpc/job/%s".format('123')
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_job_info',
-                 side_effect=HPCError(
-                     EAPIResponseCode.not_found, 'Job ID not found')
-                )
+    test_api = "/v1/hpc/job/123"
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/job/123?slurm_host=host&username=username&protocol=http',
+        json={"error_msg": "unknown job"},
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client.get(test_api, headers=header, query_string=params)
     response = res.json()
@@ -125,15 +135,19 @@ async def test_hpc_get_job_wrong_id_should_return_404(test_async_client, mocker)
     assert response.get('error_msg') == "Job ID not found"
 
 
-@pytest.mark.asyncio
-async def test_hpc_list_nodes_should_return_200(test_async_client, mocker):
+async def test_hpc_list_nodes_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
         }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_nodes',
-                 return_value=[{"hostname1": {}}, {"hostname2": {}}])
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/nodes?slurm_host=host&username=username&protocol=http',
+        json={"result": [{"hostname1": {}}, {"hostname2": {}}],
+              "code": 200},
+        status_code=200,
+    )
     test_api = "/v1/hpc/nodes"
     header = {'Authorization': 'fake token'}
     res = await test_async_client.get(test_api, headers=header, query_string=params)
@@ -147,16 +161,12 @@ async def test_hpc_list_nodes_should_return_200(test_async_client, mocker):
     assert exp_node2 in result
 
 
-@pytest.mark.asyncio
-async def test_hpc_list_nodes_without_protocal_should_return_404(test_async_client, mocker):
+async def test_hpc_list_nodes_without_protocal_should_return_404(test_async_client, httpx_mock):
     params = {
-        "host": "http://host",
+        "host": "http",
         "username": "username",
         "token": "fake-hpc-token"
     }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_nodes',
-                 side_effect=HPCError(
-                     EAPIResponseCode.bad_request, "HPC protocal required"))
     test_api = "/v1/hpc/nodes"
     header = {'Authorization': 'fake token'}
     res = await test_async_client.get(test_api, headers=header, query_string=params)
@@ -165,15 +175,19 @@ async def test_hpc_list_nodes_without_protocal_should_return_404(test_async_clie
     assert response.get('error_msg') == "HPC protocal required"
 
 
-@pytest.mark.asyncio
-async def test_hpc_get_node_with_noe_name_should_return_200(test_async_client, mocker):
+async def test_hpc_get_node_with_node_name_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
         }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_node_by_name',
-                 return_value=[{"hostname1": {"cores": 42}}])
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/nodes/fake_name?slurm_host=host&username=username&protocol=http',
+        json={"result": [{"hostname1": {"cores": 42}}],
+              "code": 200},
+        status_code=200,
+    )
     node_name = "fake_name"
     test_api = f"/v1/hpc/nodes/{node_name}"
     header = {'Authorization': 'fake token'}
@@ -186,15 +200,19 @@ async def test_hpc_get_node_with_noe_name_should_return_200(test_async_client, m
     assert  exp_node1 in result
 
 
-@pytest.mark.asyncio
-async def test_hpc_get_node_without_node_name_should_return_404(test_async_client, mocker):
+async def test_hpc_get_node_without_node_name_should_return_404(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
     }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_node_by_name',
-                 side_effect=HPCError(EAPIResponseCode.not_found, 'Node name not found'))
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/nodes/fake_name?slurm_host=host&username=username&protocol=http',
+        json={"error_msg": 'Invalid node name specified',
+              "code": 404},
+        status_code=404,
+    )
     node_name = "fake_name"
     test_api = f"/v1/hpc/nodes/{node_name}"
     header = {'Authorization': 'fake token'}
@@ -204,15 +222,19 @@ async def test_hpc_get_node_without_node_name_should_return_404(test_async_clien
     assert response.get('error_msg') == 'Node name not found'
 
 
-@pytest.mark.asyncio
-async def test_hpc_list_partitions_should_return_200(test_async_client, mocker):
+async def test_hpc_list_partitions_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
         }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_partitions',
-                 return_value=[{"partition_name1": {"nodes": ["fake_node"]}}, {"partition_name2": {"nodes": ["fake_node2"]}}])
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/partitions?slurm_host=host&username=username&protocol=http',
+        json={"result": [{"partition_name1": {"nodes": ["fake_node"]}}, {"partition_name2": {"nodes": ["fake_node2"]}}],
+              "code": 200},
+        status_code=200,
+    )
     test_api = "/v1/hpc/partitions"
     header = {'Authorization': 'fake token'}
     res = await test_async_client.get(test_api, headers=header, query_string=params)
@@ -226,15 +248,12 @@ async def test_hpc_list_partitions_should_return_200(test_async_client, mocker):
     assert exp_partition2 in result
 
 
-@pytest.mark.asyncio
 async def test_hpc_list_partitions_without_protocal_should_return_400(test_async_client, mocker):
     params = {
-        "host": "http://host",
+        "host": "http",
         "username": "username",
         "token": "fake-hpc-token"
     }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_partitions',
-                 side_effect=HPCError(EAPIResponseCode.bad_request, "HPC protocal required"))
     test_api = "/v1/hpc/partitions"
     header = {'Authorization': 'fake token'}
     res = await test_async_client.get(test_api, headers=header, query_string=params)
@@ -243,15 +262,19 @@ async def test_hpc_list_partitions_without_protocal_should_return_400(test_async
     assert response.get('error_msg') == "HPC protocal required"
 
 
-@pytest.mark.asyncio
-async def test_hpc_get_partition_by_name_should_return_200(test_async_client, mocker):
+async def test_hpc_get_partition_by_name_should_return_200(test_async_client, httpx_mock):
     params = {
         "host": "http://host",
         "username": "username",
         "token": "fake-hpc-token"
         }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_partition_by_name',
-                 return_value=[{"partition_name1": {"nodes": ["fake_node"]}}])
+    httpx_mock.add_response(
+        method='GET',
+        url='http://service_hpc/v1/hpc/partitions/fake_name?slurm_host=host&username=username&protocol=http',
+        json={"result": [{"partition_name1": {"nodes": ["fake_node"]}}],
+              "code": 200},
+        status_code=200,
+    )
     partition_name = "fake_name"
     test_api = f"/v1/hpc/partitions/{partition_name}"
     header = {'Authorization': 'fake token'}
@@ -264,15 +287,12 @@ async def test_hpc_get_partition_by_name_should_return_200(test_async_client, mo
     assert exp_partition1 in result
 
 
-@pytest.mark.asyncio
 async def test_hpc_get_partition_by_name_without_protocal_should_return_400(test_async_client, mocker):
     params = {
-        "host": "http://host",
+        "host": "http",
         "username": "username",
         "token": "fake-hpc-token"
     }
-    mocker.patch('app.routers.v1.api_hpc.get_hpc_partition_by_name',
-                 side_effect=HPCError(EAPIResponseCode.bad_request, "HPC protocal required"))
     partition_name = "fake_name"
     test_api = f"/v1/hpc/partitions/{partition_name}"
     header = {'Authorization': 'fake token'}

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
 from ...models.project_models import *
 from logger import LoggerFactory
-from ...resources.error_handler import catch_internal
+from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
 from ...resources.dependencies import *
 from ...resources.helpers import *
 
@@ -27,15 +27,15 @@ class APIProject:
         '''
         Get the project list that user have access to
         '''
+        self._logger.info("API list_project".center(80, '-'))
         api_response = ProjectListResponse()
         try:
             username = self.current_identity['username']
             user_role = self.current_identity['role']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_project".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
-        project_list = get_user_projects(user_role, username)
+        project_list = await get_user_projects(self.current_identity)
         self._logger.info(f"Getting user projects: {project_list}")
         self._logger.info(f"Number of projects: {len(project_list)}")
         api_response.result = project_list
@@ -56,7 +56,7 @@ class APIProject:
             user_id = self.current_identity["user_id"]
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info("API list_manifest".center(80, '-'))
+        self._logger.info("API project_file_preupload".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         error = validate_upload_event(data.zone, data.type)
         if error:
@@ -67,23 +67,24 @@ class APIProject:
         if role == "admin":
             self._logger.info(f"User platform role: {role}")
         else:
-            self._logger.info(f"User platform role: {role}")
-            project_role, code = get_project_role(user_id, project_code)
-            self._logger.info(f"User project role: {project_role}, {code}")
+            self._logger.info(f"LINE 70 User platform role: {role}")
+            project_role = get_project_role(self.current_identity, project_code)
+            self._logger.info(f"User project role: {project_role}")
             if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() and project_role == "contributor":
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
                 api_response.result = project_role
                 return api_response.json_response()
-            elif project_role == 'User not in the project':
+            elif not project_role:
+                self._logger.debug(f"Not project role")
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
-                api_response.result = project_role
+                api_response.result = 'User not in the project'
                 return api_response.json_response()
         for file in data.data:
-            void_check_file_in_zone(data, file, project_code)
+            await void_check_file_in_zone(data, file, project_code)
         session_id = request.headers.get("Session-ID")
-        result = transfer_to_pre(data, project_code, session_id)
+        result = await transfer_to_pre(data, project_code, session_id)
 
         trans_payload = {
             "current_folder_node": data.current_folder_node,
@@ -93,9 +94,8 @@ class APIProject:
             "data": data.data,
             "job_type": data.job_type
         }
-
-        url = select_url_by_zone(data.zone)
-        self._logger.info(f"Transfer to pre url: {url}")
+        # url = select_url_by_zone(data.zone)
+        # self._logger.info(f"Transfer to pre url: {url}")
         self._logger.info(f"Transfer to pre payload: {trans_payload}")
         self._logger.info(f"Transfer to pre result: {result}")
         self._logger.info(f"Transfer to pre result: {result.status_code}")
@@ -121,43 +121,35 @@ class APIProject:
         Get folder in project
         """
         api_response = GetProjectFolderResponse()
-        try:
-            role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
-            user_name = self.current_identity['username']
-        except (AttributeError, TypeError):
-            return self.current_identity
-        self._logger.info("API list_folder".center(80, '-'))
+        username = self.current_identity["username"]
+        self._logger.info("API get_project_folder".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
         zone_type = get_zone(zone)
-        permission_event = {'user_id': user_id,
-                            'username': user_name,
-                            'role': role,
-                            'project_code': project_code,
-                            'zone': zone_type}
-        permission = check_permission(permission_event)
-        self._logger.info(f"Permission check event: {permission_event}")
-        self._logger.info(f"Permission check result: {permission}")
-        error_msg = permission.get('error_msg', '')
-        if error_msg:
-            api_response.error_msg = error_msg
-            api_response.code = permission.get('code')
-            api_response.result = permission.get('result')
-            return api_response.json_response()
-        uploader = permission.get('uploader', '')
-        accessing_folder = folder.split('/')[0]
-        if uploader and uploader != accessing_folder:
+        error_msg = ""
+        permission = await has_permission(
+            self.current_identity, project_code, "file", zone.lower(), "view")
+        if not permission:
             api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
+        project_role = get_project_role(self.current_identity, project_code)
+        name_folder = folder.split('/')[0]
+        # verify the name folder access permission
+        if zone_type == ConfigClass.GREEN_ZONE_LABEL and not project_role in ["admin", "platform-admin"]:
+            if username != name_folder:
+                api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                api_response.code = EAPIResponseCode.forbidden
+                return api_response.json_response()
         folder_check_event = {
-            'namespace': zone_type,
-            'display_path': folder,
-            'project_code': project_code,
-            'folder_name': folder.split('/')[-1],
-            'folder_relative_path': '/'.join(folder.split('/')[0:-1])
-        }
-        response = http_query_node_zone(folder_check_event)
+                "query": {
+                            "folder_relative_path": '/'.join(folder.split('/')[0:-1]),
+                            "display_path": folder,
+                            "name": folder.split('/')[-1],
+                            "project_code": project_code,
+                            "archived": False,
+                            "labels": ['Folder', zone_type]}
+                    }
+        response = await query_node(folder_check_event)
         self._logger.info(f"Folder check event: {folder_check_event}")
         self._logger.info(f"Folder check response: {response.text}")
         if response.status_code != 200:

@@ -1,10 +1,10 @@
 import pytest
 from pytest_httpx import HTTPXMock
 
+pytestmark = pytest.mark.asyncio
 test_kg_api = "/v1/kg/resources"
 
 
-@pytest.mark.asyncio
 async def test_kg_import_resource_should_return_200(test_async_client_kg_auth, httpx_mock: HTTPXMock):
     payload = {
         'dataset_code': [],
@@ -46,7 +46,6 @@ async def test_kg_import_resource_should_return_200(test_async_client_kg_auth, h
     assert len(res_json.get('result').get('ignored')) == 0
 
 
-@pytest.mark.asyncio
 async def test_kg_import_existed_resource_should_return_200(test_async_client_kg_auth, httpx_mock: HTTPXMock):
     payload = {
         'dataset_code': [],

@@ -6,7 +6,7 @@ import httpx
 
 _logger = LoggerFactory("HPC").get_logger()
 
-def get_hpc_jwt_token(token_issuer, username, password = None):
+async def get_hpc_jwt_token(token_issuer, username, password = None):
     _logger.info("get_hpc_jwt_token".center(80, '-'))
     try:
         payload = {
@@ -17,8 +17,8 @@ def get_hpc_jwt_token(token_issuer, username, password = None):
         url = ConfigClass.HPC_SERVICE + "/v1/hpc/auth"
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request payload: {payload}")
-        with httpx.Client() as client:
-            res = client.post(url, json=payload)
+        async with httpx.AsyncClient() as client:
+            res = await client.post(url, json=payload)
         _logger.info(f"Response: {res.text}")
         _logger.info(f"Response: {res.json()}")
         token = res.json().get('result')
@@ -28,7 +28,7 @@ def get_hpc_jwt_token(token_issuer, username, password = None):
     finally:
         return token
 
-def submit_hpc_job(job_submission_event) -> dict:
+async def submit_hpc_job(job_submission_event) -> dict:
     _logger.info("submit_hpc_job".center(80, '-'))
     try:
         _logger.info(f"Received event: {job_submission_event}")
@@ -60,8 +60,8 @@ def submit_hpc_job(job_submission_event) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request payload: {payload}")
-        with httpx.Client() as client:
-            res = client.post(url, headers=headers, json=payload)
+        async with httpx.AsyncClient() as client:
+            res = await client.post(url, headers=headers, json=payload)
         _logger.info(f"Response: {res.json()}")
         response = res.json()
         status_code = response.get('code')
@@ -83,7 +83,7 @@ def submit_hpc_job(job_submission_event) -> dict:
         _logger.error(e)
         raise e
 
-def get_hpc_job_info(job_id, host, username, token) -> dict:
+async def get_hpc_job_info(job_id, host, username, token) -> dict:
     _logger.info("get_hpc_job_info".center(80, '-'))
     try:
         hpc_host = host.split('://')
@@ -104,8 +104,8 @@ def get_hpc_job_info(job_id, host, username, token) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        with httpx.Client() as client:
-            res = client.get(url, headers=headers, params=params)
+        async with httpx.AsyncClient() as client:
+            res = await client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -128,7 +128,7 @@ def get_hpc_job_info(job_id, host, username, token) -> dict:
         _logger.error(e)
         raise e
 
-def get_hpc_nodes(host, username, hpc_token) -> dict:
+async def get_hpc_nodes(host, username, hpc_token) -> dict:
     _logger.info("get_hpc_nodes".center(80, '-'))
     try:
         _logger.info(f"Received host: {host}")
@@ -150,8 +150,8 @@ def get_hpc_nodes(host, username, hpc_token) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        with httpx.Client() as client:
-            res = client.get(url, headers=headers, params=params)
+        async with httpx.AsyncClient() as client:
+            res = await client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -166,7 +166,7 @@ def get_hpc_nodes(host, username, hpc_token) -> dict:
         _logger.error(e)
         raise e
 
-def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
+async def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
     _logger.info("get_hpc_node_by_name".center(80, '-'))
     try:
         _logger.info(f"Received host: {host}")
@@ -189,8 +189,8 @@ def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        with httpx.Client() as client:
-            res = client.get(url, headers=headers, params=params)
+        async with httpx.AsyncClient() as client:
+            res = await client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -210,7 +210,7 @@ def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
         _logger.error(e)
         raise e
 
-def get_hpc_partitions(host, username, hpc_token) -> dict:
+async def get_hpc_partitions(host, username, hpc_token) -> dict:
     _logger.info("get_hpc_partitions".center(80, '-'))
     try:
         _logger.info(f"Received host: {host}")
@@ -232,8 +232,8 @@ def get_hpc_partitions(host, username, hpc_token) -> dict:
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        with httpx.Client() as client:
-            res = client.get(url, headers=headers, params=params)
+        async with httpx.AsyncClient() as client:
+            res = await client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
@@ -253,7 +253,7 @@ def get_hpc_partitions(host, username, hpc_token) -> dict:
         _logger.error(e)
         raise e
 
-def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict:
+async def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict:
     _logger.info("get_hpc_partition_by_name".center(80, '-'))
     try:
         _logger.info(f"Received host: {host}")
@@ -276,8 +276,8 @@ def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request params: {params}")
-        with httpx.Client() as client:
-            res = client.get(url, headers=headers, params=params)
+        async with httpx.AsyncClient() as client:
+            res = await client.get(url, headers=headers, params=params)
         _logger.info(f"Response: {res.text}")
         response = res.json()
         status_code = response.get('code')
