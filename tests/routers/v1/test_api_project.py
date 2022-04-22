@@ -1,7 +1,7 @@
 import pytest
 from requests.models import Response
 from tests.helper import EAPIResponseCode
-
+from pytest_httpx import HTTPXMock
 pytestmark = pytest.mark.asyncio
 test_project_api = "/v1/projects"
 test_get_project_file_api = "/v1/project/test_project/files"
@@ -178,28 +178,63 @@ async def test_upload_with_internal_error_should_return_500(test_async_client_au
     assert res_json.get('error_msg') == "Upload Error: mock_internal_error"
 
 
-async def test_get_folder_in_project_should_return_200(test_async_client_auth, mocker):
-    param = {'zone': 'zone',
-                'project_code': project_code,
-                'folder': "testuser/fake_folder"
-                }
+async def test_get_folder_in_project_should_return_200(test_async_client_auth, mocker, httpx_mock: HTTPXMock):
+    param = {
+        'zone': 'zone',
+        'project_code': project_code,
+        'folder': "testuser/fake_folder"
+        }
     mocker.patch('app.routers.v1.api_project.get_zone',
                  return_value="zone")
     mocker.patch('app.routers.v1.api_project.has_permission', return_value=True)
-    mock_response = Response()
-    mock_response.status_code = 200
-    mock_response._content = b'{"result": [{"labels": ["zone", "Folder"], \
-        "project_code": "test_project", "name": "fake_folder"}]}'
-    mocker.patch('app.routers.v1.api_project.query_node',
-                 return_value=mock_response)
+    httpx_mock.add_response(
+        method='GET',
+        url='http://metadata_service/v1/item/search/?container_code=test_project&container_type=project&parent_path=testuser&recursive=false&zone=zone&archived=false&name=fake_folder',
+        json={"code":200,"result": [{ 
+                "id": "item-id", 
+                "parent": "parent-id", 
+                "parent_path": "testuser", 
+                "restore_path": None, 
+                "archived": False, 
+                "type": "folder", 
+                "zone": 0, 
+                "name": "fake_folder", 
+                "size": 0, 
+                "owner": "testuser", 
+                "container_code": project_code, 
+                "container_type": "project", 
+                "created_time": "2022-04-13 18:17:51.008212", 
+                "last_updated_time": "2022-04-13 18:17:51.008227", 
+                "storage": { 
+                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9", 
+                    "location_uri": "",  
+                    "version": "1.0" 
+                    }, 
+                "extended": { 
+                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",  
+                    "extra": { 
+                        "tags": [], 
+                        "attributes": {} 
+                            } 
+                        }
+                    },
+                {
+                    "id": "item-id2", 
+                    "parent": "parent-id2"}
+                    ]
+                    },
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_get_project_folder_api, headers=header, query_string=param)
+    print(f'233 {res.text}')
     res_json = res.json()
     assert res_json.get('code') == 200
     result = res_json.get('result')
-    assert set(result.get('labels')) == {'zone', 'Folder'}
+    assert result.get('type') == 'folder'
     assert result.get('name') == "fake_folder"
-    assert result.get('project_code') == project_code
+    assert result.get('zone') == 0
+    assert result.get('container_code') == project_code
 
 
 async def test_get_folder_in_project_without_token_should_return_401(test_async_client):
@@ -260,10 +295,10 @@ async def test_get_folder_fail_when_query_node_should_return_500(test_async_clie
     res = await test_async_client_auth.get(test_get_project_folder_api, headers=header, query_string=param)
     res_json = res.json()
     assert res_json.get('code') == 500
-    assert res_json.get('error_msg') == "Upload Error: mock error"
+    assert res_json.get('error_msg') == "Error Getting Folder: mock error"
 
 
-async def test_get_folder_in_project_with_folder_not_found_should_return_404(test_async_client_auth, mocker):
+async def test_get_folder_in_project_with_folder_not_found_should_return_404(test_async_client_auth, mocker,  httpx_mock: HTTPXMock):
     param = {'zone': 'zone',
              'project_code': project_code,
              'folder': "testuser/fake_folder"
@@ -271,11 +306,12 @@ async def test_get_folder_in_project_with_folder_not_found_should_return_404(tes
     mocker.patch('app.routers.v1.api_project.get_zone',
                  return_value="zone")
     mocker.patch('app.routers.v1.api_project.has_permission', return_value=True)
-    mock_response = Response()
-    mock_response.status_code = 200
-    mock_response._content = b'{"result": []}'
-    mocker.patch('app.routers.v1.api_project.query_node',
-                 return_value=mock_response)
+    httpx_mock.add_response(
+        method='GET',
+        url='http://metadata_service/v1/item/search/?container_code=test_project&container_type=project&parent_path=testuser&recursive=false&zone=zone&archived=false&name=fake_folder',
+        json={"code":200,"result": []},
+        status_code=200,
+    )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_get_project_folder_api, headers=header, query_string=param)
     res_json = res.json()

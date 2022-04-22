@@ -124,7 +124,7 @@ class APIProject:
         username = self.current_identity["username"]
         self._logger.info("API get_project_folder".center(80, '-'))
         self._logger.info(f"User request with identity: {self.current_identity}")
-        zone_type = get_zone(zone)
+        zone_type = get_zone(zone.lower())
         error_msg = ""
         permission = await has_permission(
             self.current_identity, project_code, "file", zone.lower(), "view")
@@ -135,29 +135,35 @@ class APIProject:
         project_role = get_project_role(self.current_identity, project_code)
         name_folder = folder.split('/')[0]
         # verify the name folder access permission
-        if zone_type == ConfigClass.GREEN_ZONE_LABEL and not project_role in ["admin", "platform-admin"]:
+        if zone_type == 0 and not project_role in ["admin", "platform-admin"]:
             if username != name_folder:
                 api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
+        folder_path = folder.strip('/').split('/')
+        parent_path = '/'.join(folder_path[0:-1])
+        folder_name = folder_path[-1]
+
         folder_check_event = {
-                "query": {
-                            "folder_relative_path": '/'.join(folder.split('/')[0:-1]),
-                            "display_path": folder,
-                            "name": folder.split('/')[-1],
-                            "project_code": project_code,
-                            "archived": False,
-                            "labels": ['Folder', zone_type]}
-                    }
-        response = await query_node(folder_check_event)
+                    'container_code': project_code, # project_geid
+                    'container_type': 'project',
+                    'parent_path': parent_path,
+                    'recursive': False,
+                    'zone': get_zone(zone),
+                    'archived': False,
+                    'name': folder_name,
+                }
+        folder_response = await query_node(folder_check_event)
         self._logger.info(f"Folder check event: {folder_check_event}")
-        self._logger.info(f"Folder check response: {response.text}")
-        if response.status_code != 200:
-            error_msg = "Upload Error: " + response.json()["error_msg"]
+        self._logger.info(f"Folder check response: {folder_response.text}")
+        response = folder_response.json()
+        if response.get('code') != 200:
+            error_msg = "Error Getting Folder: " + response.get("error_msg")
             response_code = EAPIResponseCode.internal_error
             result = ''
         else:
-            res = response.json().get('result')
+            res = response.get('result')
+            self._logger.info(f"res: {res}")
             if res:
                 result = res[0]
                 response_code = EAPIResponseCode.success
@@ -165,6 +171,7 @@ class APIProject:
                 result = res
                 response_code = EAPIResponseCode.not_found
                 error_msg = 'Folder not exist'
+        self._logger.info(f"error_msg: {error_msg}")
         api_response.result = result
         api_response.code = response_code
         api_response.error_msg = error_msg

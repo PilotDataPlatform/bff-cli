@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     RDS_SCHEMA_DEFAULT: str 
     NEO4J_SERVICE: str
     RDS_DB_URI: str
+    METADATA_SERVICE: str
 
     def __init__(self):
         super().__init__()
@@ -75,4 +76,5 @@ def get_settings():
 
 
 ConfigClass = get_settings()
+print(ConfigClass)
 

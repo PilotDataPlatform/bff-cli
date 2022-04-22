@@ -7,30 +7,42 @@ _logger = LoggerFactory("Helpers").get_logger()
 
 
 def get_zone(namespace):
-    return {ConfigClass.GREEN_ZONE_LABEL.lower(): ConfigClass.GREEN_ZONE_LABEL,
-            ConfigClass.CORE_ZONE_LABEL.lower(): ConfigClass.CORE_ZONE_LABEL
-            }.get(namespace.lower(), ConfigClass.GREEN_ZONE_LABEL.lower())
+    return {ConfigClass.GREEN_ZONE_LABEL.lower(): 0,
+            ConfigClass.CORE_ZONE_LABEL.lower(): 1
+            }.get(namespace.lower(), 0)
 
 async def batch_query_node_by_geid(geid_list):
-    url = ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/query/geids"
-    payload = {
-        "geids": geid_list
+    _logger.info("batch_query_node_by_geid".center(80, '-'))
+    params = {
+        'ids': geid_list
     }
+    _logger.info(f"params: {params}")
     async with httpx.AsyncClient() as client:
-        res = await client.post(url, json=payload)
-    res_json = res.json()
+        response = await client.get(ConfigClass.METADATA_SERVICE + '/v1/item/batch/', params=params, follow_redirects=True)
+    _logger.info(response.url)
+    _logger.info(f"query response: {response.text}")
+    res_json = response.json()
+    _logger.info(f"res_json: {res_json}")
     result = res_json.get('result')
     located_geid = []
     query_result = {}
     for node in result:
-        geid = node.get('global_entity_id', '')
-        if geid in geid_list:
+        geid = node.get('id', '')
+        archived = node.get('archived')
+        # get file geid and archived status
+        if geid in geid_list and archived == False:
             located_geid.append(geid)
             query_result[geid] = node
+    # Returning valid geid list, incase archived or non-exist
+    _logger.info(f"returning located_geid: {located_geid}")
+    _logger.info(f"returning query_result: {query_result}")
     return located_geid, query_result
 
 
 async def get_node(post_data, label):
+    """
+    get dataset node information
+    """
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query", json=post_data)
@@ -87,13 +99,15 @@ async def attach_manifest_to_file(event):
     return response.json()
 
 async def query_node(payload):
-    _logger.info("query_node")
-    _logger.info(f"query payload: {payload}")
-    node_query_url = ConfigClass.NEO4J_SERVICE + "/v2/neo4j/nodes/query"
-    async with httpx.AsyncClient() as client:
-        response = await client.post(node_query_url, json=payload)
-    _logger.info(f"query response: {response}")
-    return response
+    _logger.info("query_node".center(80, '-'))
+    try:
+        _logger.info(f"query params: {payload}")
+        async with httpx.AsyncClient() as client:
+            response = await client.get(ConfigClass.METADATA_SERVICE + '/v1/item/search/', params=payload, follow_redirects=True)
+        _logger.info(f"query response: {response.text}")
+        return response
+    except Exception as e:
+        _logger.error(f'Error file/folder: {e}')
 
 
 def separate_rel_path(folder_path):
@@ -107,17 +121,17 @@ def separate_rel_path(folder_path):
     return rel_path, folder_name
 
 
-def verify_list_event(source_type, folder):
-    if source_type == 'Folder' and not folder:
-        code = EAPIResponseCode.bad_request
-        error_msg = 'missing folder name'
-    elif source_type == 'Container' and folder:
-        code = EAPIResponseCode.bad_request
-        error_msg = 'Query project does not require folder name'
-    else:
-        code = EAPIResponseCode.success
-        error_msg = ''
-    return code, error_msg
+# def verify_list_event(source_type, folder):
+#     if source_type == 'Folder' and not folder:
+#         code = EAPIResponseCode.bad_request
+#         error_msg = 'missing folder name'
+#     elif source_type == 'Container' and folder:
+#         code = EAPIResponseCode.bad_request
+#         error_msg = 'Query project does not require folder name'
+#     else:
+#         code = EAPIResponseCode.success
+#         error_msg = ''
+#     return code, error_msg
 
 
 async def query_relation(payload):
@@ -134,6 +148,26 @@ async def query_relation(payload):
         result = query_result
         code = EAPIResponseCode.success
         error_msg = ''
+        return code, result, error_msg
+    except Exception as e:
+        _logger.error(f"Error query files: {str(e)}")
+        error_msg = str(e)
+        code = EAPIResponseCode.internal_error
+        return code, result, error_msg
+
+async def query_file_folder_relation(params):
+    _logger.info("query_file_folder_relation".center(80, '-'))
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(ConfigClass.METADATA_SERVICE + '/v1/item/', params=params, follow_redirects=True)
+        result = response.json().get('result')
+        _logger.info(f'Query result: {result}')
+        if result:
+            code = EAPIResponseCode.success
+            error_msg = ''
+        else:
+            code = EAPIResponseCode.not_found
+            error_msg = 'Folder not exist'
         return code, result, error_msg
     except Exception as e:
         _logger.error(f"Error query files: {str(e)}")

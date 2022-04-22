@@ -11,8 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.commons.data_providers.database import DBConnection
 
 router = APIRouter()
-_API_TAG = 'V1 manifest'
-_API_NAMESPACE = "api_manifest"
 
 @cbv(router)
 class APIManifest:
