@@ -136,21 +136,38 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v2/neo4j/nodes/query',
-        json={
-            "code": 200,
-            "result": [
-                {
-                    "labels": [
-                        "Greenroom",
-                        "File"
-                    ],
-                    "global_entity_id": "fake_geid",
-                    "uploader": "amyguindoc14"
-                }
-            ]
-        },
+        method='GET',
+        url='http://metadata_service/v1/item/search/?query=%7B%27name%27%3A+%27fake_file%27%2C+%27display_path%27%3A+%27fake_file%27%2C+%27archived%27%3A+False%2C+%27project_code%27%3A+%27cli%27%2C+%27labels%27%3A+%5B%27File%27%2C+0%5D%7D',
+        json={"code":200,"result": [{ 
+                "id": "item-id", 
+                "parent": "", 
+                "parent_path": "", 
+                "restore_path": None, 
+                "archived": False, 
+                "type": "folder", 
+                "zone": 0, 
+                "name": "fake_file", 
+                "size": 0, 
+                "owner": "testuser", 
+                "container_code": project_code, 
+                "container_type": "project", 
+                "created_time": "2022-04-13 18:17:51.008212", 
+                "last_updated_time": "2022-04-13 18:17:51.008227", 
+                "storage": { 
+                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9", 
+                    "location_uri": "",  
+                    "version": "1.0" 
+                    }, 
+                "extended": { 
+                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",  
+                    "extra": { 
+                        "tags": [], 
+                        "attributes": {} 
+                            } 
+                        }
+                    }
+                    ]
+                    },
         status_code=200,
     )
     httpx_mock.add_response(
