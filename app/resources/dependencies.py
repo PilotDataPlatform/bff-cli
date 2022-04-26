@@ -20,7 +20,10 @@ async def jwt_required(request: Request):
     if token:
         token = token.replace("Bearer ", "")
     else:
-        raise APIException(error_msg="Token required", status_code=EAPIResponseCode.unauthorized.value)
+        raise APIException(
+            error_msg="Token required", 
+            status_code=EAPIResponseCode.unauthorized.value
+            )
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get("preferred_username")
     realm_roles = payload["realm_access"]["roles"]
@@ -112,30 +115,24 @@ async def has_permission(current_identity, project_code, resource, zone, operati
         raise APIException(status_code=EAPIResponseCode.internal_error, error_msg=error_msg)
 
 
-async def void_check_file_in_zone(data, file, project_code):
-    payload = {"type": data.type,
-               "zone": data.zone,
-               "file_relative_path": file.get('resumable_relative_path') + '/' +
-                                     file.get('resumable_filename'),
-               "project_code": project_code
-               }
+async def check_file_exist(zone, file, project_code):
     try:
-        async with httpx.AsyncClient() as client:
-            result = await client.get(ConfigClass.FILEINFO_HOST + f'/v1/project/{project_code}/file/exist/', params=payload)
-        result = result.json()
+        query = {
+                'container_code': project_code,
+                'container_type': 'project',
+                'parent_path': file.get('resumable_relative_path'),
+                'recursive': False,
+                'zone': get_zone(zone),
+                'archived': False,
+                'type': 'file',
+                'name': file.get('resumable_filename'),
+                }
+        response = await query_node(query)
+        result = response.json()
+        return result
     except Exception as e:
-        api_response.error_msg = f"EntityInfo service  error: {e}"
+        api_response.error_msg = f"Getting file error: {e}"
         api_response.code = EAPIResponseCode.forbidden
-        return api_response.json_response()
-    if result['code'] in [404, 200]:
-        api_response.error_msg = "debug finding file"
-        api_response.code = EAPIResponseCode.bad_request
-        api_response.result = result
-        return api_response.json_response()
-    else:
-        api_response.error_msg = "File with that name already exists"
-        api_response.code = EAPIResponseCode.conflict
-        api_response.result = data
         return api_response.json_response()
 
 

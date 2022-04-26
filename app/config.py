@@ -46,7 +46,8 @@ class Settings(BaseSettings):
     def __init__(self):
         super().__init__()
         self.RDS_DB_URI = self.RDS_DB_URI.replace(
-            'postgresql', 'postgresql+asyncpg')
+            'postgresql', 'postgresql+asyncpg'
+            )
 
 
     class Config:

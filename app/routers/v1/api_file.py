@@ -1,12 +1,18 @@
 from fastapi import APIRouter, Depends
 from fastapi_utils.cbv import cbv
-from ...models.file_models import QueryDataInfoResponse, QueryDataInfo, GetProjectFileListResponse
-from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError, EAPIResponseCode
-from ...resources.dependencies import jwt_required, has_permission, get_project_role
-from ...resources.helpers import batch_query_node_by_geid, get_zone, query_node, separate_rel_path
+from ...models.file_models import QueryDataInfoResponse
+from ...models.file_models import QueryDataInfo
+from ...models.file_models import GetProjectFileListResponse
+from ...resources.error_handler import catch_internal
+from ...resources.error_handler import customized_error_template
+from ...resources.error_handler import ECustomizedError
+from ...resources.error_handler import EAPIResponseCode
+from ...resources.dependencies import jwt_required, has_permission
+from ...resources.dependencies import get_project_role
+from ...resources.helpers import batch_query_node_by_geid, get_zone
+from ...resources.helpers import query_node, separate_rel_path
 from ...config import ConfigClass
 from logger import LoggerFactory
-import httpx
 
 router = APIRouter()
 _API_TAG = 'V1 files'
@@ -38,49 +44,73 @@ class APIFile:
         geid_list = data.geid
         self._logger.info("API /query/geid".center(80, '-'))
         self._logger.info(f"Received information geid: {geid_list}")
-        self._logger.info(f"User request with identity: {self.current_identity}")
+        self._logger.info(f"User identity: {self.current_identity}")
         response_list = []
         located_geid, query_result = await batch_query_node_by_geid(geid_list)
         for global_entity_id in geid_list:
             self._logger.info(f'Query geid: {global_entity_id}')
             if global_entity_id not in located_geid:
-                status = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
+                status = customized_error_template(
+                    ECustomizedError.FILE_NOT_FOUND
+                    )
                 result = []
                 self._logger.info(f'status: {status}')
-            elif 'File' not in query_result[global_entity_id].get('labels') and \
-                    'Folder' not in query_result[global_entity_id].get('labels'):
-                self._logger.info(f'User {user_name} attempt getting node: {query_result[global_entity_id]}')
-                status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
+            elif 'File' not in query_result[global_entity_id].get('labels') \
+                and 'Folder' not in \
+                    query_result[global_entity_id].get('labels'):
+                status = customized_error_template(
+                    ECustomizedError.FILE_FOLDER_ONLY
+                    )
                 result = []
                 self._logger.info(f'status: {status}')
             elif query_result[global_entity_id].get('archived'):
-                self._logger.info(f'User {user_name} attempt getting node: {query_result[global_entity_id]}')
-                status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
+                status = customized_error_template(
+                    ECustomizedError.FILE_FOLDER_ONLY
+                    )
                 result = []
                 self._logger.info(f'status: {status}')
             else:
-                self._logger.info(f'Query result: {query_result[global_entity_id]}')
-                project_code = query_result[global_entity_id].get('project_code')
+                self._logger.info(
+                    f'Query result: {query_result[global_entity_id]}'
+                    )
+                project_code = query_result[global_entity_id]\
+                    .get('project_code')
                 labels = query_result[global_entity_id].get('labels')
-                display_path = query_result[global_entity_id].get('display_path').lstrip('/')
+                display_path = query_result[global_entity_id]\
+                                .get('display_path') \
+                                .lstrip('/')
                 name_folder = display_path.split('/')[0]
-                zone = ConfigClass.CORE_ZONE_LABEL if ConfigClass.CORE_ZONE_LABEL in labels \
+                zone = ConfigClass.CORE_ZONE_LABEL if \
+                    ConfigClass.CORE_ZONE_LABEL in labels \
                     else ConfigClass.GREEN_ZONE_LABEL
                 self._logger.info(f'File zone: {zone}')
-                permission = await has_permission(self.current_identity, project_code, "file", zone.lower(), "view")
+                permission = await has_permission(
+                    self.current_identity, 
+                    project_code, 
+                    "file", 
+                    zone.lower(), 
+                    "view"
+                    )
                 if not permission:
                     file_response.error_msg = "Permission denied"
                     file_response.code = EAPIResponseCode.forbidden
                     return file_response.json_response()
                 if user_name and user_name != name_folder:
-                    self._logger.info(f'User {user_name} attempt getting file: {display_path}')
-                    status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    status = customized_error_template(
+                        ECustomizedError.PERMISSION_DENIED
+                        )
                     result = []
                 else:
                     status = 'success'
                     result = [query_result[global_entity_id]]
                 self._logger.info(f'file result: {result}')
-            response_list.append({'status': status, 'result': result, 'geid': global_entity_id})
+            response_list.append(
+                {
+                    'status': status, 
+                    'result': result, 
+                    'geid': global_entity_id
+                    }
+                )
         self._logger.info(f'Query file/folder result: {response_list}')
         file_response.result = response_list
         file_response.code = EAPIResponseCode.success
@@ -102,35 +132,53 @@ class APIFile:
         rel_path, folder_name = separate_rel_path(folder)
         self._logger.info(f"Getting relative_path: {rel_path}")
         self._logger.info(f"Getting folder_name: {folder_name}")
-        self._logger.info(f"Getting rel_path.split('/')[0]: {rel_path.split('/')[0]}")
+        self._logger.info(f"Getting rel_path.split('/')[0]: \
+            {rel_path.split('/')[0]}")
         self._logger.info(f"Getting username: {username}")
         self._logger.info(f"Getting zone: {zone}")
         self._logger.info(f"Getting zone: {type(zone)}")
-        self._logger.info(f"Getting role: {not project_role in ['admin', 'platform-admin']}")
+        self._logger.info(f"Getting role: \
+            {not project_role in ['admin', 'platform-admin']}")
         self._logger.info(f"Getting zone: {zone == 0}")
         self._logger.info(f"Getting project_role: {project_role}")
-        self._logger.info(f"Getting username and rel_path and rel_path.split('/')[0] != username: {username and rel_path and rel_path.split('/')[0] != username}")
-        self._logger.info(f'project_role in ["admin", "platform-admin"]: {project_role in ["admin", "platform-admin"]}')
+        self._logger.info(
+            f"Getting username and rel_path \
+            and rel_path.split('/')[0] != username: \
+            {username and rel_path and rel_path.split('/')[0] != username}"
+            )
+        self._logger.info(
+            f'project_role in ["admin", "platform-admin"]: \
+                {project_role in ["admin", "platform-admin"]}'
+                )
         if zone == 0 and not project_role in ["admin", "platform-admin"]:
             if username and not rel_path and folder_name != username:
                 self._logger.info(f"should return at 113")
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                file_response.error_msg = customized_error_template(
+                    ECustomizedError.PERMISSION_DENIED
+                    )
                 file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning wrong name folder error: {EAPIResponseCode.forbidden}, '
-                                f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                self._logger.error(
+                    f'Returning wrong name folder error: \
+                    {EAPIResponseCode.forbidden}, '
+                    f'{file_response.error_msg}')
                 return file_response.json_response()
             elif username and rel_path and rel_path.split('/')[0] != username:
                 self._logger.info(f"should return at 116")
-                file_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                file_response.error_msg = customized_error_template(
+                    ECustomizedError.PERMISSION_DENIED
+                    )
                 file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning subfolder not in correct name folder error: {EAPIResponseCode.forbidden}, '
-                                f'{customized_error_template(ECustomizedError.PERMISSION_DENIED)}')
+                self._logger.error(f'Returning subfolder not in correct name \
+                    folder error: {EAPIResponseCode.forbidden}, '
+                    f'{file_response.error_msg}')
                 return file_response.json_response()
             else:
-                self._logger.info(f"Getting username: {username}, project_role: {project_role}, rel_path: {rel_path}, foldername: {folder_name}")
-
-
-
+                self._logger.info(
+                    f"Getting username: {username}, \
+                    project_role: {project_role}, \
+                    rel_path: {rel_path}, \
+                    foldername: {folder_name}"
+                    )
         params = {
                     'container_code': project_code,
                     'container_type': source_type.lower(),

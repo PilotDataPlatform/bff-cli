@@ -1,20 +1,20 @@
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
 from fastapi_utils.cbv import cbv
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
-from ...resources.helpers import *
+from ...resources.dependencies import check_file_exist
+from ...resources.helpers import separate_rel_path
 from ...models.entity_info_models import CheckFileResponse
 from logger import LoggerFactory
-import httpx
+from ...resources.error_handler import EAPIResponseCode
 
 router = APIRouter()
 
 
 @cbv(router)
-class APIEntityInfo:
-    _API_TAG = 'Entity INFO'
-    _API_NAMESPACE = "api_forward_entity_info"
+class APIFileInfo:
+    _API_TAG = 'File INFO'
+    _API_NAMESPACE = "api_file_info"
 
     def __init__(self):
         self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
@@ -23,17 +23,27 @@ class APIEntityInfo:
                 response_model=CheckFileResponse,
                 summary="Check source file")
     @catch_internal(_API_NAMESPACE)
-    async def check_source_file(self, project_code, zone, file_relative_path,
-                                current_identity: dict = Depends(jwt_required)):
+    async def check_source_file(
+        self, 
+        project_code, 
+        zone, 
+        file_relative_path,
+        current_identity: dict = Depends(jwt_required)
+        ):
+        api_response = CheckFileResponse()
         try:
             role = current_identity["role"]
         except (AttributeError, TypeError):
             return current_identity
-        query = {
-            "project_code": project_code,
-            "zone": zone,
-            "file_relative_path": file_relative_path
-        }
-        async with httpx.AsyncClient() as client:
-            fw_response = await client.get(ConfigClass.FILEINFO_HOST + "/v1/project/{}/file/exist".format(project_code), params=query)
-        return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)
+        rel_path, file_name = separate_rel_path(file_relative_path)
+        file = {
+            'resumable_relative_path':rel_path,
+            'resumable_filename': file_name
+            }
+        response = await check_file_exist(zone, file, project_code)
+        api_response.result = response.get('result')[0]
+        api_response.code = EAPIResponseCode.success
+        api_response.error_msg = response.get('error_msg')
+        self._logger.info(f'api_response.json_response: \
+            {api_response.json_response()}')
+        return api_response.json_response()
