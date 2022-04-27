@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from fastapi_utils.cbv import cbv
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
@@ -23,21 +24,15 @@ class APIFileInfo:
                 response_model=CheckFileResponse,
                 summary="Check source file")
     @catch_internal(_API_NAMESPACE)
-    async def check_source_file(
-        self, 
-        project_code, 
-        zone, 
-        file_relative_path,
-        current_identity: dict = Depends(jwt_required)
-        ):
+    async def check_source_file(self, project_code, zone, file_relative_path, current_identity: dict = Depends(jwt_required)):
         api_response = CheckFileResponse()
         try:
-            role = current_identity["role"]
+            _ = current_identity["role"]
         except (AttributeError, TypeError):
             return current_identity
         rel_path, file_name = separate_rel_path(file_relative_path)
         file = {
-            'resumable_relative_path':rel_path,
+            'resumable_relative_path': rel_path,
             'resumable_filename': file_name
             }
         response = await check_file_exist(zone, file, project_code)

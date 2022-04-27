@@ -35,9 +35,11 @@ class APIProject:
     def __init__(self):
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.get("/projects", tags=[_API_TAG],
-                response_model=ProjectListResponse,
-                summary="Get project list that user have access to")
+    @router.get(
+        "/projects",
+        tags=[_API_TAG],
+        response_model=ProjectListResponse,
+        summary="Get project list that user have access to")
     @catch_internal(_API_NAMESPACE)
     async def list_project(self):
         '''
@@ -46,8 +48,7 @@ class APIProject:
         self._logger.info("API list_project".center(80, '-'))
         api_response = ProjectListResponse()
         try:
-            username = self.current_identity['username']
-            user_role = self.current_identity['role']
+            _ = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(
@@ -60,24 +61,22 @@ class APIProject:
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
 
-    @router.post("/project/{project_code}/files",
-                 response_model=POSTProjectFileResponse,
-                 summary="pre upload file to the target zone", 
-                 tags=["V1 Files"])
+    @router.post(
+        "/project/{project_code}/files",
+        response_model=POSTProjectFileResponse,
+        summary="pre upload file to the target zone",
+        tags=["V1 Files"])
     @catch_internal(_API_NAMESPACE)
     async def project_file_preupload(
-        self, 
-        project_code, 
-        request: Request, 
-        data: POSTProjectFile
-        ):
+        self, project_code,
+        request: Request,
+        data: POSTProjectFile):
         """
         PRE upload and check existence of file in project
         """
         api_response = POSTProjectFileResponse()
         try:
             role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info("API project_file_preupload".center(80, '-'))
@@ -96,12 +95,12 @@ class APIProject:
         else:
             self._logger.info(f"LINE 70 User platform role: {role}")
             project_role = get_project_role(
-                self.current_identity, 
+                self.current_identity,
                 project_code
                 )
             self._logger.info(f"User project role: {project_role}")
-            if data.zone == ConfigClass.CORE_ZONE_LABEL.lower() \
-                and project_role == "contributor":
+            restrict_zone = ConfigClass.CORE_ZONE_LABEL.lower()
+            if data.zone == restrict_zone and project_role == "contributor":
                 api_response.error_msg = customized_error_template(
                     ECustomizedError.PERMISSION_DENIED
                     )
@@ -109,7 +108,7 @@ class APIProject:
                 api_response.result = project_role
                 return api_response.json_response()
             elif not project_role:
-                self._logger.debug(f"Not project role")
+                self._logger.debug("Not project role")
                 api_response.error_msg = customized_error_template(
                     ECustomizedError.PERMISSION_DENIED
                     )
@@ -124,10 +123,8 @@ class APIProject:
                 api_response.code = EAPIResponseCode.conflict
                 api_response.result = data
                 return api_response.json_response()
-
         session_id = request.headers.get("Session-ID")
         result = await transfer_to_pre(data, project_code, session_id)
-
         trans_payload = {
             "current_folder_node": data.current_folder_node,
             "project_code": project_code,
@@ -153,9 +150,11 @@ class APIProject:
             api_response.result = result.json()["result"]
         return api_response.json_response()
 
-    @router.get("/project/{project_code}/folder", tags=[_API_TAG],
-                response_model=GetProjectFolderResponse,
-                summary="Get folder in the project")
+    @router.get(
+        "/project/{project_code}/folder",
+        tags=[_API_TAG],
+        response_model=GetProjectFolderResponse,
+        summary="Get folder in the project")
     @catch_internal(_API_NAMESPACE)
     async def get_project_folder(self, project_code, zone, folder):
         """
@@ -164,8 +163,7 @@ class APIProject:
         api_response = GetProjectFolderResponse()
         username = self.current_identity["username"]
         self._logger.info("API get_project_folder".center(80, '-'))
-        self._logger.info(f"User request with identity: \
-            {self.current_identity}")
+        self._logger.info(f"User request identity: {self.current_identity}")
         zone_type = get_zone(zone.lower())
         error_msg = ""
         permission = await has_permission(
@@ -179,7 +177,7 @@ class APIProject:
         project_role = get_project_role(self.current_identity, project_code)
         name_folder = folder.split('/')[0]
         # verify the name folder access permission
-        if zone_type == 0 and not project_role in ["admin", "platform-admin"]:
+        if zone_type == 0 and project_role not in ["admin", "platform-admin"]:
             if username != name_folder:
                 api_response.error_msg = customized_error_template(
                     ECustomizedError.PERMISSION_DENIED

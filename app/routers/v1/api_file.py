@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from fastapi_utils.cbv import cbv
 from ...models.file_models import QueryDataInfoResponse
 from ...models.file_models import QueryDataInfo
@@ -36,8 +37,6 @@ class APIFile:
         """
         file_response = QueryDataInfoResponse()
         try:
-            role = self.current_identity["role"]
-            user_id = self.current_identity["user_id"]
             user_name = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
@@ -76,19 +75,18 @@ class APIFile:
                 project_code = query_result[global_entity_id]\
                     .get('project_code')
                 labels = query_result[global_entity_id].get('labels')
-                display_path = query_result[global_entity_id]\
-                                .get('display_path') \
-                                .lstrip('/')
+                display_path = query_result[
+                    global_entity_id].get('display_path').lstrip('/')
                 name_folder = display_path.split('/')[0]
                 zone = ConfigClass.CORE_ZONE_LABEL if \
                     ConfigClass.CORE_ZONE_LABEL in labels \
                     else ConfigClass.GREEN_ZONE_LABEL
                 self._logger.info(f'File zone: {zone}')
                 permission = await has_permission(
-                    self.current_identity, 
-                    project_code, 
-                    "file", 
-                    zone.lower(), 
+                    self.current_identity,
+                    project_code,
+                    "file",
+                    zone.lower(),
                     "view"
                     )
                 if not permission:
@@ -106,8 +104,8 @@ class APIFile:
                 self._logger.info(f'file result: {result}')
             response_list.append(
                 {
-                    'status': status, 
-                    'result': result, 
+                    'status': status,
+                    'result': result,
                     'geid': global_entity_id
                     }
                 )
@@ -150,9 +148,8 @@ class APIFile:
             f'project_role in ["admin", "platform-admin"]: \
                 {project_role in ["admin", "platform-admin"]}'
                 )
-        if zone == 0 and not project_role in ["admin", "platform-admin"]:
+        if zone == 0 and project_role not in ["admin", "platform-admin"]:
             if username and not rel_path and folder_name != username:
-                self._logger.info(f"should return at 113")
                 file_response.error_msg = customized_error_template(
                     ECustomizedError.PERMISSION_DENIED
                     )
@@ -163,14 +160,14 @@ class APIFile:
                     f'{file_response.error_msg}')
                 return file_response.json_response()
             elif username and rel_path and rel_path.split('/')[0] != username:
-                self._logger.info(f"should return at 116")
                 file_response.error_msg = customized_error_template(
                     ECustomizedError.PERMISSION_DENIED
                     )
                 file_response.code = EAPIResponseCode.forbidden
-                self._logger.error(f'Returning subfolder not in correct name \
-                    folder error: {EAPIResponseCode.forbidden}, '
-                    f'{file_response.error_msg}')
+                self._logger.error(
+                    f'Returning subfolder not in correct \
+                        name folder error: {EAPIResponseCode.forbidden}, \
+                            {file_response.error_msg}')
                 return file_response.json_response()
             else:
                 self._logger.info(

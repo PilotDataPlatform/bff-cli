@@ -1,5 +1,7 @@
-from pydantic import Field, BaseModel
+from pydantic import Field
+from pydantic import BaseModel
 from .base_models import APIResponse
+
 
 class HPCAuthPost(BaseModel):
     """
@@ -9,6 +11,7 @@ class HPCAuthPost(BaseModel):
     username: str
     password: str
 
+
 class HPCAuthResponse(APIResponse):
     """
     HPC Auth Response Class
@@ -16,12 +19,13 @@ class HPCAuthResponse(APIResponse):
     result: dict = Field({}, example={
             "code": 200,
             "error_msg": "",
-            "result": 
-                {
-                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                }
+            "result":
+            {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            }
         }
     )
+
 
 class HPCJobSubmitPost(BaseModel):
     """
@@ -41,10 +45,11 @@ class HPCJobResponse(APIResponse):
             "code": 200,
             "error_msg": "",
             "result": {
-                "job_id":15178
+                "job_id": 15178
                 }
         }
     )
+
 
 class HPCJobInfoGet(BaseModel):
     """
@@ -64,14 +69,15 @@ class HPCJobInfoResponse(APIResponse):
             "code": 200,
             "error_msg": "",
             "result": {
-                "job_id":"12345",
-                "job_state":"COMPLETED",
-                "standard_error":"",
-                "standard_input":"",
-                "standard_output":""
+                "job_id": "12345",
+                "job_state": "COMPLETED",
+                "standard_error": "",
+                "standard_input": "",
+                "standard_output": ""
                 }
         }
     )
+
 
 class HPCNodesResponse(APIResponse):
     """
@@ -109,6 +115,7 @@ class HPCNodesResponse(APIResponse):
     }
                          )
 
+
 class HPCNodeInfoResponse(APIResponse):
     """
     HPC Node Info Response Class
@@ -132,6 +139,7 @@ class HPCNodeInfoResponse(APIResponse):
         ]
     }
                          )
+
 
 class HPCPartitonsResponse(APIResponse):
     """
@@ -161,6 +169,7 @@ class HPCPartitonsResponse(APIResponse):
     }
                          )
 
+
 class HPCPartitionInfoResponse(APIResponse):
     """
     HPC Partition Info Response Class
@@ -180,4 +189,3 @@ class HPCPartitionInfoResponse(APIResponse):
         ]
     }
                          )
-

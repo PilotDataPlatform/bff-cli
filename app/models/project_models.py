@@ -70,7 +70,7 @@ class GetProjectFolderResponse(APIResponse):
                 "Greenroom",
                 "Folder"
             ],
-            "global_entity_id": "bc8b4239-b22a-47dd-9d23-36ade331ebbf-1620685109",
+            "global_entity_id": "bc8b4239-b22a-47dd-9d23-36ade331ebbf",
             "folder_level": 1,
             "list_priority": 10,
             "folder_relative_path": "cli_folder_test23",

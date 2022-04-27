@@ -1,15 +1,14 @@
 import time
-
 import httpx
 import jwt as pyjwt
 from fastapi import Request
 from logger import LoggerFactory
-
 from app.resources.error_handler import APIException
 from ..config import ConfigClass
-import httpx
-from ..models.base_models import APIResponse, EAPIResponseCode
-from .helpers import *
+from ..models.base_models import APIResponse
+from ..models.base_models import EAPIResponseCode
+from .helpers import query_node
+from .helpers import get_zone
 
 api_response = APIResponse()
 _logger = LoggerFactory("Dependencies").get_logger()
@@ -21,7 +20,7 @@ async def jwt_required(request: Request):
         token = token.replace("Bearer ", "")
     else:
         raise APIException(
-            error_msg="Token required", 
+            error_msg="Token required",
             status_code=EAPIResponseCode.unauthorized.value
             )
     payload = pyjwt.decode(token, verify=False)
@@ -42,7 +41,10 @@ async def jwt_required(request: Request):
         payload = {
             "username": username,
         }
-        res = await client.get(ConfigClass.AUTH_SERVICE + "/v1/admin/user", params=payload)
+        res = await client.get(
+            ConfigClass.AUTH_SERVICE + "/v1/admin/user",
+            params=payload
+            )
     if res.status_code != 200:
         api_response.code = EAPIResponseCode.forbidden
         api_response.error_msg = "Auth Service: " + str(res.json())
@@ -51,7 +53,7 @@ async def jwt_required(request: Request):
     user = res.json()["result"]
     if not user:
         api_response.code = EAPIResponseCode.not_found
-        api_response.error_msg = f"Auth service: User {username} does not exist."
+        api_response.error_msg = f"Auth service: {username} does not exist."
         return api_response.json_response()
 
     user_id = user['id']
@@ -68,8 +70,10 @@ async def jwt_required(request: Request):
 
 def get_project_role(current_identity, project_code):
     role = None
-    _logger.info('get_project_role'.center(80,'='))
-    _logger.info(f'Received identity: {current_identity}, project_code: {project_code}')
+    _logger.info('get_project_role'.center(80, '='))
+    _logger.info(
+        f'Received identity: {current_identity}, project_code: {project_code}'
+        )
     if current_identity["role"] == "admin":
         role = "platform-admin"
     else:
@@ -82,16 +86,20 @@ def get_project_role(current_identity, project_code):
     return role
 
 
-async def has_permission(current_identity, project_code, resource, zone, operation):
-    if current_identity["role"] == "admin":
+async def has_permission(identity, project_code, resource, zone, operation):
+    if identity["role"] == "admin":
         role = "platform_admin"
     else:
         if not project_code:
-            _logger.info("No project code and not a platform admin, permission denied")
+            _logger.info(
+                "No project code and not a platform admin, permission denied")
             return False
-        role = get_project_role(current_identity, project_code)
+        role = get_project_role(identity, project_code)
         if not role:
-            _logger.info("Unable to get project role in permissions check, user might not belong to project")
+            _logger.info(
+                "Unable to get project role in permissions check, \
+                    user might not belong to project"
+                    )
             return False
     try:
         payload = {
@@ -101,10 +109,16 @@ async def has_permission(current_identity, project_code, resource, zone, operati
             "operation": operation,
         }
         async with httpx.AsyncClient() as client:
-            response = await client.get(ConfigClass.AUTH_SERVICE + "/v1/authorize", params=payload)
+            response = await client.get(
+                ConfigClass.AUTH_SERVICE + "/v1/authorize",
+                params=payload
+                )
         if response.status_code != 200:
             error_msg = f"Error calling authorize API - {response.json()}"
-            raise APIException(status_code=response.status_code, error_msg=error_msg)
+            raise APIException(
+                status_code=response.status_code,
+                error_msg=error_msg
+                )
         if response.json()["result"].get("has_permission"):
             return True
         else:
@@ -112,7 +126,10 @@ async def has_permission(current_identity, project_code, resource, zone, operati
     except Exception as e:
         error_msg = str(e)
         _logger.info(f"Exception on authorize call: {error_msg}")
-        raise APIException(status_code=EAPIResponseCode.internal_error, error_msg=error_msg)
+        raise APIException(
+            status_code=EAPIResponseCode.internal_error,
+            error_msg=error_msg
+            )
 
 
 async def check_file_exist(zone, file, project_code):
@@ -145,7 +162,11 @@ def select_url_by_zone(zone):
 
 
 def validate_upload_event(zone, data_type=None):
-    if zone not in [ConfigClass.CORE_ZONE_LABEL.lower(), ConfigClass.GREEN_ZONE_LABEL.lower()]:
+    zones = [
+        ConfigClass.CORE_ZONE_LABEL.lower(),
+        ConfigClass.GREEN_ZONE_LABEL.lower()
+        ]
+    if zone not in zones:
         error_msg = "Invalid Zone"
         return error_msg
     if data_type and data_type not in ["raw", "processed"]:

@@ -1,5 +1,4 @@
 import pytest
-from tests.helper import EAPIResponseCode
 
 pytestmark = pytest.mark.asyncio
 test_api = "/v1/manifest"
@@ -17,17 +16,14 @@ async def test_get_attributes_without_token(test_async_client):
 
 
 async def test_get_attributes_should_return_200(
-    test_async_client_auth, 
-    mocker,
-    create_db_manifest
-    ):
+    test_async_client_auth, mocker, create_db_manifest):
     payload = {'project_code': project_code}
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     res = await test_async_client_auth.get(
-        test_api, 
-        headers=header, 
+        test_api,
+        headers=header,
         query_string=payload
         )
     res_json = res.json()
@@ -36,18 +32,16 @@ async def test_get_attributes_should_return_200(
 
 
 async def test_get_attributes_no_access_should_return_403(
-    test_async_client_auth, 
-    mocker
-    ):
+    test_async_client_auth, mocker):
     payload = {'project_code': project_code}
     headers = {'Authorization': 'fake token'}
     mocker.patch(
-        'app.routers.v1.api_manifest.has_permission', 
+        'app.routers.v1.api_manifest.has_permission',
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_api, 
-        headers=headers, 
+        test_api,
+        headers=headers,
         query_string=payload
         )
     res_json = res.json()
@@ -56,18 +50,16 @@ async def test_get_attributes_no_access_should_return_403(
 
 
 async def test_get_attributes_project_not_exist_should_return_403(
-    test_async_client_auth, 
-    mocker
-    ):
+    test_async_client_auth, mocker):
     payload = {'project_code': 't1000'}
     headers = {'Authorization': 'fake token'}
     mocker.patch(
-        'app.routers.v1.api_manifest.has_permission', 
+        'app.routers.v1.api_manifest.has_permission',
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_api, 
-        headers=headers, 
+        test_api,
+        headers=headers,
         query_string=payload
         )
     res_json = res.json()
@@ -86,18 +78,15 @@ async def test_export_attributes_without_token(test_async_client):
 
 
 async def test_export_attributes_should_return_200(
-    test_async_client_auth, 
-    mocker,
-    create_db_manifest
-    ):
+    test_async_client_auth, mocker, create_db_manifest):
     param = {'project_code': project_code,
              'manifest_name': 'fake_manifest'}
     headers = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     res = await test_async_client_auth.get(
-        test_export_api, 
-        headers=headers, 
+        test_export_api,
+        headers=headers,
         query_string=param
         )
     res_json = res.json()
@@ -112,12 +101,12 @@ async def test_export_attributes_no_access(test_async_client_auth, mocker):
              'manifest_name': 'fake_manifest'}
     headers = {'Authorization': 'fake token'}
     mocker.patch(
-        'app.routers.v1.api_manifest.has_permission', 
+        'app.routers.v1.api_manifest.has_permission',
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_export_api, 
-        headers=headers, 
+        test_export_api,
+        headers=headers,
         query_string=param
         )
     res_json = res.json()
@@ -126,18 +115,15 @@ async def test_export_attributes_no_access(test_async_client_auth, mocker):
 
 
 async def test_export_attributes_not_exist_should_return_404(
-    test_async_client_auth, 
-    mocker,
-    create_db_manifest
-    ):
+    test_async_client_auth, mocker, create_db_manifest):
     param = {'project_code': project_code,
              'manifest_name': 'Manifest1'}
     headers = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     res = await test_async_client_auth.get(
-        test_export_api, 
-        headers=headers, 
+        test_export_api,
+        headers=headers,
         query_string=param
         )
     res_json = res.json()
@@ -146,18 +132,16 @@ async def test_export_attributes_not_exist_should_return_404(
 
 
 async def test_export_attributes_project_not_exist_should_return_403(
-    test_async_client_auth, 
-    mocker
-    ):
+    test_async_client_auth, mocker):
     param = {'project_code': 't1000', 'manifest_name': 'fake_manifest'}
     headers = {'Authorization': 'fake token'}
     mocker.patch(
-        'app.routers.v1.api_manifest.has_permission', 
+        'app.routers.v1.api_manifest.has_permission',
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_export_api, 
-        headers=headers, 
+        test_export_api,
+        headers=headers,
         query_string=param
         )
     res_json = res.json()
@@ -166,8 +150,7 @@ async def test_export_attributes_project_not_exist_should_return_403(
 
 
 async def test_attach_attributes_without_token_should_return_401(
-    test_async_client
-    ):
+    test_async_client):
     payload = {"manifest_json": {
         "manifest_name": "fake manifest",
         "project_code": project_code,
@@ -183,11 +166,7 @@ async def test_attach_attributes_without_token_should_return_401(
 
 
 async def test_attach_attributes_should_return_200(
-    test_async_client_auth, 
-    mocker,
-    httpx_mock, 
-    create_db_manifest
-    ):
+    test_async_client_auth, mocker, httpx_mock, create_db_manifest):
     payload = {
         "manifest_json": {
             "manifest_name": "fake_manifest",
@@ -201,8 +180,8 @@ async def test_attach_attributes_should_return_200(
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     httpx_mock.add_response(
-        method = 'GET',
-        url = (
+        method='GET',
+        url=(
             'http://metadata_service/v1/items/search/'
             '?container_code=cli'
             '&container_type=project'
@@ -212,35 +191,35 @@ async def test_attach_attributes_should_return_200(
             '&archived=false'
             '&name=fake_file'
         ),
-        json = {
-            "code":200,
+        json={
+            "code": 200,
             "error_msg": "",
-            "result": [{ 
-                "id": "item-id", 
-                "parent": "", 
-                "parent_path": "", 
-                "restore_path": None, 
-                "archived": False, 
-                "type": "file", 
-                "zone": 0, 
-                "name": "fake_file", 
-                "size": 0, 
-                "owner": "testuser", 
-                "container_code": project_code, 
-                "container_type": "project", 
-                "created_time": "2022-04-13 18:17:51.008212", 
-                "last_updated_time": "2022-04-13 18:17:51.008227", 
-                "storage": { 
-                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9", 
-                    "location_uri": "",  
-                    "version": "1.0" 
-                    }, 
-                "extended": { 
-                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",  
-                    "extra": { 
-                        "tags": [], 
-                        "attributes": {} 
-                            } 
+            "result": [{
+                "id": "item-id",
+                "parent": "",
+                "parent_path": "",
+                "restore_path": None,
+                "archived": False,
+                "type": "file",
+                "zone": 0,
+                "name": "fake_file",
+                "size": 0,
+                "owner": "testuser",
+                "container_code": project_code,
+                "container_type": "project",
+                "created_time": "2022-04-13 18:17:51.008212",
+                "last_updated_time": "2022-04-13 18:17:51.008227",
+                "storage": {
+                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9",
+                    "location_uri": "",
+                    "version": "1.0"
+                    },
+                "extended": {
+                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",
+                    "extra": {
+                        "tags": [],
+                        "attributes": {}
+                            }
                         }
                     }
                     ]
@@ -260,8 +239,8 @@ async def test_attach_attributes_should_return_200(
         status_code=200,
     )
     res = await test_async_client_auth.post(
-        test_manifest_attach_api, 
-        headers=header, 
+        test_manifest_attach_api,
+        headers=header,
         json=payload
         )
     res_json = res.json()
@@ -271,10 +250,7 @@ async def test_attach_attributes_should_return_200(
 
 
 async def test_attach_attributes_wrong_file_should_return_404(
-    test_async_client_auth, 
-    httpx_mock, 
-    mocker
-    ):
+    test_async_client_auth, httpx_mock, mocker):
     payload = {"manifest_json": {
         "manifest_name": "fake_manifest",
         "project_code": project_code,
@@ -298,12 +274,12 @@ async def test_attach_attributes_wrong_file_should_return_404(
             '&archived=false'
             '&name=fake_wrong_file'
             ),
-        json={"code":200,"result": []},
+        json={"code": 200, "result": []},
         status_code=200,
     )
     res = await test_async_client_auth.post(
-        test_manifest_attach_api, 
-        headers=header, 
+        test_manifest_attach_api,
+        headers=header,
         json=payload
         )
     res_json = res.json()
@@ -313,11 +289,7 @@ async def test_attach_attributes_wrong_file_should_return_404(
 
 
 async def test_attach_attributes_wrong_name_should_return_400(
-    test_async_client_auth,
-    httpx_mock,
-    create_db_manifest, 
-    mocker
-    ):
+    test_async_client_auth, httpx_mock, create_db_manifest, mocker):
     payload = {"manifest_json": {
         "manifest_name": "Manifest1",
         "project_code": project_code,
@@ -341,44 +313,46 @@ async def test_attach_attributes_wrong_name_should_return_400(
             '&archived=false'
             '&name=fake_file'
         ),
-        json={"code":200,"result": [{ 
-                "id": "item-id", 
-                "parent": "parent-id", 
-                "parent_path": "testuser", 
-                "restore_path": None, 
-                "archived": False, 
-                "type": "file", 
-                "zone": 0, 
-                "name": "fake_file", 
-                "size": 0, 
-                "owner": "testuser", 
-                "container_code": project_code, 
-                "container_type": "project", 
-                "created_time": "2022-04-13 18:17:51.008212", 
-                "last_updated_time": "2022-04-13 18:17:51.008227", 
-                "storage": { 
-                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9", 
-                    "location_uri": "",  
-                    "version": "1.0" 
-                    }, 
-                "extended": { 
-                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",  
-                    "extra": { 
-                        "tags": [], 
-                        "attributes": {} 
-                            } 
+        json={
+            "code": 200,
+            "result": [{
+                "id": "item-id",
+                "parent": "parent-id",
+                "parent_path": "testuser",
+                "restore_path": None,
+                "archived": False,
+                "type": "file",
+                "zone": 0,
+                "name": "fake_file",
+                "size": 0,
+                "owner": "testuser",
+                "container_code": project_code,
+                "container_type": "project",
+                "created_time": "2022-04-13 18:17:51.008212",
+                "last_updated_time": "2022-04-13 18:17:51.008227",
+                "storage": {
+                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9",
+                    "location_uri": "",
+                    "version": "1.0"
+                    },
+                "extended": {
+                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",
+                    "extra": {
+                        "tags": [],
+                        "attributes": {}
+                            }
                         }
                     },
                 {
-                    "id": "item-id2", 
+                    "id": "item-id2",
                     "parent": "parent-id2"}
                     ]
                     },
         status_code=200,
     )
     res = await test_async_client_auth.post(
-        test_manifest_attach_api, 
-        headers=header, 
+        test_manifest_attach_api,
+        headers=header,
         json=payload
         )
     res_json = res.json()
@@ -388,9 +362,7 @@ async def test_attach_attributes_wrong_name_should_return_400(
 
 
 async def test_attach_attributes_no_access_should_return_403(
-    test_async_client_auth, 
-    mocker
-    ):
+    test_async_client_auth, mocker):
     payload = {"manifest_json": {
         "manifest_name": "fake manifest",
         "project_code": project_code,
@@ -401,12 +373,12 @@ async def test_attach_attributes_no_access_should_return_403(
     }
     header = {'Authorization': 'fake token'}
     mocker.patch(
-        'app.routers.v1.api_manifest.has_permission', 
+        'app.routers.v1.api_manifest.has_permission',
         return_value=False
         )
     res = await test_async_client_auth.post(
-        test_manifest_attach_api, 
-        headers=header, 
+        test_manifest_attach_api,
+        headers=header,
         json=payload
         )
     res_json = res.json()
@@ -416,11 +388,7 @@ async def test_attach_attributes_no_access_should_return_403(
 
 
 async def test_fail_to_attach_attributes_return_404(
-    test_async_client_auth, 
-    httpx_mock,
-    mocker, 
-    create_db_manifest
-    ):
+    test_async_client_auth, httpx_mock, mocker, create_db_manifest):
     payload = {"manifest_json": {
         "manifest_name": "fake_manifest",
         "project_code": project_code,
@@ -444,46 +412,48 @@ async def test_fail_to_attach_attributes_return_404(
             '&archived=false'
             '&name=fake_file'
         ),
-        json={"code":200,"result": [{ 
-                "id": "item-id", 
-                "parent": "parent-id", 
-                "parent_path": "testuser", 
-                "restore_path": None, 
-                "archived": False, 
-                "type": "file", 
-                "zone": 0, 
-                "name": "fake_file", 
-                "size": 0, 
-                "owner": "testuser", 
-                "container_code": project_code, 
-                "container_type": "project", 
-                "created_time": "2022-04-13 18:17:51.008212", 
-                "last_updated_time": "2022-04-13 18:17:51.008227", 
-                "storage": { 
-                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9", 
-                    "location_uri": "",  
-                    "version": "1.0" 
-                    }, 
-                "extended": { 
-                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",  
-                    "extra": { 
-                        "tags": [], 
-                        "attributes": {} 
-                            } 
+        json={
+            "code": 200,
+            "result": [{
+                "id": "item-id",
+                "parent": "parent-id",
+                "parent_path": "testuser",
+                "restore_path": None,
+                "archived": False,
+                "type": "file",
+                "zone": 0,
+                "name": "fake_file",
+                "size": 0,
+                "owner": "testuser",
+                "container_code": project_code,
+                "container_type": "project",
+                "created_time": "2022-04-13 18:17:51.008212",
+                "last_updated_time": "2022-04-13 18:17:51.008227",
+                "storage": {
+                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9",
+                    "location_uri": "",
+                    "version": "1.0"
+                    },
+                "extended": {
+                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",
+                    "extra": {
+                        "tags": [],
+                        "attributes": {}
+                            }
                         }
                     },
                 {
-                    "id": "item-id2", 
+                    "id": "item-id2",
                     "parent": "parent-id2"}
                     ]
-                    },
+            },
         status_code=200,
     )
     mocker.patch('app.routers.v1.api_manifest.attach_manifest_to_file',
                  return_value=None)
     res = await test_async_client_auth.post(
-        test_manifest_attach_api, 
-        headers=header, 
+        test_manifest_attach_api,
+        headers=header,
         json=payload
         )
     res_json = res.json()

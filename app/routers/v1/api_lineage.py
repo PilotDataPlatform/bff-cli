@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from fastapi.responses import JSONResponse
 from fastapi_utils.cbv import cbv
-from ...models.lineage_models import *
+from ...models.lineage_models import LineageCreatePost
 from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
@@ -31,5 +32,11 @@ class APILineage:
         self._logger.info(f"url: {url}")
         self._logger.info(f"payload: {proxy_payload}")
         async with httpx.AsyncClient() as client:
-            fw_response = await client.post(url, json=proxy_payload, timeout=100, follow_redirects=True)
-        return JSONResponse(content=fw_response.json(), status_code=fw_response.status_code)
+            fw_response = await client.post(
+                url,
+                json=proxy_payload,
+                timeout=100,
+                follow_redirects=True)
+        return JSONResponse(
+            content=fw_response.json(),
+            status_code=fw_response.status_code)

@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+from pydantic import BaseModel
 from .base_models import APIResponse
 
 
@@ -59,6 +60,7 @@ class ManifestAttachPost(BaseModel):
     }
     )
 
+
 class ManifestAttachResponse(APIResponse):
     """
     Attach Manifest response class
@@ -73,7 +75,7 @@ class ManifestAttachResponse(APIResponse):
                         "File",
                         "Greenroom"
                     ],
-                    "global_entity_id": "file_data-11f0d2b4-7163-11eb-8428-be498ca98c54-1613595588",
+                    "global_entity_id": "file_data-11f0d2b4-7163...",
                     "operator": "",
                     "file_size": 1048576,
                     "tags": [

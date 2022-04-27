@@ -1,6 +1,5 @@
 import pytest
 from requests.models import Response
-from tests.helper import EAPIResponseCode
 from pytest_httpx import HTTPXMock
 pytestmark = pytest.mark.asyncio
 test_project_api = "/v1/projects"
@@ -10,11 +9,10 @@ project_code = "test_project"
 
 
 async def test_get_project_list_should_return_200(
-    test_async_client_auth, mocker
-    ):
+    test_async_client_auth, mocker):
     test_project = ["project1", "project2", "project3"]
     mocker.patch(
-        'app.routers.v1.api_project.get_user_projects', 
+        'app.routers.v1.api_project.get_user_projects',
         return_value=test_project)
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(test_project_api, headers=header)
@@ -25,8 +23,7 @@ async def test_get_project_list_should_return_200(
 
 
 async def test_get_project_list_without_token_should_return_401(
-    test_async_client
-    ):
+    test_async_client):
     res = await test_async_client.get(test_project_api)
     res_json = res.json()
     assert res_json.get('code') == 401
@@ -34,8 +31,7 @@ async def test_get_project_list_without_token_should_return_401(
 
 
 async def test_upload_files_into_project_should_return_200(
-    test_async_client_auth, mocker
-    ):
+    test_async_client_auth, mocker):
     payload = {
         "operator": "test_user",
         "upload_message": "test",
@@ -60,8 +56,8 @@ async def test_upload_files_into_project_should_return_200(
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     response = await test_async_client_auth.post(
-        test_get_project_file_api, 
-        headers=header, 
+        test_get_project_file_api,
+        headers=header,
         json=payload
         )
     assert response.status_code == 200
@@ -69,8 +65,7 @@ async def test_upload_files_into_project_should_return_200(
 
 
 async def test_upload_files_with_invalid_upload_event_should_return_400(
-    test_async_client_auth, mocker
-    ):
+    test_async_client_auth, mocker):
     payload = {
         "operator": "test_user",
         "upload_message": "test",
@@ -84,12 +79,13 @@ async def test_upload_files_with_invalid_upload_event_should_return_400(
             {"resumable_filename": "fake.png", "resumable_relative_path": ""}
             ]
     }
-    mocker.patch('app.routers.v1.api_project.validate_upload_event',
-                 return_value="Invalid Zone")
+    mocker.patch(
+        'app.routers.v1.api_project.validate_upload_event',
+        return_value="Invalid Zone")
     header = {'Authorization': 'fake token'}
     response = await test_async_client_auth.post(
-        test_get_project_file_api, 
-        headers=header, 
+        test_get_project_file_api,
+        headers=header,
         json=payload)
     res_json = response.json()
     assert res_json.get('code') == 400
@@ -116,8 +112,8 @@ async def test_upload_for_project_member_should_return_403(
                  return_value={})
     header = {'Authorization': 'fake token'}
     response = await test_async_client_project_member_auth.post(
-        test_get_project_file_api, 
-        headers=header, 
+        test_get_project_file_api,
+        headers=header,
         json=payload)
     res_json = response.json()
     assert res_json.get('code') == 403
@@ -126,8 +122,7 @@ async def test_upload_for_project_member_should_return_403(
 
 
 async def test_upload_for_contributor_into_core_should_return_403(
-    test_async_client_project_member_auth, mocker
-    ):
+    test_async_client_project_member_auth, mocker):
     payload = {
         "operator": "test_user",
         "upload_message": "test",
@@ -147,8 +142,8 @@ async def test_upload_for_contributor_into_core_should_return_403(
                  return_value={})
     header = {'Authorization': 'fake token'}
     response = await test_async_client_project_member_auth.post(
-        test_get_project_file_api, 
-        headers=header, 
+        test_get_project_file_api,
+        headers=header,
         json=payload)
     res_json = response.json()
     assert res_json.get('code') == 403
@@ -157,8 +152,7 @@ async def test_upload_for_contributor_into_core_should_return_403(
 
 
 async def test_upload_with_conflict_should_return_409(
-    test_async_client_auth, mocker
-    ):
+    test_async_client_auth, mocker):
     payload = {
         "operator": "test_user",
         "upload_message": "test",
@@ -172,10 +166,12 @@ async def test_upload_with_conflict_should_return_409(
             {"resumable_filename": "fake.png", "resumable_relative_path": ""}
             ]
     }
-    mocker.patch('app.routers.v1.api_project.validate_upload_event',
-                 return_value=None)
-    mocker.patch('app.routers.v1.api_project.check_file_exist',
-                 return_value={})
+    mocker.patch(
+        'app.routers.v1.api_project.validate_upload_event',
+        return_value=None)
+    mocker.patch(
+        'app.routers.v1.api_project.check_file_exist',
+        return_value={})
     mock_response = Response()
     mock_response.status_code = 409
     mock_response._content = b'{ "error_msg" : "mock_conflict" }'
@@ -183,8 +179,8 @@ async def test_upload_with_conflict_should_return_409(
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     response = await test_async_client_auth.post(
-        test_get_project_file_api, 
-        headers=header, 
+        test_get_project_file_api,
+        headers=header,
         json=payload
         )
     res_json = response.json()
@@ -208,10 +204,12 @@ async def test_upload_with_internal_error_should_return_500(
             {"resumable_filename": "fake.png", "resumable_relative_path": ""}
             ]
     }
-    mocker.patch('app.routers.v1.api_project.validate_upload_event',
-                 return_value=None)
-    mocker.patch('app.routers.v1.api_project.check_file_exist',
-                 return_value={})
+    mocker.patch(
+        'app.routers.v1.api_project.validate_upload_event',
+        return_value=None)
+    mocker.patch(
+        'app.routers.v1.api_project.check_file_exist',
+        return_value={})
     mock_response = Response()
     mock_response.status_code = 400
     mock_response._content = b'{ "error_msg" : "mock_internal_error" }'
@@ -219,8 +217,8 @@ async def test_upload_with_internal_error_should_return_500(
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     response = await test_async_client_auth.post(
-        test_get_project_file_api, 
-        headers=header, 
+        test_get_project_file_api,
+        headers=header,
         json=payload
         )
     res_json = response.json()
@@ -229,19 +227,19 @@ async def test_upload_with_internal_error_should_return_500(
 
 
 async def test_get_folder_in_project_should_return_200(
-    test_async_client_auth, 
-    mocker, 
-    httpx_mock: HTTPXMock
-    ):
+    test_async_client_auth,
+    mocker,
+    httpx_mock: HTTPXMock):
     param = {
         'zone': 'zone',
         'project_code': project_code,
         'folder': "testuser/fake_folder"
         }
-    mocker.patch('app.routers.v1.api_project.get_zone',
-                 return_value="zone")
     mocker.patch(
-        'app.routers.v1.api_project.has_permission', 
+        'app.routers.v1.api_project.get_zone',
+        return_value="zone")
+    mocker.patch(
+        'app.routers.v1.api_project.has_permission',
         return_value=True)
     httpx_mock.add_response(
         method='GET',
@@ -255,36 +253,38 @@ async def test_get_folder_in_project_should_return_200(
             '&archived=false'
             '&name=fake_folder'
             ),
-        json={"code":200,"result": [{ 
-                "id": "item-id", 
-                "parent": "parent-id", 
-                "parent_path": "testuser", 
-                "restore_path": None, 
-                "archived": False, 
-                "type": "folder", 
-                "zone": 0, 
-                "name": "fake_folder", 
-                "size": 0, 
-                "owner": "testuser", 
-                "container_code": project_code, 
-                "container_type": "project", 
-                "created_time": "2022-04-13 18:17:51.008212", 
-                "last_updated_time": "2022-04-13 18:17:51.008227", 
-                "storage": { 
-                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9", 
-                    "location_uri": "",  
-                    "version": "1.0" 
-                    }, 
-                "extended": { 
-                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",  
-                    "extra": { 
-                        "tags": [], 
-                        "attributes": {} 
-                            } 
+        json={
+            "code": 200,
+            "result": [{
+                "id": "item-id",
+                "parent": "parent-id",
+                "parent_path": "testuser",
+                "restore_path": None,
+                "archived": False,
+                "type": "folder",
+                "zone": 0,
+                "name": "fake_folder",
+                "size": 0,
+                "owner": "testuser",
+                "container_code": project_code,
+                "container_type": "project",
+                "created_time": "2022-04-13 18:17:51.008212",
+                "last_updated_time": "2022-04-13 18:17:51.008227",
+                "storage": {
+                    "id": "8cd8cef7-2603-4ec3-b5a0-479e58e4c9d9",
+                    "location_uri": "",
+                    "version": "1.0"
+                    },
+                "extended": {
+                    "id": "96510da0-22f4-4487-ac88-71cd48967c8d",
+                    "extra": {
+                        "tags": [],
+                        "attributes": {}
+                            }
                         }
                     },
                 {
-                    "id": "item-id2", 
+                    "id": "item-id2",
                     "parent": "parent-id2"}
                     ]
                     },
@@ -292,8 +292,8 @@ async def test_get_folder_in_project_should_return_200(
     )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(
-        test_get_project_folder_api, 
-        headers=header, 
+        test_get_project_folder_api,
+        headers=header,
         query_string=param
         )
     res_json = res.json()
@@ -306,14 +306,13 @@ async def test_get_folder_in_project_should_return_200(
 
 
 async def test_get_folder_in_project_without_token_should_return_401(
-    test_async_client
-    ):
+    test_async_client):
     param = {'zone': 'zone',
              'project_code': project_code,
              'folder': "fake_user/fake_folder"
              }
     res = await test_async_client.get(
-        test_get_project_folder_api, 
+        test_get_project_folder_api,
         query_string=param
         )
     res_json = res.json()
@@ -322,23 +321,22 @@ async def test_get_folder_in_project_without_token_should_return_401(
 
 
 async def test_get_folder_in_project_without_permission_should_return_403(
-    test_async_client_auth, 
-    mocker
-    ):
+    test_async_client_auth, mocker):
     param = {'zone': 'zone',
              'project_code': project_code,
              'folder': "fake_user/fake_folder"
              }
-    mocker.patch('app.routers.v1.api_project.get_zone',
-                 return_value="zone")
     mocker.patch(
-        'app.routers.v1.api_project.has_permission', 
+        'app.routers.v1.api_project.get_zone',
+        return_value="zone")
+    mocker.patch(
+        'app.routers.v1.api_project.has_permission',
         return_value=False
         )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(
-        test_get_project_folder_api, 
-        headers=header, 
+        test_get_project_folder_api,
+        headers=header,
         query_string=param
         )
     res_json = res.json()
@@ -347,22 +345,22 @@ async def test_get_folder_in_project_without_permission_should_return_403(
 
 
 async def test_get_folder_not_in_own_namefolder_should_return_403(
-    test_async_client_auth, mocker
-    ):
+    test_async_client_auth, mocker):
     param = {'zone': 'zone',
              'project_code': project_code,
              'folder': "testuser/fake_folder"
              }
-    mocker.patch('app.routers.v1.api_project.get_zone',
-                 return_value="zone")
     mocker.patch(
-        'app.routers.v1.api_project.has_permission', 
+        'app.routers.v1.api_project.get_zone',
+        return_value="zone")
+    mocker.patch(
+        'app.routers.v1.api_project.has_permission',
         return_value=False
         )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(
-        test_get_project_folder_api, 
-        headers=header, 
+        test_get_project_folder_api,
+        headers=header,
         query_string=param)
     res_json = res.json()
     assert res.status_code == 403
@@ -370,17 +368,16 @@ async def test_get_folder_not_in_own_namefolder_should_return_403(
 
 
 async def test_get_folder_fail_when_query_node_should_return_500(
-    test_async_client_auth, 
-    mocker
-    ):
+    test_async_client_auth, mocker):
     param = {'zone': 'zone',
              'project_code': project_code,
              'folder': "testuser/fake_folder"
              }
-    mocker.patch('app.routers.v1.api_project.get_zone',
-                 return_value="zone")
     mocker.patch(
-        'app.routers.v1.api_project.has_permission', 
+        'app.routers.v1.api_project.get_zone',
+        return_value="zone")
+    mocker.patch(
+        'app.routers.v1.api_project.has_permission',
         return_value=True)
     mock_response = Response()
     mock_response.status_code = 400
@@ -389,8 +386,8 @@ async def test_get_folder_fail_when_query_node_should_return_500(
                  return_value=mock_response)
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(
-        test_get_project_folder_api, 
-        headers=header, 
+        test_get_project_folder_api,
+        headers=header,
         query_string=param)
     res_json = res.json()
     assert res_json.get('code') == 500
@@ -398,10 +395,8 @@ async def test_get_folder_fail_when_query_node_should_return_500(
 
 
 async def test_get_folder_in_project_with_folder_not_found_should_return_404(
-    test_async_client_auth, 
-    mocker,  
-    httpx_mock: HTTPXMock
-    ):
+    test_async_client_auth, mocker,
+    httpx_mock: HTTPXMock):
     param = {'zone': 'zone',
              'project_code': project_code,
              'folder': "testuser/fake_folder"
@@ -409,7 +404,7 @@ async def test_get_folder_in_project_with_folder_not_found_should_return_404(
     mocker.patch('app.routers.v1.api_project.get_zone',
                  return_value="zone")
     mocker.patch(
-        'app.routers.v1.api_project.has_permission', 
+        'app.routers.v1.api_project.has_permission',
         return_value=True
         )
     httpx_mock.add_response(
@@ -424,13 +419,13 @@ async def test_get_folder_in_project_with_folder_not_found_should_return_404(
             '&archived=false'
             '&name=fake_folder'
             ),
-        json={"code":200,"result": []},
+        json={"code": 200, "result": []},
         status_code=200,
     )
     header = {'Authorization': 'fake token'}
     res = await test_async_client_auth.get(
-        test_get_project_folder_api, 
-        headers=header, 
+        test_get_project_folder_api,
+        headers=header,
         query_string=param
         )
     res_json = res.json()

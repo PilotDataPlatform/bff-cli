@@ -26,13 +26,16 @@ def instrument_app(app) -> None:
     trace.set_tracer_provider(tracer_provider)
 
     jaeger_exporter = JaegerExporter(
-        agent_host_name=ConfigClass.OPEN_TELEMETRY_HOST, agent_port=ConfigClass.OPEN_TELEMETRY_PORT
+        agent_host_name=ConfigClass.OPEN_TELEMETRY_HOST,
+        agent_port=ConfigClass.OPEN_TELEMETRY_PORT
     )
 
     tracer_provider.add_span_processor(BatchSpanProcessor(jaeger_exporter))
     
     FastAPIInstrumentor.instrument_app(app)
-    SQLAlchemyInstrumentor().instrument(engine=engine.sync_engine, service=namespace)
+    SQLAlchemyInstrumentor().instrument(
+        engine=engine.sync_engine,
+        service=namespace)
     HTTPXClientInstrumentor().instrument()
 
 

@@ -14,7 +14,10 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
     if CONFIG_CENTER_ENABLED == 'false':
         return {}
     else:
-        vc = VaultClient(os.getenv("VAULT_URL"), os.getenv("VAULT_CRT"), os.getenv("VAULT_TOKEN"))
+        vc = VaultClient(
+            os.getenv("VAULT_URL"),
+            os.getenv("VAULT_CRT"),
+            os.getenv("VAULT_TOKEN"))
         return vc.get_from_vault(SRV_NAMESPACE)
 
 class Settings(BaseSettings):

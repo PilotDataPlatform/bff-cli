@@ -1,14 +1,14 @@
 import re
 from app.models.error_model import InvalidEncryptionError
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from fastapi_utils.cbv import cbv
 from logger import LoggerFactory
 from ...commons.data_providers.database import DBConnection
-from ...resources.error_handler import catch_internal 
+from ...resources.error_handler import catch_internal
 from ...resources.error_handler import EAPIResponseCode
 from ...resources.error_handler import customized_error_template
 from ...resources.error_handler import ECustomizedError
-from app.config import ConfigClass
 from ...resources.validation_service import ManifestValidator
 from ...resources.validation_service import decryption
 from ...resources.database_service import RDConnection
@@ -19,9 +19,7 @@ from ...models.validation_models import ManifestValidatePost
 from ...models.validation_models import EnvValidateResponse
 from ...models.validation_models import EnvValidatePost
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.commons.data_providers.database import DBConnection
-from app.resources.error_handler import customized_error_template
-from app.resources.error_handler import ECustomizedError
+from app.config import ConfigClass
 
 router = APIRouter()
 
@@ -36,9 +34,10 @@ class APIValidation:
         self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
         self.db = RDConnection()
 
-    @router.post("/validate/gid", tags=[_API_TAG],
-                 response_model=ValidateDICOMIDResponse,
-                 summary="Validate DICOM ID")
+    @router.post(
+        "/validate/gid", tags=[_API_TAG],
+        response_model=ValidateDICOMIDResponse,
+        summary="Validate DICOM ID")
     @catch_internal(_API_NAMESPACE)
     async def validate_dicom_id(self, request_payload: ValidateDICOMIDPOST):
         api_response = ValidateDICOMIDResponse()
@@ -56,15 +55,15 @@ class APIValidation:
         api_response.code = res_code
         return api_response.json_response()
 
-    @router.post("/validate/manifest", tags=[_API_TAG],
-                 response_model=ManifestValidateResponse,
-                 summary="Validate manifest for project")
+    @router.post(
+        "/validate/manifest", tags=[_API_TAG],
+        response_model=ManifestValidateResponse,
+        summary="Validate manifest for project")
     @catch_internal(_API_NAMESPACE)
     async def validate_manifest(
-        self, 
-        request_payload: ManifestValidatePost,               
-        db_session: AsyncSession = Depends(db_connection.get_db)
-        ):
+        self,
+        request_payload: ManifestValidatePost,
+        db_session: AsyncSession = Depends(db_connection.get_db)):
         """Validate the manifest based on the project"""
         self._logger.info("API validate_manifest".center(80, '-'))
         self._logger.info(f"DB URI: {ConfigClass.RDS_DB_URI}")
@@ -76,12 +75,12 @@ class APIValidation:
         validation_event = {"project_code": project_code,
                             "manifest_name": manifest_name,
                             "attributes": attributes}
-        self._logger.info(f"Validation event: {validation_event}")                    
-        manifest_info = await self.db.get_manifest_name_from_project_in_db(
-            validation_event, 
+        self._logger.info(f"Validation event: {validation_event}")
+        manifest_info = await self.db.get_manifest_name_from_project_db(
+            validation_event,
             db_session
             )
-        self._logger.info(f"manifest_info: {manifest_info}")  
+        self._logger.info(f"manifest_info: {manifest_info}")
         if not manifest_info:
             api_response.result = customized_error_template(
                 ECustomizedError.MANIFEST_NOT_FOUND
@@ -91,7 +90,7 @@ class APIValidation:
         validation_event["manifest"] = manifest_info
         validator = ManifestValidator()
         attribute_validation_error_msg = await validator.has_valid_attributes(
-            validation_event, 
+            validation_event,
             db_session
             )
         if attribute_validation_error_msg:
@@ -116,8 +115,11 @@ class APIValidation:
         action = request_payload.action
         self._logger.info(f'msg: {encrypted_msg}')
         self._logger.info(request_payload)
-        if zone not in [ConfigClass.GREEN_ZONE_LABEL.lower(), \
-            ConfigClass.CORE_ZONE_LABEL.lower()]:
+        valid_zones = [
+            ConfigClass.GREEN_ZONE_LABEL.lower(),
+            ConfigClass.CORE_ZONE_LABEL.lower()
+            ]
+        if zone not in valid_zones:
             self._logger.debug(f"Invalid zone value: {zone}")
             api_response.code = EAPIResponseCode.bad_request
             api_response.error_msg = customized_error_template(
@@ -128,13 +130,13 @@ class APIValidation:
         greenroom = ConfigClass.GREEN_ZONE_LABEL.lower()
         core = ConfigClass.CORE_ZONE_LABEL.lower()
         restrict_zone = {
-        greenroom: {'upload': [greenroom], 'download': [greenroom]},
-        core: {'upload': [greenroom, core], 'download': [core]}
-        }
+            greenroom: {'upload': [greenroom], 'download': [greenroom]},
+            core: {'upload': [greenroom, core], 'download': [core]}
+            }
         if encrypted_msg:
             try:
                 current_zone = decryption(
-                    encrypted_msg, 
+                    encrypted_msg,
                     ConfigClass.CLI_SECRET
                     )
             except InvalidEncryptionError as e:

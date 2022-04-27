@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from fastapi_utils.cbv import cbv
-from ...models.kg_models import KGImportPost, KGResponseModel
+from ...models.kg_models import KGImportPost
+from ...models.kg_models import KGResponseModel
 from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
 from ...resources.dependencies import jwt_required
 from ...config import ConfigClass
 import httpx
-from fastapi.security import HTTPBasicCredentials, HTTPBearer
+from fastapi.security import HTTPBasicCredentials
+from fastapi.security import HTTPBearer
 
 router = APIRouter()
 _API_TAG = 'V1 KG'
@@ -17,13 +20,15 @@ _API_NAMESPACE = "api_kg"
 class APIProject:
     current_identity: dict = Depends(jwt_required)
     security = HTTPBearer()
-    
+
     def __init__(self):
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.post("/kg/resources", tags=[_API_TAG],
-                response_model=KGResponseModel,
-                summary="Import kg_resources")
+    @router.post(
+        "/kg/resources",
+        tags=[_API_TAG],
+        response_model=KGResponseModel,
+        summary="Import kg_resources")
     @catch_internal(_API_NAMESPACE)
     async def kg_import(self, request_payload: KGImportPost, credentials: HTTPBasicCredentials = Depends(security)):
         '''
@@ -42,6 +47,6 @@ class APIProject:
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=payload, headers=headers)
         self._logger.info(f'Response: {response.text}')
-        content=response.json()
+        content = response.json()
         self._logger.info(f'Response content: {content}')
         return content
