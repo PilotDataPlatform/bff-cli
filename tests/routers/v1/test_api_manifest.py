@@ -40,8 +40,8 @@ async def test_get_attributes_no_access_should_return_403(
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_api,
-        headers=headers,
+        test_api, 
+        headers=headers, 
         query_string=payload
         )
     res_json = res.json()
@@ -54,12 +54,12 @@ async def test_get_attributes_project_not_exist_should_return_403(
     payload = {'project_code': 't1000'}
     headers = {'Authorization': 'fake token'}
     mocker.patch(
-        'app.routers.v1.api_manifest.has_permission',
+        'app.routers.v1.api_manifest.has_permission', 
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_api,
-        headers=headers,
+        test_api, 
+        headers=headers, 
         query_string=payload
         )
     res_json = res.json()
@@ -85,8 +85,8 @@ async def test_export_attributes_should_return_200(
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     res = await test_async_client_auth.get(
-        test_export_api,
-        headers=headers,
+        test_export_api, 
+        headers=headers, 
         query_string=param
         )
     res_json = res.json()
@@ -105,8 +105,8 @@ async def test_export_attributes_no_access(test_async_client_auth, mocker):
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_export_api,
-        headers=headers,
+        test_export_api, 
+        headers=headers, 
         query_string=param
         )
     res_json = res.json()
@@ -122,8 +122,8 @@ async def test_export_attributes_not_exist_should_return_404(
     mocker.patch('app.routers.v1.api_manifest.has_permission',
                  return_value=True)
     res = await test_async_client_auth.get(
-        test_export_api,
-        headers=headers,
+        test_export_api, 
+        headers=headers, 
         query_string=param
         )
     res_json = res.json()
@@ -140,8 +140,8 @@ async def test_export_attributes_project_not_exist_should_return_403(
         return_value=False
         )
     res = await test_async_client_auth.get(
-        test_export_api,
-        headers=headers,
+        test_export_api, 
+        headers=headers, 
         query_string=param
         )
     res_json = res.json()
@@ -217,7 +217,14 @@ async def test_attach_attributes_should_return_200(
                 "extended": {
                     "id": "96510da0-22f4-4487-ac88-71cd48967c8d",
                     "extra": {
-                        "tags": [],
+                        "tags": [
+                        "tag1",
+                        "tag2"
+                        ],
+                        "system_tags": [
+                        "tag1",
+                        "tag2"
+                        ],
                         "attributes": {}
                             }
                         }
@@ -228,14 +235,51 @@ async def test_attach_attributes_should_return_200(
     )
     httpx_mock.add_response(
         method='PUT',
-        url='http://metadata_service/v1/items/batch/',
+        url='http://metadata_service/v1/items/batch/bequeath/',
         json={
-            "code": 200,
-            "error_msg": "",
-            "result": {
-                'operation_status': 'SUCCEED'
-            }
-        },
+                "code": 200,
+                "error_msg": "",
+                "page": 0,
+                "total": 1,
+                "num_of_pages": 1,
+                "result": {
+                    "id": "85465212-168a-4f0c-a7aa-f3a19795d2ff",
+                    "parent": "28c608ac-1693-4318-a1c4-412caf2cd74a",
+                    "parent_path": "path.to.file",
+                    "type": "file",
+                    "zone": 0,
+                    "name": "fake_file",
+                    "size": 0,
+                    "owner": "username",
+                    "container_code": project_code,
+                    "container_type": "project",
+                    "created_time": "2022-04-13 13:30:10.890347",
+                    "last_updated_time": "2022-04-13 13:30:10.890347",
+                    "storage": {
+                    "id": "ba623005-8183-419a-972a-e4ce0d539349",
+                    "location_uri": "https://example.com/item",
+                    "version": "1.0"
+                    },
+                    "extended": {
+                    "id": "dc763d28-7e74-4db3-a702-fa719aa702c6",
+                    "extra": {
+                        "tags": [
+                        "tag1",
+                        "tag2"
+                        ],
+                        "system_tags": [
+                        "tag1",
+                        "tag2"
+                        ],
+                        "attributes": {
+                        "101778d7-a628-41ea-823b-e4b377f3476c": {
+                            "fake_attribute": "a1"
+                            }
+                        }
+                    }
+                    }
+                }
+                },
         status_code=200,
     )
     res = await test_async_client_auth.post(
@@ -246,7 +290,11 @@ async def test_attach_attributes_should_return_200(
     res_json = res.json()
     assert res_json.get('code') == 200
     result = res_json.get('result')
-    assert result.get('operation_status') == 'SUCCEED'
+    assert result.get('extended').get('extra').get('attributes') == {
+                        "101778d7-a628-41ea-823b-e4b377f3476c": {
+                            "fake_attribute": "a1"
+                            }
+                        }
 
 
 async def test_attach_attributes_wrong_file_should_return_404(

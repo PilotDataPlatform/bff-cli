@@ -85,28 +85,13 @@ async def get_user_projects(current_identity):
 
 
 async def attach_manifest_to_file(event):
-    project_code = event.get('project_code')
     global_entity_id = event.get('global_entity_id')
     manifest_id = event.get('manifest_id')
     attributes = event.get('attributes')
-    file_type = event.get('file_type')
     _logger.info("attach_manifest_to_file".center(80, '-'))
-    url = ConfigClass.METADATA_SERVICE + '/v1/items/batch/'
-    if file_type == 'folder':
-        params = {
-                    'container_code': project_code,
-                    'container_type': 'project',
-                    'parent_id': global_entity_id,
-                    'recursive': True,
-                    'archived': False
-                }
-        _logger.info(f"Query node payload: {params}")
-        folder_files = await query_node(params)
-        ids_list = [geid for geid in folder_files.get('id')]
-    else:
-        ids_list = [global_entity_id]
+    url = ConfigClass.METADATA_SERVICE + '/v1/items/batch/bequeath/'
     params = {
-        'ids': ids_list
+        'ids': global_entity_id
     }
     payload = {
         'attribute_template_id': manifest_id,
@@ -123,16 +108,17 @@ async def attach_manifest_to_file(event):
     return response.json()
 
 
-async def query_node(payload):
+async def query_node(params):
     _logger.info("query_node".center(80, '-'))
     try:
-        _logger.info(f"query params: {payload}")
+        _logger.info(f"query params: {params}")
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 ConfigClass.METADATA_SERVICE + '/v1/items/search/',
-                params=payload,
+                params=params,
                 follow_redirects=True
                 )
+        _logger.info(f"query response: {response.url}")
         _logger.info(f"query response: {response.text}")
         return response
     except Exception as e:

@@ -157,7 +157,6 @@ class APIManifest:
         file_response = await query_node(file_info)
         self._logger.info(f"Query result: {file_response}")
         file_node = file_response.json().get('result')
-        self._logger.info(f"line 106: {file_node}")
         if not file_node:
             api_response.error_msg = customized_error_template(
                 ECustomizedError.FILE_NOT_FOUND)
@@ -166,7 +165,6 @@ class APIManifest:
         else:
             global_entity_id = file_node[0].get('global_entity_id')
             file_owner = file_node[0].get('uploader')
-            file_type = file_node[0].get('type')
         self._logger.info(
             f"Globale entity id for {file_name}: {global_entity_id}")
         self._logger.info(f"File {file_name} uploaded by {file_owner}")
@@ -192,11 +190,9 @@ class APIManifest:
             manifest_info = manifest_info[0]
         manifest_id = manifest_info.get('id')
         annotation_event = {
-            "project_code": project_code,
             "global_entity_id": global_entity_id,
             "manifest_id": manifest_id,
             "attributes": attributes,
-            'file_type': file_type
             }
         response = await attach_manifest_to_file(annotation_event)
         self._logger.info(f"Attach manifest result: {response}")

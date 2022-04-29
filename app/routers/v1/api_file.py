@@ -179,11 +179,12 @@ class APIFile:
         params = {
                     'container_code': project_code,
                     'container_type': source_type.lower(),
-                    'parent_path': folder,
                     'recursive': False,
                     'zone': zone,
                     'archived': False
                 }
+        if folder:
+            params['parent_path'] = folder
         self._logger.info(f"Query node payload: {params}")
         folder_info = await query_node(params)
         self._logger.info(f'folder_info: {folder_info}')
