@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from fastapi_utils.cbv import cbv
-from ...models.dataset_models import *
+from ...models.dataset_models import DatasetDetailResponse
+from ...models.dataset_models import DatasetListResponse
 from ...models.base_models import EAPIResponseCode
-from ...resources.error_handler import catch_internal, customized_error_template, ECustomizedError
+from ...resources.error_handler import catch_internal
+from ...resources.error_handler import customized_error_template
+from ...resources.error_handler import ECustomizedError
 from ...resources.database_service import RDConnection
 from ...resources.dependencies import jwt_required
 from app.resources.helpers import get_node
@@ -39,7 +43,8 @@ class APIDataset:
             username = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info(f"User request with identity: {self.current_identity}")
+        self._logger.info(
+            f"User request with identity: {self.current_identity}")
         payload = {"creator": username}
         dataset_list = await get_node(payload, 'Dataset')
         self._logger.info(f"Getting user datasets: {dataset_list}")
@@ -52,7 +57,9 @@ class APIDataset:
                 response_model=DatasetDetailResponse,
                 summary="Get dataset detail based on the dataset code")
     @catch_internal(_API_NAMESPACE)
-    async def get_dataset(self, dataset_code, db_session: AsyncSession = Depends(db_connection.get_db)):
+    async def get_dataset(
+        self, dataset_code,
+        db_session: AsyncSession = Depends(db_connection.get_db)):
         '''
         Get the dataset detail by dataset code
         '''
@@ -62,31 +69,38 @@ class APIDataset:
             username = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
-        self._logger.info(f"User request with identity: {self.current_identity}")
+        self._logger.info(
+            f"User request with identity: {self.current_identity}")
         node = await get_node({"code": dataset_code}, 'Dataset')
         self._logger.info(f"Getting user dataset node: {node}")
         if not node:
             api_response.code = EAPIResponseCode.not_found
-            api_response.error_msg = customized_error_template(ECustomizedError.DATASET_NOT_FOUND)
+            api_response.error_msg = customized_error_template(
+                ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
         elif node[0].get('creator') != username:
             api_response.code = EAPIResponseCode.forbidden
-            api_response.error_msg = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+            api_response.error_msg = customized_error_template(
+                ECustomizedError.PERMISSION_DENIED)
             return api_response.json_response()
         elif 'Dataset' not in node[0].get('labels'):
             api_response.code = EAPIResponseCode.not_found
-            api_response.error_msg = customized_error_template(ECustomizedError.DATASET_NOT_FOUND)
+            api_response.error_msg = customized_error_template(
+                ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
         node_geid = node[0].get('global_entity_id')
         dataset_query_event = {
             'dataset_geid': node_geid,
             }
         self._logger.info(f"Dataset query: {dataset_query_event}")
-        versions = await self.db.get_dataset_versions(dataset_query_event, db_session)
+        versions = await self.db.get_dataset_versions(
+            dataset_query_event, db_session)
         self._logger.info(f"Dataset versions: {versions}")
-        dataset_detail = {'general_info': node, 'version_detail': versions, 'version_no': len(versions)}
+        dataset_detail = {
+            'general_info': node,
+            'version_detail': versions,
+            'version_no': len(versions)
+            }
         api_response.result = dataset_detail
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
-
-

@@ -1,13 +1,25 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from fastapi_utils.cbv import cbv
-from ...models.hpc_models import *
+from ...models.hpc_models import HPCPartitionInfoResponse
+from ...models.hpc_models import HPCJobResponse
+from ...models.hpc_models import HPCJobSubmitPost
+from ...models.hpc_models import HPCJobInfoResponse
+from ...models.hpc_models import HPCNodesResponse
+from ...models.hpc_models import HPCNodeInfoResponse
+from ...models.hpc_models import HPCPartitonsResponse
+from ...models.hpc_models import HPCAuthResponse
+from ...models.hpc_models import HPCAuthPost
 from ...models.error_model import HPCError
 from logger import LoggerFactory
 from ...resources.error_handler import catch_internal
-from ...resources.dependencies import *
-from ...resources.hpc import submit_hpc_job, get_hpc_job_info
-from ...resources.hpc import get_hpc_nodes, get_hpc_node_by_name, get_hpc_jwt_token
-from ...resources.hpc import get_hpc_partitions, get_hpc_partition_by_name
+from ...resources.error_handler import EAPIResponseCode
+from ...resources.hpc import submit_hpc_job
+from ...resources.hpc import get_hpc_job_info
+from ...resources.hpc import get_hpc_nodes
+from ...resources.hpc import get_hpc_node_by_name
+from ...resources.hpc import get_hpc_jwt_token
+from ...resources.hpc import get_hpc_partitions
+from ...resources.hpc import get_hpc_partition_name
 
 router = APIRouter()
 _API_TAG = 'V1 HPC'
@@ -16,13 +28,14 @@ _API_NAMESPACE = "api_hpc"
 
 @cbv(router)
 class APIProject:
-    
     def __init__(self):
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.post("/hpc/auth", tags=[_API_TAG],
-                response_model=HPCAuthResponse,
-                summary="HPC authentication")
+    @router.post(
+        "/hpc/auth",
+        tags=[_API_TAG],
+        response_model=HPCAuthResponse,
+        summary="HPC authentication")
     @catch_internal(_API_NAMESPACE)
     async def hpc_auth(self, request_payload: HPCAuthPost):
         '''
@@ -46,7 +59,7 @@ class APIProject:
             error_msg = str(e)
             self._logger.info(f"ERROR GETTING HPC TOKEN: {error_msg}")
             if 'open_session' in error_msg:
-                error = f"Cannot authorized HPC"
+                error = "Cannot authorized HPC"
             else:
                 error = f"Cannot authorized HPC: {error_msg}"
             code = EAPIResponseCode.internal_error
@@ -55,9 +68,11 @@ class APIProject:
         api_response.code = code
         return api_response.json_response()
 
-    @router.post("/hpc/job", tags=[_API_TAG],
-                response_model=HPCJobResponse,
-                summary="HPC job submission")
+    @router.post(
+        "/hpc/job",
+        tags=[_API_TAG],
+        response_model=HPCJobResponse,
+        summary="HPC job submission")
     @catch_internal(_API_NAMESPACE)
     async def hpc_submit_job(self, request_payload: HPCJobSubmitPost):
         '''
@@ -100,7 +115,6 @@ class APIProject:
         api_response = HPCJobInfoResponse()
         result = {}
         try:
-        
             information = await get_hpc_job_info(job_id, host, username, token)
             if information:
                 error = ""
@@ -117,7 +131,9 @@ class APIProject:
             self._logger.info(f"ERROR GETTING HPC job: {e}")
             code = EAPIResponseCode.internal_error
             error = e
-        self._logger.info(f"RESPONSE: 'code': {code}, 'result': {result}, 'error_msg': {error}")
+        self._logger.info(
+            f"RESPONSE: 'code': {code}, \
+                'result': {result}, 'error_msg': {error}")
         api_response.result = result
         api_response.error_msg = error
         api_response.code = code
@@ -151,12 +167,13 @@ class APIProject:
             self._logger.info(f"ERROR GETTING HPC nodes: {e}")
             code = EAPIResponseCode.internal_error
             error = e
-        self._logger.info(f"RESPONSE: 'code': {code}, 'result': {result}, 'error_msg': {error}")
+        self._logger.info(
+            f"RESPONSE: 'code': {code}, \
+                'result': {result}, 'error_msg': {error}")
         api_response.result = result
         api_response.error_msg = error
         api_response.code = code
         return api_response.json_response()
-
 
     @router.get("/hpc/nodes/{node_name}", tags=[_API_TAG],
                 response_model=HPCNodeInfoResponse,
@@ -177,7 +194,8 @@ class APIProject:
                 code = EAPIResponseCode.success
                 result = information
             else:
-                self._logger.info(f"ERROR GETTING HPC node {node_name}: {information}")
+                self._logger.info(
+                    f"ERROR GETTING HPC node {node_name}: {information}")
                 raise HPCError('Cannot get HPC nodes information')
         except HPCError as job_error:
             self._logger.info(f"ERROR GETTING HPC nodes: {job_error}")
@@ -187,7 +205,9 @@ class APIProject:
             self._logger.info(f"ERROR GETTING HPC nodes: {e}")
             code = EAPIResponseCode.internal_error
             error = e
-        self._logger.info(f"RESPONSE: 'code': {code}, 'result': {result}, 'error_msg': {error}")
+        self._logger.info(
+            f"RESPONSE: 'code': {code}, \
+                'result': {result}, 'error_msg': {error}")
         api_response.result = result
         api_response.error_msg = error
         api_response.code = code
@@ -211,7 +231,8 @@ class APIProject:
                 code = EAPIResponseCode.success
                 result = information
             else:
-                self._logger.info(f"ERROR GETTING HPC partitions: {information}")
+                self._logger.info(
+                    f"ERROR GETTING HPC partitions: {information}")
                 raise HPCError('Cannot get HPC partitions')
         except HPCError as job_error:
             self._logger.info(f"ERROR GETTING HPC partitions: {job_error}")
@@ -221,7 +242,9 @@ class APIProject:
             self._logger.info(f"ERROR GETTING HPC partitions: {e}")
             code = EAPIResponseCode.internal_error
             error = e
-        self._logger.info(f"RESPONSE: 'code': {code}, 'result': {result}, 'error_msg': {error}")
+        self._logger.info(
+            f"RESPONSE: 'code': {code}, \
+                'result': {result}, 'error_msg': {error}")
         api_response.result = result
         api_response.error_msg = error
         api_response.code = code
@@ -239,14 +262,15 @@ class APIProject:
         api_response = HPCPartitionInfoResponse()
         result = {}
         try:
-            information = await get_hpc_partition_by_name(
+            information = await get_hpc_partition_name(
                 host, username, token, partition_name)
             if information:
                 error = ""
                 code = EAPIResponseCode.success
                 result = information
             else:
-                self._logger.info(f"ERROR GETTING HPC partition: {information}")
+                self._logger.info(
+                    f"ERROR GETTING HPC partition: {information}")
                 raise HPCError(f'Cannot get HPC partition: {partition_name}')
         except HPCError as job_error:
             self._logger.info(f"ERROR GETTING HPC partition: {job_error}")
@@ -256,7 +280,9 @@ class APIProject:
             self._logger.info(f"ERROR GETTING HPC partitions: {e}")
             code = EAPIResponseCode.internal_error
             error = e
-        self._logger.info(f"RESPONSE: 'code': {code}, 'result': {result}, 'error_msg': {error}")
+        self._logger.info(
+            f"RESPONSE: 'code': {code}, \
+                'result': {result}, 'error_msg': {error}")
         api_response.result = result
         api_response.error_msg = error
         api_response.code = code

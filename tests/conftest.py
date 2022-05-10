@@ -211,3 +211,5 @@ def mock_settings(monkeypatch, db_postgres):
         ConfigClass, 'AUTH_SERVICE', 'http://service_auth')
     monkeypatch.setattr(
         ConfigClass, 'RDS_DB_URI',  f'{db_postgres}?prepared_statement_cache_size=0')
+    monkeypatch.setattr(
+        ConfigClass, 'METADATA_SERVICE', 'http://metadata_service')

@@ -14,7 +14,10 @@ def load_vault_settings(settings: BaseSettings) -> Dict[str, Any]:
     if CONFIG_CENTER_ENABLED == 'false':
         return {}
     else:
-        vc = VaultClient(os.getenv("VAULT_URL"), os.getenv("VAULT_CRT"), os.getenv("VAULT_TOKEN"))
+        vc = VaultClient(
+            os.getenv("VAULT_URL"),
+            os.getenv("VAULT_CRT"),
+            os.getenv("VAULT_TOKEN"))
         return vc.get_from_vault(SRV_NAMESPACE)
 
 class Settings(BaseSettings):
@@ -41,11 +44,13 @@ class Settings(BaseSettings):
     RDS_SCHEMA_DEFAULT: str 
     NEO4J_SERVICE: str
     RDS_DB_URI: str
+    METADATA_SERVICE: str
 
     def __init__(self):
         super().__init__()
         self.RDS_DB_URI = self.RDS_DB_URI.replace(
-            'postgresql', 'postgresql+asyncpg')
+            'postgresql', 'postgresql+asyncpg'
+            )
 
 
     class Config:
@@ -75,4 +80,3 @@ def get_settings():
 
 
 ConfigClass = get_settings()
-

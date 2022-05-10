@@ -3,35 +3,29 @@ import jwt
 import time
 from fastapi import Request
 from app.models.project_models import POSTProjectFile
-from app.resources.dependencies import get_project_role
 from app.resources.dependencies import jwt_required
-from app.resources.dependencies import has_permission
-from app.resources.dependencies import void_check_file_in_zone
+from app.resources.dependencies import check_file_exist
 from app.resources.dependencies import validate_upload_event
 from app.resources.dependencies import transfer_to_pre
 from app.resources.error_handler import APIException
-from app.config import ConfigClass
 
 pytestmark = pytest.mark.asyncio
 project_code = "test_project"
 
 
-
 async def test_jwt_required_should_return_successed(httpx_mock):
-    mock_request = Request(scope={"type":"http"})
+    mock_request = Request(scope={"type": "http"})
     encoded_jwt = jwt.encode({
         "realm_access": {"roles": ["platform_admin"]},
         "preferred_username": "test_user",
         "exp": time.time()+3
-    }, key="unittest" ,algorithm="HS256").decode('utf-8')
+    }, key="unittest", algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
         method='GET',
-        url=f'http://service_auth/v1/admin/user?username=test_user',
-        json={ "result": {
-            "id": 1,
-            "role": "admin"
-        }},
+        url='http://service_auth/v1/admin/user?username=test_user',
+        json={
+            "result": {"id": 1, "role": "admin"}},
         status_code=200,
     )
     test_result = await jwt_required(mock_request)
@@ -44,7 +38,7 @@ async def test_jwt_required_without_token_should_return_unauthorized():
     mock_request = Request(scope={"type": "http"})
     mock_request._headers = {}
     with pytest.raises(APIException) as e:
-        test_result = await jwt_required(mock_request)
+        _ = await jwt_required(mock_request)
         assert e.value.status_code == 401
         assert e.value.error_msg == "Token required"
 
@@ -55,46 +49,30 @@ async def test_jwt_required_with_token_expired_should_return_unauthorized():
         "realm_access": {"roles": ["platform_admin"]},
         "preferred_username": "test_user",
         "exp": time.time()-3
-    }, key="unittest" ,algorithm="HS256").decode('utf-8')
+    }, key="unittest", algorithm="HS256").decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     test_result = await jwt_required(mock_request)
     response = test_result.__dict__
     assert response['status_code'] == 401
 
 
-async def test_jwt_required_with_neo4j_error_should_return_forbidden(httpx_mock):
+async def test_jwt_required_without_username_return_not_found(httpx_mock):
     mock_request = Request(scope={"type": "http"})
-    encoded_jwt = jwt.encode({
-        "realm_access": {"roles": ["platform_admin"]},
-        "preferred_username": "test_user",
-        "exp": time.time()+3
-    }, key="unittest" ,algorithm="HS256").decode('utf-8')
+
+    encoded_jwt = jwt.encode(
+        {
+            "realm_access": {"roles": ["platform_admin"]},
+            "preferred_username": "test_user",
+            "exp": time.time()+3
+        },
+        key="unittest",
+        algorithm="HS256"
+        ).decode('utf-8')
     mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
     httpx_mock.add_response(
         method='GET',
         url='http://service_auth/v1/admin/user?username=test_user',
-        json={ "result": {
-        }},
-        status_code=500,
-    )
-    test_result = await jwt_required(mock_request)
-    response = test_result.__dict__
-    assert response['status_code'] == 403
-
-
-async def test_jwt_required_with_username_not_in_token_should_return_not_found(httpx_mock):
-    mock_request = Request(scope={"type": "http"})
-
-    encoded_jwt = jwt.encode({
-        "realm_access": {"roles": ["platform_admin"]},
-        "preferred_username": "test_user",
-        "exp": time.time()+3
-    }, key="unittest" ,algorithm="HS256").decode('utf-8')
-    mock_request._headers = {'Authorization': "Bearer " + encoded_jwt}
-    httpx_mock.add_response(
-        method='GET',
-        url='http://service_auth/v1/admin/user?username=test_user',
-        json={ "result": None},
+        json={"result": None},
         status_code=404,
     )
     test_result = await jwt_required(mock_request)
@@ -102,27 +80,36 @@ async def test_jwt_required_with_username_not_in_token_should_return_not_found(h
     assert response['status_code'] == 403
 
 
-async def test_void_check_file_in_zone_should_return_bad_request(httpx_mock):
-    mock_post_model = POSTProjectFile
-    mock_post_model.type = "type"
-    mock_post_model.zone = "gr"
+async def test_check_file_in_zone_should_return_bad_request(httpx_mock):
+    zone = "gr"
     mock_file = {
         "resumable_relative_path": "relative_path",
         "resumable_filename": "file_name"
     }
     httpx_mock.add_response(
         method='GET',
-        url='http://fileinfo_service/v1/project/test_project/file/exist/?type=type&zone=gr&file_relative_path=relative_path%2Ffile_name&project_code=test_project',
-        json={"code": 200},
+        url=(
+            'http://metadata_service/v1/items/search/'
+            '?container_code=test_project'
+            '&container_type=project'
+            '&parent_path=relative_path'
+            '&recursive=false'
+            '&zone=0'
+            '&archived=false'
+            '&type=file'
+            '&name=file_name'
+            ),
+        json={
+            "code": 200,
+            "error_msg": "",
+            "result": []},
         status_code=200,
     )
-
-    result = await void_check_file_in_zone(mock_post_model, mock_file, project_code)
-    response = result.__dict__
-    assert response['status_code'] == 400
+    result = await check_file_exist(zone, mock_file, project_code)
+    assert result['code'] == 200
 
 
-async def test_void_check_file_in_zone_with_external_service_error_should_return_forbidden():
+async def test_check_file_with_external_error_should_return_forbidden():
     mock_post_model = POSTProjectFile
     mock_post_model.type = "type"
     mock_post_model.zone = "gr"
@@ -130,13 +117,15 @@ async def test_void_check_file_in_zone_with_external_service_error_should_return
         "resumable_relative_path": "relative_path",
         "resumable_filename": "file_name"
     }
-    result = await void_check_file_in_zone(mock_post_model, mock_file, project_code)
+    result = await check_file_exist(mock_post_model, mock_file, project_code)
     response = result.__dict__
     assert response['status_code'] == 403
 
 
-@pytest.mark.parametrize("test_zone, data_type", [("cr", "fake"), ("gr", "fake")])
-def test_validate_upload_event_should_return_invalid_type(test_zone, data_type):
+@pytest.mark.parametrize(
+    "test_zone, data_type",
+    [("cr", "fake"), ("gr", "fake")])
+def test_validate_upload_event_return_invalid_type(test_zone, data_type):
     result = validate_upload_event(test_zone, data_type)
     assert result == "Invalid Type"
 

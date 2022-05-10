@@ -1,5 +1,5 @@
-from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import Field
+from pydantic import BaseModel
 from .base_models import APIResponse
 
 

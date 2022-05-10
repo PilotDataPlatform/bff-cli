@@ -6,7 +6,8 @@ import httpx
 
 _logger = LoggerFactory("HPC").get_logger()
 
-async def get_hpc_jwt_token(token_issuer, username, password = None):
+
+async def get_hpc_jwt_token(token_issuer, username, password=None):
     _logger.info("get_hpc_jwt_token".center(80, '-'))
     try:
         payload = {
@@ -28,6 +29,7 @@ async def get_hpc_jwt_token(token_issuer, username, password = None):
     finally:
         return token
 
+
 async def submit_hpc_job(job_submission_event) -> dict:
     _logger.info("submit_hpc_job".center(80, '-'))
     try:
@@ -39,7 +41,9 @@ async def submit_hpc_job(job_submission_event) -> dict:
         job_script = job_info.get('script', '')
         hpc_host = host.split('://')
         if len(hpc_host) < 2:
-            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+            raise HPCError(
+                EAPIResponseCode.bad_request,
+                "HPC protocal required")
         slurm_host = hpc_host[1]
         protocol_type = hpc_host[0]
         _logger.info(f"Request job script: {job_script}")
@@ -56,7 +60,7 @@ async def submit_hpc_job(job_submission_event) -> dict:
             "username": username,
             "job_info": job_info,
             'protocol': protocol_type
-        }
+            }
         _logger.info(f"Request url: {url}")
         _logger.info(f"Request headers: {headers}")
         _logger.info(f"Request payload: {payload}")
@@ -69,9 +73,11 @@ async def submit_hpc_job(job_submission_event) -> dict:
             result = response.get('result')
             return result
         elif status_code == 400:
+            msg = "Jobs description entry not found, \
+                empty or not dictionary or list"
             error_msg = response.get('error_msg')
-            if "Jobs description entry not found, empty or not dictionary or list" in error_msg:
-                raise HPCError(EAPIResponseCode.bad_request, "Jobs description entry not found, empty or not dictionary or list")
+            if msg in error_msg:
+                raise HPCError(EAPIResponseCode.bad_request, msg)
         elif status_code == 500:
             error_msg = response.get('error_msg')
             if "Zero Bytes were transmitted or received" in error_msg:
@@ -83,12 +89,15 @@ async def submit_hpc_job(job_submission_event) -> dict:
         _logger.error(e)
         raise e
 
+
 async def get_hpc_job_info(job_id, host, username, token) -> dict:
     _logger.info("get_hpc_job_info".center(80, '-'))
     try:
         hpc_host = host.split('://')
         if len(hpc_host) < 2:
-            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+            raise HPCError(
+                EAPIResponseCode.bad_request,
+                "HPC protocal required")
         slurm_host = hpc_host[1]
         protocol_type = hpc_host[0]
         _logger.info(f"Received job_id: {job_id}")
@@ -128,6 +137,7 @@ async def get_hpc_job_info(job_id, host, username, token) -> dict:
         _logger.error(e)
         raise e
 
+
 async def get_hpc_nodes(host, username, hpc_token) -> dict:
     _logger.info("get_hpc_nodes".center(80, '-'))
     try:
@@ -135,10 +145,12 @@ async def get_hpc_nodes(host, username, hpc_token) -> dict:
         _logger.info(f"Received username: {username}")
         hpc_host = host.split('://')
         if len(hpc_host) < 2:
-            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+            raise HPCError(
+                EAPIResponseCode.bad_request,
+                "HPC protocal required")
         slurm_host = hpc_host[1]
         protocol_type = hpc_host[0]
-        url = ConfigClass.HPC_SERVICE + f"/v1/hpc/nodes"
+        url = ConfigClass.HPC_SERVICE + "/v1/hpc/nodes"
         headers = {
             "Authorization": hpc_token
         }
@@ -166,6 +178,7 @@ async def get_hpc_nodes(host, username, hpc_token) -> dict:
         _logger.error(e)
         raise e
 
+
 async def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
     _logger.info("get_hpc_node_by_name".center(80, '-'))
     try:
@@ -174,7 +187,9 @@ async def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
         _logger.info(f"Received nodename: {node_name}")
         hpc_host = host.split('://')
         if len(hpc_host) < 2:
-            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+            raise HPCError(
+                EAPIResponseCode.bad_request,
+                "HPC protocal required")
         slurm_host = hpc_host[1]
         protocol_type = hpc_host[0]
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/nodes/{node_name}"
@@ -210,6 +225,7 @@ async def get_hpc_node_by_name(host, username, hpc_token, node_name) -> dict:
         _logger.error(e)
         raise e
 
+
 async def get_hpc_partitions(host, username, hpc_token) -> dict:
     _logger.info("get_hpc_partitions".center(80, '-'))
     try:
@@ -217,10 +233,12 @@ async def get_hpc_partitions(host, username, hpc_token) -> dict:
         _logger.info(f"Received username: {username}")
         hpc_host = host.split('://')
         if len(hpc_host) < 2:
-            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+            raise HPCError(
+                EAPIResponseCode.bad_request,
+                "HPC protocal required")
         slurm_host = hpc_host[1]
         protocol_type = hpc_host[0]
-        url = ConfigClass.HPC_SERVICE + f"/v1/hpc/partitions"
+        url = ConfigClass.HPC_SERVICE + "/v1/hpc/partitions"
         headers = {
             "Authorization": hpc_token
         }
@@ -243,7 +261,8 @@ async def get_hpc_partitions(host, username, hpc_token) -> dict:
         else:
             error_msg = response.get('error_msg')
             if 'Retrieval of HPC partitions info failed' in error_msg:
-                error_msg = 'Cannot list partitions, please check if hpc token valid'
+                error_msg = 'Cannot list partitions, \
+                    please check if hpc token valid'
                 status_code = EAPIResponseCode.bad_request
                 raise HPCError(status_code, error_msg)
             else:
@@ -253,15 +272,18 @@ async def get_hpc_partitions(host, username, hpc_token) -> dict:
         _logger.error(e)
         raise e
 
-async def get_hpc_partition_by_name(host, username, hpc_token, partition_name) -> dict:
-    _logger.info("get_hpc_partition_by_name".center(80, '-'))
+
+async def get_hpc_partition_name(host, username, hpc_token, partition_name):
+    _logger.info("get_hpc_partition_name".center(80, '-'))
     try:
         _logger.info(f"Received host: {host}")
         _logger.info(f"Received username: {username}")
         _logger.info(f"Received partition_name: {partition_name}")
         hpc_host = host.split('://')
         if len(hpc_host) < 2:
-            raise HPCError(EAPIResponseCode.bad_request, "HPC protocal required")
+            raise HPCError(
+                EAPIResponseCode.bad_request,
+                "HPC protocal required")
         slurm_host = hpc_host[1]
         protocol_type = hpc_host[0]
         url = ConfigClass.HPC_SERVICE + f"/v1/hpc/partitions/{partition_name}"

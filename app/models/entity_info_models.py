@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 from .base_models import APIResponse
 
 
@@ -10,7 +10,7 @@ class CheckFileResponse(APIResponse):
             "Greenroom"
             "Raw"
         ],
-        "global_entity_id": "file_data-2a7ea1d8-7dea-11eb-8428-be498ca98c54-1614973025",
+        "global_entity_id": "file_data-2a7ea1d8-7dea-11eb-8428-be498ca98c54",
         "operator": "",
         "file_size": 1048576,
         "tags": [],

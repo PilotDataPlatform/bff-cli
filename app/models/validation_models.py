@@ -43,6 +43,7 @@ class ValidateDICOMIDResponse(APIResponse):
         }
     )
 
+
 class EnvValidatePost(BaseModel):
     """
     Validate Environment post model
@@ -57,8 +58,8 @@ class EnvValidateResponse(APIResponse):
     Validate Manifest Response class
     """
     result: dict = Field({}, example={
-        "code":200,
-        "error_msg":"",
-        "result":"valid"
+        "code": 200,
+        "error_msg": "",
+        "result": "valid"
         }
     )

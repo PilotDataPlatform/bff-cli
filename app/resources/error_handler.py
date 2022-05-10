@@ -1,5 +1,6 @@
 import enum
-from ..models.base_models import APIResponse, EAPIResponseCode
+from ..models.base_models import APIResponse
+from ..models.base_models import EAPIResponseCode
 from functools import wraps
 
 
@@ -84,4 +85,3 @@ class APIException(Exception):
             "error_msg": error_msg,
             "result": "",
         }
-
