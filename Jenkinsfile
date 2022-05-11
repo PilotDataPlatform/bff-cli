@@ -1,28 +1,30 @@
 pipeline {
     agent { label 'small' }
     environment {
-      imagename_dev = "registry-gitlab.indocresearch.org/pilot/bff_cli"
-      imagename_staging = "registry-gitlab.indocresearch.org/pilot/bff_cli"
+      imagename_dev = "ghcr.io/pilotdataplatform/bff_cli"
+      imagename_staging = "ghcr.io/pilotdataplatform/bff_cli"
       commit = sh(returnStdout: true, script: 'git describe --always').trim()
-      registryCredential = 'pilot-gitlab-registry'
+      registryCredential = 'pilot-ghcr'
+      registryURL = "https://github.com/PilotDataPlatform/bff-cli.git"
+      registryURLBase = "https://ghcr.io"
       dockerImage = ''
     }
 
     stages {
 
     stage('Git clone for dev') {
-        when {branch "k8s-dev"}
+        when {branch "develop"}
         steps{
           script {
-          git branch: "k8s-dev",
-              url: 'https://git.indocresearch.org/pilot/bff_cli.git',
+          git branch: "develop",
+              url: "$registryURL",
               credentialsId: 'lzhao'
             }
         }
     }
-
+/**
     stage('DEV unit test') {
-      when {branch "k8s-dev"}
+      when {branch "develop"}
       steps{
           withCredentials([
             usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD'),
@@ -46,14 +48,14 @@ pipeline {
             }
       }
     }
-
+**/
     stage('DEV Build and push image') {
-      when {branch "k8s-dev"}
+      when {branch "develop"}
       steps{
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
-            docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/pilot/bff_cli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
+            docker.withRegistry("$registryURLBase", registryCredential) {
+                customImage = docker.build("$imagename_dev:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
                 customImage.push()
             }
             }
@@ -61,14 +63,14 @@ pipeline {
       }
     }
     stage('DEV Remove image') {
-      when {branch "k8s-dev"}
+      when {branch "develop"}
       steps{
         sh "docker rmi $imagename_dev:$commit"
       }
     }
 
     stage('DEV Deploy') {
-      when {branch "k8s-dev"}
+      when {branch "develop"}
       steps{
         build(job: "/VRE-IaC/UpdateAppVersion", parameters: [
           [$class: 'StringParameterValue', name: 'TF_TARGET_ENV', value: 'dev' ],
@@ -77,25 +79,25 @@ pipeline {
         ])
       }
     }
-
+/**
     stage('Git clone staging') {
-        when {branch "k8s-staging"}
+        when {branch "main"}
         steps{
           script {
-          git branch: "k8s-staging",
-              url: 'https://git.indocresearch.org/pilot/bff_cli.git',
+          git branch: "main",
+              url: "registryURL",
               credentialsId: 'lzhao'
             }
         }
     }
 
     stage('STAGING Building and push image') {
-      when {branch "k8s-staging"}
+      when {branch "main"}
       steps{
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
-            docker.withRegistry('https://registry-gitlab.indocresearch.org', registryCredential) {
-                customImage = docker.build("registry-gitlab.indocresearch.org/pilot/bff_cli:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} --add-host git.indocresearch.org:10.4.3.151 .")
+            docker.withRegistry("$registryURLBase", registryCredential) {
+                customImage = docker.build("$imagename_staging:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
                 customImage.push()
             }
             }
@@ -104,14 +106,14 @@ pipeline {
     }
 
     stage('STAGING Remove image') {
-      when {branch "k8s-staging"}
+      when {branch "main"}
       steps{
         sh "docker rmi $imagename_staging:$commit"
       }
     }
 
     stage('STAGING Deploy') {
-      when {branch "k8s-staging"}
+      when {branch "main"}
       steps{
         build(job: "/VRE-IaC/Staging-UpdateAppVersion", parameters: [
             [$class: 'StringParameterValue', name: 'TF_TARGET_ENV', value: 'staging' ],
