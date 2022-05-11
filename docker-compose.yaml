@@ -18,7 +18,6 @@ services:
   web:
     build: .
     ports:
-      - "5080:8000"
-    environment:
-      CONFIG_CENTER_ENABLED: "true"
-      CONFIG_CENTER_BASE_URL: http://10.3.7.222:5062/
+      - "5080:5080"
+    volumes:
+    - .:/usr/src/app
