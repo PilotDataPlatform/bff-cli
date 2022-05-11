@@ -1,0 +1,89 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      
+      # Setup python version
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      # Install poetry
+      - name: Install poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      # Load cached env
+      - name: load cached env
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ hashFiles('**/poetry.lock') }}
+      # In stall dependencies
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          pip install -U pip
+          poetry install --no-interaction --no-root
+  linter:
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - uses: actions/cache@v2
+      id: cached-poetry-dependencies
+      with:
+        path: .venv
+        key: venv-${{ hashFiles('**/poetry.lock') }}
+    - name: Install pre-commit
+      run: |
+          source .venv/bin/activate
+          pip3 install pre_commit
+          python3 -m pre_commit install
+    - name: flake8
+      run: |
+        source .venv/bin/activate
+        python3 -m pre_commit run flake8 --all-files
+    - name: isort
+      run: |
+        source .venv/bin/activate
+        python3 -m pre_commit run isort --all-files
+  tests:
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - uses: actions/cache@v2
+      id: cached-poetry-dependencies
+      with:
+        path: .venv
+        key: venv-${{ hashFiles('**/poetry.lock') }}
+    - name: Run tests
+      run: |
+        source .venv/bin/activate
+        PYTHONPATH=. pytest -c tests/pytest.ini -vvv --cov=app --cov-report term-missing --cov-report=xml --disable-warnings
+    - name: Upload coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
