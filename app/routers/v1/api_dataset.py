@@ -1,23 +1,39 @@
+# Copyright (C) 2022 Indoc Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from common import LoggerFactory
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi_utils.cbv import cbv
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.commons.data_providers.database import DBConnection
+from app.resources.helpers import get_node
+
+from ...models.base_models import EAPIResponseCode
 from ...models.dataset_models import DatasetDetailResponse
 from ...models.dataset_models import DatasetListResponse
-from ...models.base_models import EAPIResponseCode
-from ...resources.error_handler import catch_internal
-from ...resources.error_handler import customized_error_template
-from ...resources.error_handler import ECustomizedError
 from ...resources.database_service import RDConnection
 from ...resources.dependencies import jwt_required
-from app.resources.helpers import get_node
-from logger import LoggerFactory
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.commons.data_providers.database import DBConnection
-
+from ...resources.error_handler import ECustomizedError
+from ...resources.error_handler import catch_internal
+from ...resources.error_handler import customized_error_template
 
 router = APIRouter()
 _API_TAG = 'V1 dataset'
-_API_NAMESPACE = "api_dataset"
+_API_NAMESPACE = 'api_dataset'
 
 
 @cbv(router)
@@ -29,50 +45,47 @@ class APIDataset:
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
         self.db = RDConnection()
 
-    @router.get("/datasets", tags=[_API_TAG],
+    @router.get('/datasets', tags=[_API_TAG],
                 response_model=DatasetListResponse,
-                summary="Get dataset list that user have access to")
+                summary='Get dataset list that user have access to')
     @catch_internal(_API_NAMESPACE)
     async def list_datasets(self):
-        '''
-        Get the dataset list that user have access to
-        '''
-        self._logger.info("API list_datasets".center(80, '-'))
+        """Get the dataset list that user have access to."""
+        self._logger.info('API list_datasets'.center(80, '-'))
         api_response = DatasetListResponse()
         try:
             username = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(
-            f"User request with identity: {self.current_identity}")
-        payload = {"creator": username}
+            f'User request with identity: {self.current_identity}')
+        payload = {'creator': username}
         dataset_list = await get_node(payload, 'Dataset')
-        self._logger.info(f"Getting user datasets: {dataset_list}")
-        self._logger.info(f"Number of datasets: {len(dataset_list)}")
+        self._logger.info(f'Getting user datasets: {dataset_list}')
+        self._logger.info(f'Number of datasets: {len(dataset_list)}')
         api_response.result = dataset_list
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()
 
-    @router.get("/dataset/{dataset_code}", tags=[_API_TAG],
+    @router.get('/dataset/{dataset_code}', tags=[_API_TAG],
                 response_model=DatasetDetailResponse,
-                summary="Get dataset detail based on the dataset code")
+                summary='Get dataset detail based on the dataset code')
     @catch_internal(_API_NAMESPACE)
     async def get_dataset(
         self, dataset_code,
-        db_session: AsyncSession = Depends(db_connection.get_db)):
-        '''
-        Get the dataset detail by dataset code
-        '''
-        self._logger.info("API get_dataset".center(80, '-'))
+        db_session: AsyncSession = Depends(db_connection.get_db)
+    ):
+        """Get the dataset detail by dataset code."""
+        self._logger.info('API get_dataset'.center(80, '-'))
         api_response = DatasetDetailResponse()
         try:
             username = self.current_identity['username']
         except (AttributeError, TypeError):
             return self.current_identity
         self._logger.info(
-            f"User request with identity: {self.current_identity}")
-        node = await get_node({"code": dataset_code}, 'Dataset')
-        self._logger.info(f"Getting user dataset node: {node}")
+            f'User request with identity: {self.current_identity}')
+        node = await get_node({'code': dataset_code}, 'Dataset')
+        self._logger.info(f'Getting user dataset node: {node}')
         if not node:
             api_response.code = EAPIResponseCode.not_found
             api_response.error_msg = customized_error_template(
@@ -89,18 +102,15 @@ class APIDataset:
                 ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
         node_geid = node[0].get('global_entity_id')
-        dataset_query_event = {
-            'dataset_geid': node_geid,
-            }
-        self._logger.info(f"Dataset query: {dataset_query_event}")
+        dataset_query_event = {'dataset_geid': node_geid}
+        self._logger.info(f'Dataset query: {dataset_query_event}')
         versions = await self.db.get_dataset_versions(
             dataset_query_event, db_session)
-        self._logger.info(f"Dataset versions: {versions}")
+        self._logger.info(f'Dataset versions: {versions}')
         dataset_detail = {
             'general_info': node,
             'version_detail': versions,
-            'version_no': len(versions)
-            }
+            'version_no': len(versions)}
         api_response.result = dataset_detail
         api_response.code = EAPIResponseCode.success
         return api_response.json_response()

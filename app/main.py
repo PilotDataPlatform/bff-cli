@@ -1,20 +1,38 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+# Copyright (C) 2022 Indoc Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from fastapi import FastAPI
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
-from .api_registry import api_registry
+from fastapi.responses import JSONResponse
 from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.sdk.resources import Resource
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
-from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from app.namespace import namespace
-from app.config import ConfigClass
+
 from app.commons.data_providers.database import engine
+from app.config import ConfigClass
+from app.namespace import namespace
 from app.resources.error_handler import APIException
+
+from .api_registry import api_registry
 
 
 def instrument_app(app) -> None:
@@ -31,7 +49,6 @@ def instrument_app(app) -> None:
     )
 
     tracer_provider.add_span_processor(BatchSpanProcessor(jaeger_exporter))
-    
     FastAPIInstrumentor.instrument_app(app)
     SQLAlchemyInstrumentor().instrument(
         engine=engine.sync_engine,
@@ -40,22 +57,20 @@ def instrument_app(app) -> None:
 
 
 def create_app():
-    """
-    create app function
-    """
+    """create app function."""
     app = FastAPI(
-        title="BFF CLI",
-        description="BFF for cli",
-        docs_url="/v1/api-doc",
+        title='BFF CLI',
+        description='BFF for cli',
+        docs_url='/v1/api-doc',
         version=ConfigClass.version
     )
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins="*",
+        allow_origins='*',
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=['*'],
+        allow_headers=['*'],
     )
 
     @app.exception_handler(APIException)

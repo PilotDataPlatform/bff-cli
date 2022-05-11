@@ -1,16 +1,32 @@
-from ..resources. error_handler import customized_error_template
-from ..resources. error_handler import ECustomizedError
-from ..models.error_model import InvalidEncryptionError
-from .database_service import RDConnection
+# Copyright (C) 2022 Indoc Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import base64
+
+from common import LoggerFactory
+from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.fernet import Fernet
-import base64
-from logger import LoggerFactory
 
+from .database_service import RDConnection
+from ..models.error_model import InvalidEncryptionError
+from ..resources.error_handler import ECustomizedError
+from ..resources.error_handler import customized_error_template
 
-_logger = LoggerFactory("validation_service").get_logger()
+_logger = LoggerFactory('validation_service').get_logger()
 
 
 def decryption(encrypted_message, secret):
@@ -36,8 +52,8 @@ def decryption(encrypted_message, secret):
         return decrypted.decode()
     except Exception:
         raise InvalidEncryptionError(
-            "Invalid encryption, could not decrypt message"
-            )
+            'Invalid encryption, could not decrypt message'
+        )
 
 
 class ManifestValidator:
@@ -57,12 +73,12 @@ class ManifestValidator:
     def validate_attribute_field_by_value(input_attributes, compare_attr):
         attr_name = compare_attr.get('name')
         value = input_attributes.get(attr_name)
-        if value and compare_attr.get('type') == "text":
+        if value and compare_attr.get('type') == 'text':
             if len(value) > 100:
                 return customized_error_template(
                     ECustomizedError.TEXT_TOO_LONG) % attr_name
         elif value and compare_attr.get('type') == 'multiple_choice':
-            if value not in compare_attr.get('value').split(","):
+            if value not in compare_attr.get('value').split(','):
                 return customized_error_template(
                     ECustomizedError.INVALID_CHOICE) % attr_name
         else:
@@ -72,26 +88,26 @@ class ManifestValidator:
 
     @staticmethod
     def validate_attribute_name(input_attributes, exist_attributes):
-        _logger.info("validate attribute name")
+        _logger.info('validate attribute name')
         valid_attributes = [attr.get('name') for attr in exist_attributes]
-        for key, value in input_attributes.items():
+        for key, _ in input_attributes.items():
             if key not in valid_attributes:
                 return customized_error_template(
                     ECustomizedError.INVALID_ATTRIBUTE) % key
 
     async def has_valid_attributes(self, event, db_session):
-        _logger.info(f"received event: {event}")
+        _logger.info(f'received event: {event}')
         attributes = event.get('attributes')
         manifest = event.get('manifest')
         exist_manifest = await self.db.get_attributes_in_manifest_db(
             manifest,
             db_session
-            )
-        _logger.info(f"existing manifest: {exist_manifest}")
+        )
+        _logger.info(f'existing manifest: {exist_manifest}')
         exist_attributes = exist_manifest[0].get('attributes')
         _name_error = self.validate_attribute_name(
             attributes, exist_attributes)
-        _logger.info(f"validation name error: {_name_error}")
+        _logger.info(f'validation name error: {_name_error}')
         if _name_error:
             return _name_error
         for attr in exist_attributes:
@@ -99,7 +115,7 @@ class ManifestValidator:
             if not attr.get('optional') and required_attr not in attributes:
                 return customized_error_template(
                     ECustomizedError.MISSING_REQUIRED_ATTRIBUTES
-                    ) % required_attr
+                ) % required_attr
             elif attr not in exist_attributes:
                 return customized_error_template(
                     ECustomizedError.INVALID_ATTRIBUTE) % attr

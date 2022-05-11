@@ -1,8 +1,24 @@
-import httpx
-from ..config import ConfigClass
-from logger import LoggerFactory
+# Copyright (C) 2022 Indoc Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-_logger = LoggerFactory("Helpers").get_logger()
+import httpx
+from common import LoggerFactory
+
+from ..config import ConfigClass
+
+_logger = LoggerFactory('Helpers').get_logger()
 
 
 def get_zone(namespace):
@@ -12,21 +28,21 @@ def get_zone(namespace):
 
 
 async def batch_query_node_by_geid(geid_list):
-    _logger.info("batch_query_node_by_geid".center(80, '-'))
+    _logger.info('batch_query_node_by_geid'.center(80, '-'))
     params = {
         'ids': geid_list
     }
-    _logger.info(f"params: {params}")
+    _logger.info(f'params: {params}')
     async with httpx.AsyncClient() as client:
         response = await client.get(
             ConfigClass.METADATA_SERVICE + '/v1/items/batch/',
             params=params,
             follow_redirects=True
-            )
+        )
     _logger.info(response.url)
-    _logger.info(f"query response: {response.text}")
+    _logger.info(f'query response: {response.text}')
     res_json = response.json()
-    _logger.info(f"res_json: {res_json}")
+    _logger.info(f'res_json: {res_json}')
     result = res_json.get('result')
     located_geid = []
     query_result = {}
@@ -38,49 +54,47 @@ async def batch_query_node_by_geid(geid_list):
             located_geid.append(geid)
             query_result[geid] = node
     # Returning valid geid list, incase archived or non-exist
-    _logger.info(f"returning located_geid: {located_geid}")
-    _logger.info(f"returning query_result: {query_result}")
+    _logger.info(f'returning located_geid: {located_geid}')
+    _logger.info(f'returning query_result: {query_result}')
     return located_geid, query_result
 
 
 async def get_node(post_data, label):
-    """
-    get dataset node information
-    """
+    """get dataset node information."""
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                ConfigClass.NEO4J_SERVICE + f"/v1/neo4j/nodes/{label}/query",
+                ConfigClass.NEO4J_SERVICE + f'/v1/neo4j/nodes/{label}/query',
                 json=post_data
-                )
+            )
         return response.json()
     except Exception:
         return None
 
 
 async def get_user_projects(current_identity):
-    _logger.info("get_user_projects".center(80, '-'))
+    _logger.info('get_user_projects'.center(80, '-'))
     projects_list = []
 
     payload = {}
 
-    if current_identity["role"] != "admin":
-        roles = current_identity["realm_roles"]
-        project_codes = list(set(i.split("-")[0] for i in roles))
-        payload["code__in"] = project_codes
+    if current_identity['role'] != 'admin':
+        roles = current_identity['realm_roles']
+        project_codes = [i.split('-')[0] for i in roles]
+        payload['code__in'] = project_codes
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            ConfigClass.NEO4J_SERVICE + "/v1/neo4j/nodes/Container/query",
+            ConfigClass.NEO4J_SERVICE + '/v1/neo4j/nodes/Container/query',
             json=payload
-            )
+        )
     for p in response.json():
         res_projects = {'name': p.get('name'),
                         'code': p.get('code'),
                         'id': p.get('id'),
                         'geid': p.get('global_entity_id')}
         projects_list.append(res_projects)
-    _logger.info(f"Number of projects found: {len(projects_list)}")
+    _logger.info(f'Number of projects found: {len(projects_list)}')
     return projects_list
 
 
@@ -88,7 +102,7 @@ async def attach_manifest_to_file(event):
     global_entity_id = event.get('global_entity_id')
     manifest_id = event.get('manifest_id')
     attributes = event.get('attributes')
-    _logger.info("attach_manifest_to_file".center(80, '-'))
+    _logger.info('attach_manifest_to_file'.center(80, '-'))
     url = ConfigClass.METADATA_SERVICE + '/v1/items/batch/bequeath/'
     params = {
         'ids': global_entity_id
@@ -97,29 +111,29 @@ async def attach_manifest_to_file(event):
         'attribute_template_id': manifest_id,
         'attributes': attributes
     }
-    _logger.info(f"POSTING: {url}")
-    _logger.info(f"PAYLOAD: {payload}")
-    _logger.info(f"PARAMS: {params}")
+    _logger.info(f'POSTING: {url}')
+    _logger.info(f'PAYLOAD: {payload}')
+    _logger.info(f'PARAMS: {params}')
     async with httpx.AsyncClient() as client:
         response = await client.put(url=url, params=params, json=payload)
-    _logger.info(f"RESPONSE: {response.text}")
+    _logger.info(f'RESPONSE: {response.text}')
     if not response.json():
         return None
     return response.json()
 
 
 async def query_node(params):
-    _logger.info("query_node".center(80, '-'))
+    _logger.info('query_node'.center(80, '-'))
     try:
-        _logger.info(f"query params: {params}")
+        _logger.info(f'query params: {params}')
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 ConfigClass.METADATA_SERVICE + '/v1/items/search/',
                 params=params,
                 follow_redirects=True
-                )
-        _logger.info(f"query response: {response.url}")
-        _logger.info(f"query response: {response.text}")
+            )
+        _logger.info(f'query response: {response.url}')
+        _logger.info(f'query response: {response.text}')
         return response
     except Exception as e:
         _logger.error(f'Error file/folder: {e}')

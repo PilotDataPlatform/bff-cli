@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "bff_cli"
+version = "0.1.0"
+description = "This service is designed to support command line interface"
+authors = ["Indoc Research"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pilot-platform-common = "^0.0.25"
+python-json-logger = "0.1.11"
+fastapi = "0.62.0"
+fastapi-utils = "0.2.1"
+uvicorn = "0.12.3"
+gunicorn = "20.0.4"
+uvloop = "0.14.0"
+httptools = "0.1.1"
+httpx = "0.22.0"
+PyJWT = "1.4.2"
+cryptography = "3.1.1"
+SQLAlchemy = "1.4.31"
+python-dotenv = "0.19.1"
+asyncpg = "0.25.0"
+psycopg2-binary = "2.8.5"
+opentelemetry-exporter-jaeger = "1.6.2"
+opentelemetry-instrumentation = "0.26b1"
+opentelemetry-instrumentation-fastapi = "0.26b1"
+opentelemetry-instrumentation-sqlalchemy = "0.26b1"
+opentelemetry-instrumentation-httpx = "0.26b1"
+opentelemetry-instrumentation-asyncpg = "0.26b1"
+
+[tool.poetry.dev-dependencies]
+pytest = "6.2.5"
+pytest-asyncio = "0.17.2"
+pytest-cov = "^3.0.0"
+pytest-env = "0.6.2"
+sqlalchemy-utils = "0.38.2"
+fastapi = "0.62.0"
+fastapi-utils = "0.2.1"
+uvicorn = "0.12.3"
+gunicorn = "20.0.4"
+uvloop = "0.14.0"
+httptools = "0.1.1"
+requests = "2.24.0"
+PyJWT = "1.4.2"
+python-multipart = "0.0.5"
+aiofiles = "0.6.0"
+redis = "3.5.3"
+pytest-httpx = "0.20.0"
+pytest-mock = "3.7.0"
+async-asgi-testclient = "1.4.9"
+testcontainers = "3.4.2"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,31 +1,46 @@
-from pydantic import BaseModel
+# Copyright (C) 2022 Indoc Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import asyncio
+import os
+from datetime import datetime
+
 import pytest
 import pytest_asyncio
-import os
-
-from datetime import datetime
+from async_asgi_testclient import TestClient as TestAsyncClient
+from fastapi import Request
+from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.schema import CreateTable
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.schema import CreateTable
 from testcontainers.postgres import PostgresContainer
-from async_asgi_testclient import TestClient as TestAsyncClient
-from fastapi import Request
-from app.config import ConfigClass
-from app.resources.dependencies import jwt_required
+
+from app.commons.data_providers.data_models import DataAttributeModel
+from app.commons.data_providers.data_models import DataManifestModel
+from app.commons.data_providers.data_models import DatasetVersionModel
+from app.commons.data_providers.database import Base as DatasetBase
+from app.commons.data_providers.database import Base as ManifestBase
 from app.commons.data_providers.database import DBConnection
+from app.config import ConfigClass
 from app.main import create_app
+from app.resources.dependencies import jwt_required
 from app.routers.v1.api_kg import APIProject
 
-from app.commons.data_providers.data_models import DataManifestModel
-from app.commons.data_providers.data_models import DataAttributeModel
-from app.commons.data_providers.data_models import DatasetVersionModel
-from app.commons.data_providers.database import Base as ManifestBase
-from app.commons.data_providers.database import Base as DatasetBase
-
-os.environ['RDS_DB_URI'] = "test_container_uri"
+os.environ['RDS_DB_URI'] = 'test_container_uri'
 RDS_SCHEMA_DEFAULT = os.environ['RDS_SCHEMA_DEFAULT']
 
 
@@ -52,11 +67,10 @@ async def test_async_client(db_postgres, engine):
 
 @pytest_asyncio.fixture
 async def test_async_client_auth(db_postgres, engine):
-    '''
-        Create client with mock auth token
-    '''
+    """Create client with mock auth token."""
     async with engine.begin() as connection:
-        await connection.execute(text(f'CREATE SCHEMA IF NOT EXISTS {RDS_SCHEMA_DEFAULT};'))
+        await connection.execute(
+            text(f'CREATE SCHEMA IF NOT EXISTS {RDS_SCHEMA_DEFAULT};'))
     ConfigClass.RDS_DB_URI = db_postgres
     app = create_app()
     mock_session = sessionmaker(
@@ -76,9 +90,7 @@ async def test_async_client_auth(db_postgres, engine):
 
 @pytest.fixture
 def test_async_client_kg_auth():
-    '''
-        Create client with mock auth token for kg api only
-    '''
+    """Create client with mock auth token for kg api only."""
     from run import app
     client = TestAsyncClient(app)
     security = HTTPAuthorizationCredentials
@@ -89,9 +101,7 @@ def test_async_client_kg_auth():
 
 @pytest.fixture
 def test_async_client_project_member_auth():
-    '''
-        Create client with mock auth token for project api only
-    '''
+    """Create client with mock auth token for project api only."""
     from run import app
     client = TestAsyncClient(app)
     security = HTTPAuthorizationCredentials
@@ -117,8 +127,13 @@ async def create_db_dataset_metrics(engine):
     async with AsyncSession(engine) as session:
         session.add(
             DatasetVersionModel(
-                dataset_code="testdataset", dataset_geid="fake_geid", version="0",
-                created_by="testuser", created_at=datetime(2022, 1, 9, 15, 11, 0), location="minio", notes="test123"
+                dataset_code='testdataset',
+                dataset_geid='fake_geid',
+                version='0',
+                created_by='testuser',
+                created_at=datetime(2022, 1, 9, 15, 11, 0),
+                location='minio',
+                notes='test123'
             )
         )
         await session.commit()
@@ -140,12 +155,22 @@ async def create_db_manifest(engine):
         await session.commit()
         session.add(
             DataAttributeModel(
-                manifest_id=1, name='fake_attribute', type='multiple_choice', value='1', project_code=project_code, optional=True
+                manifest_id=1,
+                name='fake_attribute',
+                attr_type='multiple_choice',
+                value='1',
+                project_code=project_code,
+                optional=True
             )
         )
         session.add(
             DataAttributeModel(
-                manifest_id=1, name='fake_attribute2', type='text', value=None, project_code=project_code, optional=True
+                manifest_id=1,
+                name='fake_attribute2',
+                attr_type='text',
+                value=None,
+                project_code=project_code,
+                optional=True
             )
         )
         await session.commit()
@@ -158,23 +183,23 @@ async def create_db_manifest(engine):
 # Mock for the permission
 async def override_jwt_required(request: Request):
     return {
-        "code": 200,
-        "user_id": 1,
-        "username": "testuser",
-        "role": "admin",
-        "token": "fake token",
-        "realm_roles": ["platform-admin"]
+        'code': 200,
+        'user_id': 1,
+        'username': 'testuser',
+        'role': 'admin',
+        'token': 'fake token',
+        'realm_roles': ['platform-admin']
     }
 
 
 async def override_member_jwt_required(request: Request):
     return {
-        "code": 200,
-        "user_id": 1,
-        "username": "testuser",
-        "role": "contributor",
-        "token": "fake token",
-        "realm_roles": ["testproject-contributor"]
+        'code': 200,
+        'user_id': 1,
+        'username': 'testuser',
+        'role': 'contributor',
+        'token': 'fake token',
+        'realm_roles': ['testproject-contributor']
     }
 
 
@@ -187,7 +212,7 @@ def mock_query__node_has_relation_with_admin(httpx_mock):
     httpx_mock.add_response(
         method='POST',
         url='http://10.3.7.216:5062/v1/neo4j/nodes/Container/query',
-        json=[{"node": "fake_node"}],
+        json=[{'node': 'fake_node'}],
         status_code=200,
     )
 
@@ -195,7 +220,8 @@ def mock_query__node_has_relation_with_admin(httpx_mock):
 @pytest.fixture(autouse=True)
 def mock_settings(monkeypatch, db_postgres):
     monkeypatch.setattr(ConfigClass, 'NEO4J_SERVICE', 'http://neo4j_service')
-    monkeypatch.setattr(ConfigClass, 'FILEINFO_HOST', 'http://fileinfo_service')
+    monkeypatch.setattr(
+        ConfigClass, 'FILEINFO_HOST', 'http://fileinfo_service')
     monkeypatch.setattr(ConfigClass, 'KG_SERVICE', 'http://kg_service')
     monkeypatch.setattr(ConfigClass, 'PROVENANCE_SERVICE',
                         'http://provenance_service')
@@ -210,6 +236,8 @@ def mock_settings(monkeypatch, db_postgres):
     monkeypatch.setattr(
         ConfigClass, 'AUTH_SERVICE', 'http://service_auth')
     monkeypatch.setattr(
-        ConfigClass, 'RDS_DB_URI',  f'{db_postgres}?prepared_statement_cache_size=0')
+        ConfigClass,
+        'RDS_DB_URI',
+        f'{db_postgres}?prepared_statement_cache_size=0')
     monkeypatch.setattr(
         ConfigClass, 'METADATA_SERVICE', 'http://metadata_service')

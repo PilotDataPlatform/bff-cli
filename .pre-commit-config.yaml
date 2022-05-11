@@ -1,0 +1,81 @@
+# Copyright (C) 2022 Indoc Research
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+repos:
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-added-large-files
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: double-quote-string-fixer
+      - id: end-of-file-fixer
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/psf/black
+    rev: 21.10b0
+    hooks:
+      - id: black
+        args: [
+            '--line-length=120',
+            '--skip-string-normalization',
+        ]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.0
+    hooks:
+      - id: isort
+        args: [
+            '--profile=black',
+            '--filter-files',
+            '--force-single-line-imports',
+            '--reverse-relative',
+        ]
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        additional_dependencies: [
+            'pycodestyle==2.7.0',
+            'pyflakes==2.3.0',
+            'mccabe==0.6.1',
+            'flake8-bugbear==21.3.2',
+            'flake8-builtins==1.5.3',
+            'flake8-comprehensions==3.3.1',
+            'flake8-debugger==4.0.0',
+            'flake8-logging-format==0.6.0',
+            'flake8-print==4.0.0',
+        ]
+        args: [
+            '--select=E,W,F,C,B,A,C4,T1,G,T0',
+            '--ignore=W503,B008,B305,A003,G003,G004',
+            '--max-complexity=10',
+            '--max-line-length=120',
+        ]
+
+  - repo: https://github.com/myint/docformatter
+    rev: v1.4
+    hooks:
+      - id: docformatter
+        args: [
+            '--wrap-summaries=120',
+            '--wrap-descriptions=120',
+            '--in-place',
+        ]
