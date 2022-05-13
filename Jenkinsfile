@@ -26,12 +26,9 @@ pipeline {
     stage('DEV unit test') {
       when {branch "develop"}
       steps{
-          withCredentials([
-            usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD'),
             string(credentialsId:'VAULT_TOKEN', variable: 'VAULT_TOKEN'),
             string(credentialsId:'VAULT_URL', variable: 'VAULT_URL'),
             file(credentialsId:'VAULT_CRT', variable: 'VAULT_CRT')
-          ])
           {
             sh """
             export CONFIG_CENTER_ENABLED='true'
@@ -53,11 +50,9 @@ pipeline {
       when {branch "develop"}
       steps{
         script {
-            withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry("$registryURLBase", registryCredential) {
-                customImage = docker.build("$imagename_dev:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
+                customImage = docker.build("$imagename_dev:$commit", ".")
                 customImage.push()
-            }
             }
         }
       }
@@ -97,7 +92,7 @@ pipeline {
         script {
             withCredentials([usernamePassword(credentialsId:'readonly', usernameVariable: 'PIP_USERNAME', passwordVariable: 'PIP_PASSWORD')]) {
             docker.withRegistry("$registryURLBase", registryCredential) {
-                customImage = docker.build("$imagename_staging:$commit", "--build-arg pip_username=${PIP_USERNAME} --build-arg pip_password=${PIP_PASSWORD} .")
+                customImage = docker.build("$imagename_staging:$commit", ".")
                 customImage.push()
             }
             }
