@@ -100,7 +100,6 @@ class ManifestAttachResponse(APIResponse):
                 'time_created': '2021-02-17T20:59:48',
                 'guid': '6afa671d-f093-446c-a5a2-a495adcf29a5',
                 'full_path': '/data/core-storage/sampleproject/raw/testf1',
-                'dcm_id': 'undefined',
                 'manifest_id': 270,
                 'attr_attr1': 'a1',
                 'attr_attr2': 'test cli upload'

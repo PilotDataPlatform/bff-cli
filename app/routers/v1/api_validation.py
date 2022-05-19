@@ -29,7 +29,6 @@ from ...models.validation_models import EnvValidatePost
 from ...models.validation_models import EnvValidateResponse
 from ...models.validation_models import ManifestValidatePost
 from ...models.validation_models import ManifestValidateResponse
-from ...models.validation_models import ValidateDICOMIDPOST
 from ...models.validation_models import ValidateDICOMIDResponse
 from ...resources.database_service import RDConnection
 from ...resources.error_handler import EAPIResponseCode
@@ -51,26 +50,6 @@ class APIValidation:
     def __init__(self):
         self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
         self.db = RDConnection()
-
-    @router.post(
-        '/validate/gid', tags=[_API_TAG],
-        response_model=ValidateDICOMIDResponse,
-        summary='Validate DICOM ID')
-    @catch_internal(_API_NAMESPACE)
-    async def validate_dicom_id(self, request_payload: ValidateDICOMIDPOST):
-        api_response = ValidateDICOMIDResponse()
-        dcm_id = request_payload.dcm_id
-        is_valid = re.match('^([A-Z]{3})-([0-9]{4})$', dcm_id)
-        if is_valid:
-            result = 'Valid'
-            res_code = EAPIResponseCode.success
-        else:
-            result = customized_error_template(
-                ECustomizedError.INVALID_DICOM_ID)
-            res_code = EAPIResponseCode.bad_request
-        api_response.result = result
-        api_response.code = res_code
-        return api_response.json_response()
 
     @router.post(
         '/validate/manifest', tags=[_API_TAG],
