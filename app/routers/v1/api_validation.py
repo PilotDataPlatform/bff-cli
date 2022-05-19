@@ -13,8 +13,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import re
-
 from common import LoggerFactory
 from fastapi import APIRouter
 from fastapi import Depends
@@ -29,7 +27,6 @@ from ...models.validation_models import EnvValidatePost
 from ...models.validation_models import EnvValidateResponse
 from ...models.validation_models import ManifestValidatePost
 from ...models.validation_models import ManifestValidateResponse
-from ...models.validation_models import ValidateDICOMIDResponse
 from ...resources.database_service import RDConnection
 from ...resources.error_handler import EAPIResponseCode
 from ...resources.error_handler import ECustomizedError
@@ -52,14 +49,14 @@ class APIValidation:
         self.db = RDConnection()
 
     @router.post(
-        '/validate/manifest', tags=[_API_TAG],
+        '/validate/manifest',
+        tags=[_API_TAG],
         response_model=ManifestValidateResponse,
-        summary='Validate manifest for project')
+        summary='Validate manifest for project',
+    )
     @catch_internal(_API_NAMESPACE)
     async def validate_manifest(
-        self,
-        request_payload: ManifestValidatePost,
-        db_session: AsyncSession = Depends(db_connection.get_db)
+        self, request_payload: ManifestValidatePost, db_session: AsyncSession = Depends(db_connection.get_db)
     ):
         """Validate the manifest based on the project."""
         self._logger.info('API validate_manifest'.center(80, '-'))
@@ -69,24 +66,17 @@ class APIValidation:
         manifest_name = manifests['manifest_name']
         project_code = manifests['project_code']
         attributes = manifests.get('attributes', {})
-        validation_event = {'project_code': project_code,
-                            'manifest_name': manifest_name,
-                            'attributes': attributes}
+        validation_event = {'project_code': project_code, 'manifest_name': manifest_name, 'attributes': attributes}
         self._logger.info(f'Validation event: {validation_event}')
-        manifest_info = await self.db.get_manifest_name_from_project_db(
-            validation_event,
-            db_session)
+        manifest_info = await self.db.get_manifest_name_from_project_db(validation_event, db_session)
         self._logger.info(f'manifest_info: {manifest_info}')
         if not manifest_info:
-            api_response.result = customized_error_template(
-                ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
+            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         validation_event['manifest'] = manifest_info
         validator = ManifestValidator()
-        attribute_validation_error_msg = await validator.has_valid_attributes(
-            validation_event,
-            db_session)
+        attribute_validation_error_msg = await validator.has_valid_attributes(validation_event, db_session)
         if attribute_validation_error_msg:
             api_response.result = attribute_validation_error_msg
             api_response.code = EAPIResponseCode.bad_request
@@ -95,9 +85,9 @@ class APIValidation:
         api_response.result = 'Valid'
         return api_response.json_response()
 
-    @router.post('/validate/env', tags=[_API_TAG],
-                 response_model=EnvValidateResponse,
-                 summary='Validate env for CLI commands')
+    @router.post(
+        '/validate/env', tags=[_API_TAG], response_model=EnvValidateResponse, summary='Validate env for CLI commands'
+    )
     @catch_internal(_API_NAMESPACE)
     async def validate_env(self, request_payload: EnvValidatePost):
         """Validate the environment accessible zone."""
@@ -109,31 +99,26 @@ class APIValidation:
         action = request_payload.action
         self._logger.info(f'msg: {encrypted_msg}')
         self._logger.info(request_payload)
-        valid_zones = [
-            ConfigClass.GREEN_ZONE_LABEL.lower(),
-            ConfigClass.CORE_ZONE_LABEL.lower()]
+        valid_zones = [ConfigClass.GREEN_ZONE_LABEL.lower(), ConfigClass.CORE_ZONE_LABEL.lower()]
         if zone not in valid_zones:
             self._logger.debug(f'Invalid zone value: {zone}')
             api_response.code = EAPIResponseCode.bad_request
-            api_response.error_msg = customized_error_template(
-                ECustomizedError.INVALID_ZONE)
+            api_response.error_msg = customized_error_template(ECustomizedError.INVALID_ZONE)
             api_response.result = 'Invalid'
             return api_response.json_response()
         greenroom = ConfigClass.GREEN_ZONE_LABEL.lower()
         core = ConfigClass.CORE_ZONE_LABEL.lower()
         restrict_zone = {
             greenroom: {'upload': [greenroom], 'download': [greenroom]},
-            core: {'upload': [greenroom, core], 'download': [core]}}
+            core: {'upload': [greenroom, core], 'download': [core]},
+        }
         if encrypted_msg:
             try:
-                current_zone = decryption(
-                    encrypted_msg,
-                    ConfigClass.CLI_SECRET)
+                current_zone = decryption(encrypted_msg, ConfigClass.CLI_SECRET)
             except InvalidEncryptionError as e:
                 self._logger.error(f'Invalid encryption: {e}')
                 api_response.code = EAPIResponseCode.bad_request
-                api_response.error_msg = customized_error_template(
-                    ECustomizedError.INVALID_VARIABLE)
+                api_response.error_msg = customized_error_template(ECustomizedError.INVALID_VARIABLE)
                 api_response.result = 'Invalid'
                 return api_response.json_response()
         else:
