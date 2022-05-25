@@ -16,28 +16,28 @@
 import httpx
 from common import LoggerFactory
 from common.project.project_client import ProjectClient
+
 from ..config import ConfigClass
 
 _logger = LoggerFactory('Helpers').get_logger()
 
 
 def get_zone(namespace):
-    return {ConfigClass.GREEN_ZONE_LABEL.lower(): 0,
-            ConfigClass.CORE_ZONE_LABEL.lower(): 1
-            }.get(namespace.lower(), 0)
+    return {
+        ConfigClass.GREEN_ZONE_LABEL.lower(): 0,
+        ConfigClass.CORE_ZONE_LABEL.lower(): 1,
+    }.get(namespace.lower(), 0)
 
 
 async def batch_query_node_by_geid(geid_list):
     _logger.info('batch_query_node_by_geid'.center(80, '-'))
-    params = {
-        'ids': geid_list
-    }
+    params = {'ids': geid_list}
     _logger.info(f'params: {params}')
     async with httpx.AsyncClient() as client:
         response = await client.get(
             ConfigClass.METADATA_SERVICE + '/v1/items/batch/',
             params=params,
-            follow_redirects=True
+            follow_redirects=True,
         )
     _logger.info(response.url)
     _logger.info(f'query response: {response.text}')
@@ -65,7 +65,7 @@ async def get_node(post_data, label):
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 ConfigClass.NEO4J_SERVICE + f'/v1/neo4j/nodes/{label}/query',
-                json=post_data
+                json=post_data,
             )
         return response.json()
     except Exception:
@@ -76,8 +76,7 @@ async def get_user_projects(current_identity):
     _logger.info('get_user_projects'.center(80, '-'))
     projects_list = []
     project_client = ProjectClient(
-        ConfigClass.PROJECT_SERVICE,
-        ConfigClass.REDIS_DB_URI
+        ConfigClass.PROJECT_SERVICE, ConfigClass.REDIS_DB_URI
     )
     if current_identity['role'] != 'admin':
         roles = current_identity['realm_roles']
@@ -90,11 +89,7 @@ async def get_user_projects(current_identity):
     projects = project_res.get('result')
     _logger.info(f'projects: {projects}')
     for p in projects:
-        res_projects = {
-            'name': p.name,
-            'code': p.code,
-            'geid': p.id
-            }
+        res_projects = {'name': p.name, 'code': p.code, 'geid': p.id}
         projects_list.append(res_projects)
     _logger.info(f'Number of projects found: {len(projects_list)}')
     return projects_list
@@ -106,13 +101,8 @@ async def attach_manifest_to_file(event):
     attributes = event.get('attributes')
     _logger.info('attach_manifest_to_file'.center(80, '-'))
     url = ConfigClass.METADATA_SERVICE + '/v1/items/batch/bequeath/'
-    params = {
-        'ids': global_entity_id
-    }
-    payload = {
-        'attribute_template_id': manifest_id,
-        'attributes': attributes
-    }
+    params = {'ids': global_entity_id}
+    payload = {'attribute_template_id': manifest_id, 'attributes': attributes}
     _logger.info(f'POSTING: {url}')
     _logger.info(f'PAYLOAD: {payload}')
     _logger.info(f'PARAMS: {params}')
@@ -132,7 +122,7 @@ async def query_node(params):
             response = await client.get(
                 ConfigClass.METADATA_SERVICE + '/v1/items/search/',
                 params=params,
-                follow_redirects=True
+                follow_redirects=True,
             )
         _logger.info(f'query response: {response.url}')
         _logger.info(f'query response: {response.text}')
