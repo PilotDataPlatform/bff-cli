@@ -6,7 +6,7 @@ authors = ["Indoc Research"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-pilot-platform-common = "^0.0.25"
+pilot-platform-common = "^0.0.27"
 python-json-logger = "0.1.11"
 fastapi = "0.62.0"
 fastapi-utils = "0.2.1"

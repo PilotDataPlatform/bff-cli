@@ -116,7 +116,10 @@ class APIManifest:
         current_identity: dict = Depends(jwt_required),
         db_session: AsyncSession = Depends(db_connection.get_db)
     ):
-        """CLI will call manifest validation API before attach manifest to file after uploading process."""
+        """
+        CLI will call manifest validation API
+        before attach manifest to file after uploading process.
+        """
         api_response = ManifestAttachResponse()
         try:
             _ = current_identity['username']

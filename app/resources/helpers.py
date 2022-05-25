@@ -15,7 +15,7 @@
 
 import httpx
 from common import LoggerFactory
-
+from common.project.project_client import ProjectClient
 from ..config import ConfigClass
 
 _logger = LoggerFactory('Helpers').get_logger()
@@ -75,24 +75,26 @@ async def get_node(post_data, label):
 async def get_user_projects(current_identity):
     _logger.info('get_user_projects'.center(80, '-'))
     projects_list = []
-
-    payload = {}
-
+    project_client = ProjectClient(
+        ConfigClass.PROJECT_SERVICE,
+        ConfigClass.REDIS_DB_URI
+    )
     if current_identity['role'] != 'admin':
         roles = current_identity['realm_roles']
         project_codes = [i.split('-')[0] for i in roles]
-        payload['code__in'] = project_codes
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            ConfigClass.NEO4J_SERVICE + '/v1/neo4j/nodes/Container/query',
-            json=payload
-        )
-    for p in response.json():
-        res_projects = {'name': p.get('name'),
-                        'code': p.get('code'),
-                        'id': p.get('id'),
-                        'geid': p.get('global_entity_id')}
+        project_codes = ','.join(project_codes)
+    else:
+        project_codes = ''
+    project_res = await project_client.search(code_any=project_codes)
+    _logger.info(f'project_res: {project_res}')
+    projects = project_res.get('result')
+    _logger.info(f'projects: {projects}')
+    for p in projects:
+        res_projects = {
+            'name': p.name,
+            'code': p.code,
+            'geid': p.id
+            }
         projects_list.append(res_projects)
     _logger.info(f'Number of projects found: {len(projects_list)}')
     return projects_list
