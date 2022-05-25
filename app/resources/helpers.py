@@ -114,8 +114,8 @@ async def attach_manifest_to_file(event):
     return response.json()
 
 
-async def query_node(params):
-    _logger.info('query_node'.center(80, '-'))
+async def query_file_folder(params):
+    _logger.info('query_file_folder'.center(80, '-'))
     try:
         _logger.info(f'query params: {params}')
         async with httpx.AsyncClient() as client:

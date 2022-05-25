@@ -25,7 +25,7 @@ from app.resources.error_handler import ECustomizedError
 from app.resources.error_handler import customized_error_template
 
 from .helpers import get_zone
-from .helpers import query_node
+from .helpers import query_file_folder
 from ..config import ConfigClass
 from ..models.base_models import APIResponse
 from ..models.base_models import EAPIResponseCode
@@ -41,7 +41,7 @@ async def jwt_required(request: Request):
     else:
         raise APIException(
             error_msg='Token required',
-            status_code=EAPIResponseCode.unauthorized.value
+            status_code=EAPIResponseCode.unauthorized.value,
         )
     payload = pyjwt.decode(token, verify=False)
     username: str = payload.get('preferred_username')
@@ -62,8 +62,7 @@ async def jwt_required(request: Request):
             'username': username,
         }
         res = await client.get(
-            ConfigClass.AUTH_SERVICE + '/v1/admin/user',
-            params=payload
+            ConfigClass.AUTH_SERVICE + '/v1/admin/user', params=payload
         )
     if res.status_code != 200:
         api_response.code = EAPIResponseCode.forbidden
@@ -84,7 +83,7 @@ async def jwt_required(request: Request):
         'username': username,
         'role': role,
         'token': token,
-        'realm_roles': realm_roles
+        'realm_roles': realm_roles,
     }
 
 
@@ -98,8 +97,9 @@ def get_project_role(current_identity, project_code):
         role = 'platform-admin'
     else:
         possible_roles = [
-            project_code + '-' + i for i in [
-                'admin', 'contributor', 'collaborator']]
+            project_code + '-' + i
+            for i in ['admin', 'contributor', 'collaborator']
+        ]
         for realm_role in current_identity['realm_roles']:
             # if this is a role for the correct project
             if realm_role in possible_roles:
@@ -113,7 +113,8 @@ async def has_permission(identity, project_code, resource, zone, operation):
     else:
         if not project_code:
             _logger.info(
-                'No project code and not a platform admin, permission denied')
+                'No project code and not a platform admin, permission denied'
+            )
             return False
         role = get_project_role(identity, project_code)
         if not role:
@@ -131,14 +132,12 @@ async def has_permission(identity, project_code, resource, zone, operation):
         }
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                ConfigClass.AUTH_SERVICE + '/v1/authorize',
-                params=payload
+                ConfigClass.AUTH_SERVICE + '/v1/authorize', params=payload
             )
         if response.status_code != 200:
             error_msg = f'Error calling authorize API - {response.json()}'
             raise APIException(
-                status_code=response.status_code,
-                error_msg=error_msg
+                status_code=response.status_code, error_msg=error_msg
             )
         if response.json()['result'].get('has_permission'):
             return True
@@ -148,8 +147,7 @@ async def has_permission(identity, project_code, resource, zone, operation):
         error_msg = str(e)
         _logger.info(f'Exception on authorize call: {error_msg}')
         raise APIException(
-            status_code=EAPIResponseCode.internal_error,
-            error_msg=error_msg
+            status_code=EAPIResponseCode.internal_error, error_msg=error_msg
         )
 
 
@@ -165,7 +163,7 @@ async def check_file_exist(zone, file, project_code):
             'type': 'file',
             'name': file.get('resumable_filename'),
         }
-        response = await query_node(query)
+        response = await query_file_folder(query)
         result = response.json()
         return result
     except Exception as e:
@@ -185,7 +183,7 @@ def select_url_by_zone(zone):
 def validate_upload_event(zone, current_identity, project_code):
     zones = [
         ConfigClass.CORE_ZONE_LABEL.lower(),
-        ConfigClass.GREEN_ZONE_LABEL.lower()
+        ConfigClass.GREEN_ZONE_LABEL.lower(),
     ]
     if zone not in zones:
         error_msg = 'Invalid Zone'
@@ -193,10 +191,7 @@ def validate_upload_event(zone, current_identity, project_code):
         return result, error_msg
     role = current_identity['role']
     if role != 'admin':
-        project_role = get_project_role(
-            current_identity,
-            project_code
-        )
+        project_role = get_project_role(current_identity, project_code)
         restrict_zone = ConfigClass.CORE_ZONE_LABEL.lower()
         if zone == restrict_zone and project_role == 'contributor':
             error_msg = customized_error_template(
@@ -220,11 +215,9 @@ async def transfer_to_pre(data, project_code, session_id):
             'operator': data.operator,
             'upload_message': data.upload_message,
             'data': data.data,
-            'job_type': data.job_type
+            'job_type': data.job_type,
         }
-        headers = {
-            'Session-ID': session_id
-        }
+        headers = {'Session-ID': session_id}
         url = select_url_by_zone(data.zone)
         async with httpx.AsyncClient() as client:
             result = await client.post(url, headers=headers, json=payload)
