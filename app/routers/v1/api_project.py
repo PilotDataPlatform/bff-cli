@@ -35,7 +35,7 @@ from ...resources.error_handler import catch_internal
 from ...resources.error_handler import customized_error_template
 from ...resources.helpers import get_user_projects
 from ...resources.helpers import get_zone
-from ...resources.helpers import query_node
+from ...resources.helpers import query_file_folder
 
 router = APIRouter()
 _API_TAG = 'V1 Projects'
@@ -53,7 +53,8 @@ class APIProject:
         '/projects',
         tags=[_API_TAG],
         response_model=ProjectListResponse,
-        summary='Get project list that user have access to')
+        summary='Get project list that user have access to',
+    )
     @catch_internal(_API_NAMESPACE)
     async def list_project(self):
         """Get the project list that user have access to."""
@@ -77,13 +78,11 @@ class APIProject:
         '/project/{project_code}/files',
         response_model=POSTProjectFileResponse,
         summary='pre upload file to the target zone',
-        tags=['V1 Files'])
+        tags=['V1 Files'],
+    )
     @catch_internal(_API_NAMESPACE)
     async def project_file_preupload(
-        self,
-        project_code,
-        request: Request,
-        data: POSTProjectFile
+        self, project_code, request: Request, data: POSTProjectFile
     ):
         """PRE upload and check existence of file in project."""
         api_response = POSTProjectFileResponse()
@@ -97,17 +96,16 @@ class APIProject:
             {self.current_identity}'
         )
         val_result, val_error = validate_upload_event(
-            data.zone,
-            self.current_identity,
-            project_code
+            data.zone, self.current_identity, project_code
         )
-        self._logger.info(
-            f'validation code and error: {val_error}'
-        )
+        self._logger.info(f'validation code and error: {val_error}')
         if val_error:
             self._logger.error(f'Upload event error: {val_error}')
-            code = EAPIResponseCode.forbidden if val_result \
+            code = (
+                EAPIResponseCode.forbidden
+                if val_result
                 else EAPIResponseCode.bad_request
+            )
             api_response.error_msg = val_error
             api_response.code = code
             api_response.result = val_result
@@ -127,8 +125,9 @@ class APIProject:
             api_response.code = EAPIResponseCode.conflict
             return api_response.json_response()
         elif result.status_code != 200:
-            api_response.error_msg = 'Upload Error: ' + \
-                result.json()['error_msg']
+            api_response.error_msg = (
+                'Upload Error: ' + result.json()['error_msg']
+            )
             api_response.code = EAPIResponseCode.internal_error
             return api_response.json_response()
         else:
@@ -139,7 +138,8 @@ class APIProject:
         '/project/{project_code}/folder',
         tags=[_API_TAG],
         response_model=GetProjectFolderResponse,
-        summary='Get folder in the project')
+        summary='Get folder in the project',
+    )
     @catch_internal(_API_NAMESPACE)
     async def get_project_folder(self, project_code, zone, folder):
         """Get folder in project."""
@@ -150,7 +150,8 @@ class APIProject:
         zone_type = get_zone(zone.lower())
         error_msg = ''
         permission = await has_permission(
-            self.current_identity, project_code, 'file', zone.lower(), 'view')
+            self.current_identity, project_code, 'file', zone.lower(), 'view'
+        )
         if not permission:
             api_response.error_msg = customized_error_template(
                 ECustomizedError.PERMISSION_DENIED
@@ -180,7 +181,7 @@ class APIProject:
             'archived': False,
             'name': folder_name,
         }
-        folder_response = await query_node(folder_check_event)
+        folder_response = await query_file_folder(folder_check_event)
         self._logger.info(f'Folder check event: {folder_check_event}')
         self._logger.info(f'Folder check response: {folder_response.text}')
         response = folder_response.json()

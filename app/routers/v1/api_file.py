@@ -31,7 +31,7 @@ from ...resources.error_handler import catch_internal
 from ...resources.error_handler import customized_error_template
 from ...resources.helpers import batch_query_node_by_geid
 from ...resources.helpers import get_zone
-from ...resources.helpers import query_node
+from ...resources.helpers import query_file_folder
 from ...resources.helpers import separate_rel_path
 
 router = APIRouter()
@@ -46,9 +46,12 @@ class APIFile:
     def __init__(self):
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
 
-    @router.post('/query/geid', tags=[_API_TAG],
-                 response_model=QueryDataInfoResponse,
-                 summary='Query file/folder information by geid')
+    @router.post(
+        '/query/geid',
+        tags=[_API_TAG],
+        response_model=QueryDataInfoResponse,
+        summary='Query file/folder information by geid',
+    )
     @catch_internal(_API_NAMESPACE)
     async def query_file_folders_by_geid(self, data: QueryDataInfo):
         """Get file/folder information by geid."""
@@ -71,9 +74,9 @@ class APIFile:
                 )
                 result = []
                 self._logger.info(f'status: {status}')
-            elif 'File' not in query_result[global_entity_id].get('labels') \
-                and 'Folder' not in \
-                    query_result[global_entity_id].get('labels'):
+            elif 'File' not in query_result[global_entity_id].get(
+                'labels'
+            ) and 'Folder' not in query_result[global_entity_id].get('labels'):
                 status = customized_error_template(
                     ECustomizedError.FILE_FOLDER_ONLY
                 )
@@ -89,22 +92,28 @@ class APIFile:
                 self._logger.info(
                     f'Query result: {query_result[global_entity_id]}'
                 )
-                project_code = query_result[global_entity_id]\
-                    .get('project_code')
+                project_code = query_result[global_entity_id].get(
+                    'project_code'
+                )
                 labels = query_result[global_entity_id].get('labels')
-                display_path = query_result[
-                    global_entity_id].get('display_path').lstrip('/')
+                display_path = (
+                    query_result[global_entity_id]
+                    .get('display_path')
+                    .lstrip('/')
+                )
                 name_folder = display_path.split('/')[0]
-                zone = ConfigClass.CORE_ZONE_LABEL if \
-                    ConfigClass.CORE_ZONE_LABEL in labels \
+                zone = (
+                    ConfigClass.CORE_ZONE_LABEL
+                    if ConfigClass.CORE_ZONE_LABEL in labels
                     else ConfigClass.GREEN_ZONE_LABEL
+                )
                 self._logger.info(f'File zone: {zone}')
                 permission = await has_permission(
                     self.current_identity,
                     project_code,
                     'file',
                     zone.lower(),
-                    'view'
+                    'view',
                 )
                 if not permission:
                     file_response.error_msg = 'Permission denied'
@@ -120,20 +129,19 @@ class APIFile:
                     result = [query_result[global_entity_id]]
                 self._logger.info(f'file result: {result}')
             response_list.append(
-                {
-                    'status': status,
-                    'result': result,
-                    'geid': global_entity_id
-                }
+                {'status': status, 'result': result, 'geid': global_entity_id}
             )
         self._logger.info(f'Query file/folder result: {response_list}')
         file_response.result = response_list
         file_response.code = EAPIResponseCode.success
         return file_response.json_response()
 
-    @router.get('/{project_code}/files/query', tags=[_API_TAG],
-                response_model=GetProjectFileListResponse,
-                summary='Get files and folders in the project/folder')
+    @router.get(
+        '/{project_code}/files/query',
+        tags=[_API_TAG],
+        response_model=GetProjectFileListResponse,
+        summary='Get files and folders in the project/folder',
+    )
     @catch_internal(_API_NAMESPACE)
     async def get_file_folders(self, project_code, zone, folder, source_type):
         """List files and folders in project."""
@@ -145,13 +153,17 @@ class APIFile:
         rel_path, folder_name = separate_rel_path(folder)
         self._logger.info(f'Getting relative_path: {rel_path}')
         self._logger.info(f'Getting folder_name: {folder_name}')
-        self._logger.info(f"Getting rel_path.split('/')[0]: \
-            {rel_path.split('/')[0]}")
+        self._logger.info(
+            f"Getting rel_path.split('/')[0]: \
+            {rel_path.split('/')[0]}"
+        )
         self._logger.info(f'Getting username: {username}')
         self._logger.info(f'Getting zone: {zone}')
         self._logger.info(f'Getting zone: {type(zone)}')
-        self._logger.info(f"Getting role: \
-            {not project_role in ['admin', 'platform-admin']}")
+        self._logger.info(
+            f"Getting role: \
+            {not project_role in ['admin', 'platform-admin']}"
+        )
         self._logger.info(f'Getting zone: {zone == 0}')
         self._logger.info(f'Getting project_role: {project_role}')
         self._logger.info(
@@ -172,7 +184,8 @@ class APIFile:
                 self._logger.error(
                     f'Returning wrong name folder error: \
                     {EAPIResponseCode.forbidden}, '
-                    f'{file_response.error_msg}')
+                    f'{file_response.error_msg}'
+                )
                 return file_response.json_response()
             elif username and rel_path and rel_path.split('/')[0] != username:
                 file_response.error_msg = customized_error_template(
@@ -182,7 +195,8 @@ class APIFile:
                 self._logger.error(
                     f'Returning subfolder not in correct \
                         name folder error: {EAPIResponseCode.forbidden}, \
-                            {file_response.error_msg}')
+                            {file_response.error_msg}'
+                )
                 return file_response.json_response()
             else:
                 self._logger.info(
@@ -196,12 +210,12 @@ class APIFile:
             'container_type': source_type.lower(),
             'recursive': False,
             'zone': zone,
-            'archived': False
+            'archived': False,
         }
         if folder:
             params['parent_path'] = folder
         self._logger.info(f'Query node payload: {params}')
-        folder_info = await query_node(params)
+        folder_info = await query_file_folder(params)
         self._logger.info(f'folder_info: {folder_info}')
         response = folder_info.json()
         self._logger.info(f'folder_response: {response}')

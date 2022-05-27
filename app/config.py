@@ -55,7 +55,6 @@ class Settings(BaseSettings):
     version = '1.7.0'
     port: int = 5080
     host: str = '0.0.0.0'
-    RDS_PWD: str
     CLI_SECRET: str = ''
     OPEN_TELEMETRY_HOST: str = '0.0.0.0'
     OPEN_TELEMETRY_PORT: int = 6831
@@ -72,16 +71,25 @@ class Settings(BaseSettings):
     RDS_HOST: str
     RDS_DBNAME: str
     RDS_USER: str
+    RDS_PWD: str
     RDS_SCHEMA_DEFAULT: str
     NEO4J_SERVICE: str
     RDS_DB_URI: str
     METADATA_SERVICE: str
+    PROJECT_SERVICE: str
+    REDIS_DB: str
+    REDIS_HOST: str
+    REDIS_PASSWORD: str
+    REDIS_PORT: str
 
     def __init__(self):
         super().__init__()
         self.RDS_DB_URI = self.RDS_DB_URI.replace(
             'postgresql', 'postgresql+asyncpg'
         )
+        self.REDIS_DB_URI = (
+            f'redis://:{self.REDIS_PASSWORD}@'
+            f'{self.REDIS_HOST}:{self.REDIS_PORT}')
 
     class Config:
         env_file = '.env'

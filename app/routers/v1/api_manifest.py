@@ -36,7 +36,7 @@ from ...resources.error_handler import catch_internal
 from ...resources.error_handler import customized_error_template
 from ...resources.helpers import attach_manifest_to_file
 from ...resources.helpers import get_zone
-from ...resources.helpers import query_node
+from ...resources.helpers import query_file_folder
 from ...resources.helpers import separate_rel_path
 
 router = APIRouter()
@@ -53,14 +53,17 @@ class APIManifest:
         self.db = RDConnection()
 
     @router.get(
-        '/manifest', tags=[_API_TAG],
+        '/manifest',
+        tags=[_API_TAG],
         response_model=ManifestListResponse,
-        summary='Get manifest list by project code')
+        summary='Get manifest list by project code',
+    )
     @catch_internal(_API_NAMESPACE)
     async def list_manifest(
-        self, project_code: str,
+        self,
+        project_code: str,
         current_identity: dict = Depends(jwt_required),
-        db_session: AsyncSession = Depends(db_connection.get_db)
+        db_session: AsyncSession = Depends(db_connection.get_db),
     ):
         api_response = ManifestListResponse()
         try:
@@ -79,7 +82,7 @@ class APIManifest:
                 project_code,
                 'file_attribute_template',
                 zone.lower(),
-                'view'
+                'view',
             )
             if not permission:
                 api_response.error_msg = 'Permission denied'
@@ -88,14 +91,12 @@ class APIManifest:
             mani_project_event = {'project_code': project_code}
             self._logger.info('Getiting project manifests')
             manifests = await self.db.get_manifest_name_from_project_db(
-                mani_project_event,
-                db_session
+                mani_project_event, db_session
             )
             self._logger.info(f'Manifest in project check result: {manifests}')
             self._logger.info('Getting attributes for manifests')
             manifest_list = await self.db.get_attributes_in_manifest_db(
-                manifests,
-                db_session
+                manifests, db_session
             )
             api_response.result = manifest_list
             api_response.code = EAPIResponseCode.success
@@ -106,15 +107,18 @@ class APIManifest:
             api_response.error_msg = str(e)
             return api_response.json_response()
 
-    @router.post('/manifest/attach', tags=[_API_TAG],
-                 response_model=ManifestAttachResponse,
-                 summary='Attach manifest to file')
+    @router.post(
+        '/manifest/attach',
+        tags=[_API_TAG],
+        response_model=ManifestAttachResponse,
+        summary='Attach manifest to file',
+    )
     @catch_internal(_API_NAMESPACE)
     async def attach_manifest(
         self,
         request_payload: ManifestAttachPost,
         current_identity: dict = Depends(jwt_required),
-        db_session: AsyncSession = Depends(db_connection.get_db)
+        db_session: AsyncSession = Depends(db_connection.get_db),
     ):
         """CLI will call manifest validation API before attach manifest to file after uploading process."""
         api_response = ManifestAttachResponse()
@@ -136,16 +140,13 @@ class APIManifest:
                 project_code,
                 'file_attribute_template',
                 zone,
-                'attach'
+                'attach',
             )
             if not permission:
                 api_response.error_msg = 'Permission denied'
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
-            project_role = get_project_role(
-                current_identity,
-                project_code
-            )
+            project_role = get_project_role(current_identity, project_code)
             self._logger.info(f'project_role: {project_role}')
             # zone_type = get_zone(zone)
         except KeyError as e:
@@ -169,36 +170,40 @@ class APIManifest:
             'archived': False,
             'name': file_name,
         }
-        file_response = await query_node(file_info)
+        file_response = await query_file_folder(file_info)
         self._logger.info(f'Query result: {file_response}')
         file_node = file_response.json().get('result')
         if not file_node:
             api_response.error_msg = customized_error_template(
-                ECustomizedError.FILE_NOT_FOUND)
+                ECustomizedError.FILE_NOT_FOUND
+            )
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         else:
             global_entity_id = file_node[0].get('global_entity_id')
             file_owner = file_node[0].get('uploader')
         self._logger.info(
-            f'Globale entity id for {file_name}: {global_entity_id}')
+            f'Globale entity id for {file_name}: {global_entity_id}'
+        )
         self._logger.info(f'File {file_name} uploaded by {file_owner}')
         project_code = manifests['project_code']
         attributes = manifests.get('attributes', {})
         mani_project_event = {
             'project_code': project_code,
-            'manifest_name': manifest_name
+            'manifest_name': manifest_name,
         }
         self._logger.info(
-            f'Getting manifest from project event: {mani_project_event}')
+            f'Getting manifest from project event: {mani_project_event}'
+        )
         manifest_info = await self.db.get_manifest_name_from_project_db(
-            mani_project_event,
-            db_session
+            mani_project_event, db_session
         )
         self._logger.info(f'Manifest information: {manifest_info}')
         if not manifest_info:
-            api_response.error_msg = customized_error_template(
-                ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
+            api_response.error_msg = (
+                customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
+                % manifest_name
+            )
             api_response.code = EAPIResponseCode.bad_request
             return api_response.json_response()
         else:
@@ -213,7 +218,8 @@ class APIManifest:
         self._logger.info(f'Attach manifest result: {response}')
         if not response:
             api_response.error_msg = customized_error_template(
-                ECustomizedError.FILE_NOT_FOUND)
+                ECustomizedError.FILE_NOT_FOUND
+            )
             api_response.code = EAPIResponseCode.not_found
             return api_response.json_response()
         else:
@@ -221,16 +227,19 @@ class APIManifest:
             api_response.code = EAPIResponseCode.success
             return api_response.json_response()
 
-    @router.get('/manifest/export', tags=[_API_TAG],
-                response_model=ManifestExportResponse,
-                summary='Export manifest from project')
+    @router.get(
+        '/manifest/export',
+        tags=[_API_TAG],
+        response_model=ManifestExportResponse,
+        summary='Export manifest from project',
+    )
     @catch_internal(_API_NAMESPACE)
     async def export_manifest(
         self,
         project_code,
         manifest_name,
         current_identity: dict = Depends(jwt_required),
-        db_session: AsyncSession = Depends(db_connection.get_db)
+        db_session: AsyncSession = Depends(db_connection.get_db),
     ):
         """Export manifest from the project."""
         api_response = ManifestExportResponse()
@@ -248,27 +257,32 @@ class APIManifest:
             project_code,
             'file_attribute_template',
             zone,
-            'view')
+            'view',
+        )
         self._logger.info(f'User permission: {permission}')
         if not permission:
             api_response.error_msg = 'Permission denied'
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
-        manifest_event = {'project_code': project_code,
-                          'manifest_name': manifest_name}
+        manifest_event = {
+            'project_code': project_code,
+            'manifest_name': manifest_name,
+        }
         manifest = await self.db.get_manifest_name_from_project_db(
-            manifest_event,
-            db_session)
+            manifest_event, db_session
+        )
         self._logger.info(f'Matched manifest in database: {manifest}')
         if not manifest:
             api_response.code = EAPIResponseCode.not_found
-            api_response.error_msg = customized_error_template(
-                ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
+            api_response.error_msg = (
+                customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND)
+                % manifest_name
+            )
             return api_response.json_response()
         else:
             db_result = await self.db.get_attributes_in_manifest_db(
-                manifest,
-                db_session)
+                manifest, db_session
+            )
             result = db_result[0]
             self._logger.debug(f'Attributes result {result}')
             api_response.code = EAPIResponseCode.success
