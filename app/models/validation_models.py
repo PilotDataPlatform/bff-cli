@@ -40,16 +40,6 @@ class ManifestValidateResponse(APIResponse):
     )
 
 
-class ValidateDICOMIDResponse(APIResponse):
-    """Validate DICOM ID response class."""
-    result: dict = Field({}, example={
-        'code': 200,
-        'error_msg': '',
-        'result': 'VALID'
-    }
-    )
-
-
 class EnvValidatePost(BaseModel):
     """Validate Environment post model."""
     action: str
