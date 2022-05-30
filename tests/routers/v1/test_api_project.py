@@ -59,7 +59,6 @@ async def test_upload_files_into_project_should_return_200(
         'zone': 'zone',
         'filename': 'fake.png',
         'job_type': 'AS_FILE',
-        'dcm_id': 'undefined',
         'current_folder_node': '',
         'data': [
             {'resumable_filename': 'fake.png', 'resumable_relative_path': ''}
@@ -94,7 +93,6 @@ async def test_upload_files_with_invalid_upload_event_should_return_400(
         'zone': 'zone',
         'filename': 'fake.png',
         'job_type': 'AS_FILE',
-        'dcm_id': 'undefined',
         'current_folder_node': '',
         'data': [
             {'resumable_filename': 'fake.png', 'resumable_relative_path': ''}
@@ -123,7 +121,6 @@ async def test_upload_for_project_member_should_return_403(
         'zone': 'gr',
         'filename': 'fake.png',
         'job_type': 'AS_FILE',
-        'dcm_id': 'undefined',
         'current_folder_node': '',
         'data': [
             {'resumable_filename': 'fake.png', 'resumable_relative_path': ''}
@@ -150,7 +147,6 @@ async def test_upload_for_contributor_into_core_should_return_403(
         'zone': 'cr',
         'filename': 'fake.png',
         'job_type': 'AS_FILE',
-        'dcm_id': 'undefined',
         'current_folder_node': '',
         'data': [
             {'resumable_filename': 'fake.png', 'resumable_relative_path': ''}
@@ -182,7 +178,6 @@ async def test_upload_with_conflict_should_return_409(
         'zone': 'zone',
         'filename': 'fake.png',
         'job_type': 'AS_FILE',
-        'dcm_id': 'undefined',
         'current_folder_node': '',
         'data': [
             {'resumable_filename': 'fake.png', 'resumable_relative_path': ''}
@@ -218,7 +213,6 @@ async def test_upload_with_internal_error_should_return_500(
         'zone': 'zone',
         'filename': 'fake.png',
         'job_type': 'AS_FILE',
-        'dcm_id': 'undefined',
         'current_folder_node': '',
         'data': [
             {'resumable_filename': 'fake.png', 'resumable_relative_path': ''}

@@ -50,7 +50,6 @@ class ECustomizedError(enum.Enum):
     INVALID_CHOICE = 'INVALID_CHOICE'
     FIELD_REQUIRED = 'FIELD_REQUIRED'
     TEXT_TOO_LONG = 'TEXT_TOO_LONG'
-    INVALID_DICOM_ID = 'INVALID_DICOM_ID'
     PROJECT_NOT_FOUND = 'PROJECT_NOT_FOUND'
     PERMISSION_DENIED = 'PERMISSION_DENIED'
     USER_NOT_IN_PROJECT = 'USER_NOT_IN_PROJECT'
@@ -73,7 +72,6 @@ def customized_error_template(customized_error: ECustomizedError):
         'INVALID_CHOICE': 'Invalid Choice Field %s',
         'FIELD_REQUIRED': 'Field Required %s',
         'TEXT_TOO_LONG': 'Text Too Long %s',
-        'INVALID_DICOM_ID': 'Invalid DICOM ID',
         'PROJECT_NOT_FOUND': 'Project not found',
         'PERMISSION_DENIED': 'Permission Denied',
         'USER_NOT_IN_PROJECT': 'User not in the project',
