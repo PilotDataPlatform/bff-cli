@@ -36,10 +36,33 @@ async def test_list_dataset_should_successed(
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
-        json=[
-            {'code': dataset_code},
-        ],
+        url='http://dataset_service/v1/users/testuser/datasets',
+        json={
+            'code': 200,
+            'error_msg': '',
+            'page': 0,
+            'total': 1,
+            'num_of_pages': 1,
+            'result': [{
+                'id': 'fake-geid',
+                'source': '',
+                'authors': ['user1', 'user2'],
+                'code': dataset_code,
+                'type': 'GENERAL',
+                'modality': [],
+                'collection_method': [],
+                'license': '',
+                'tags': [],
+                'description': 'my description',
+                'size': 0,
+                'total_files': 0,
+                'title': 'test dataset',
+                'creator': 'testuser',
+                'project_id': 'None',
+                'created_at': '2022-03-31T15:00:04',
+                'updated_at': '2022-03-31T15:00:04'
+            }]
+        },
         status_code=200,
     )
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
@@ -58,8 +81,15 @@ async def test_list_empty_dataset(
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
-        json=[],
+        url='http://dataset_service/v1/users/testuser/datasets',
+        json={
+            'code': 200,
+            'error_msg': '',
+            'page': 0,
+            'total': 1,
+            'num_of_pages': 1,
+            'result': []
+        },
         status_code=200,
     )
     res = await test_async_client_auth.get(test_dataset_api, headers=header)
@@ -83,15 +113,34 @@ async def test_get_dataset_detail_should_successed(
 ):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
-        json=[{
-            'labels': ['Dataset'],
-            'global_entity_id': 'fake_geid',
-            'creator': 'testuser',
-            'modality': [],
-            'code': 'test0111'
-        }],
+        method='GET',
+        url=f'http://dataset_service/v1/dataset-peek/{dataset_code}',
+        json={
+            'code': 200,
+            'error_msg': '',
+            'page': 0,
+            'total': 1,
+            'num_of_pages': 1,
+            'result': {
+                'id': 'fake_geid',
+                'source': '',
+                'authors': ['user1', 'user2'],
+                'code': dataset_code,
+                'type': 'GENERAL',
+                'modality': [],
+                'collection_method': [],
+                'license': '',
+                'tags': [],
+                'description': 'my description',
+                'size': 0,
+                'total_files': 0,
+                'title': 'my title',
+                'creator': 'testuser',
+                'project_id': 'None',
+                'created_at': '2022-03-31T15:00:04',
+                'updated_at': '2022-03-31T15:00:04'
+            }
+        },
         status_code=200,
     )
     res = await test_async_client_auth.get(
@@ -99,7 +148,7 @@ async def test_get_dataset_detail_should_successed(
     res_json = res.json()
     assert res_json.get('code') == 200
     result = res_json.get('result')
-    _dataset_info = result.get('general_info')[0]
+    _dataset_info = result.get('general_info')
     assert _dataset_info['creator'] == 'testuser'
     _version_info = result.get('version_detail')
     assert _version_info[0]['dataset_code'] == dataset_code
@@ -113,15 +162,34 @@ async def test_get_dataset_detail_no_access(
 ):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
-        json=[{
-            'labels': ['Dataset'],
-            'global_entity_id': 'fake_geid',
-            'creator': 'fakeuser',
-            'modality': [],
-            'code': 'test0111'
-        }],
+        method='GET',
+        url=f'http://dataset_service/v1/dataset-peek/{dataset_code}',
+        json={
+            'code': 200,
+            'error_msg': '',
+            'page': 0,
+            'total': 1,
+            'num_of_pages': 1,
+            'result': {
+                'id': 'fake_geid',
+                'source': '',
+                'authors': ['user1', 'user2'],
+                'code': dataset_code,
+                'type': 'GENERAL',
+                'modality': [],
+                'collection_method': [],
+                'license': '',
+                'tags': [],
+                'description': 'my description',
+                'size': 0,
+                'total_files': 0,
+                'title': 'my title',
+                'creator': 'fakeuser',
+                'project_id': 'None',
+                'created_at': '2022-03-31T15:00:04',
+                'updated_at': '2022-03-31T15:00:04'
+            }
+        },
         status_code=200,
     )
     res = await test_async_client_auth.get(
@@ -137,15 +205,16 @@ async def test_get_dataset_detail_not_exist(
 ):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
-        method='POST',
-        url='http://neo4j_service/v1/neo4j/nodes/Dataset/query',
-        json=[{
-            'labels': ['None'],
-            'global_entity_id': 'fake_geid',
-            'creator': 'testuser',
-            'modality': [],
-            'code': 'test0111'
-        }],
+        method='GET',
+        url=f'http://dataset_service/v1/dataset-peek/{dataset_code}',
+        json={
+            "code": 404,
+            "error_msg": "Not Found, invalid dataset code",
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1,
+            "result": {}
+        },
         status_code=200,
     )
     res = await test_async_client_auth.get(
@@ -153,12 +222,3 @@ async def test_get_dataset_detail_not_exist(
     res_json = res.json()
     assert res_json.get('code') == 404
     assert res_json.get('error_msg') == 'Cannot found given dataset code'
-
-
-async def mock_get_dataset_versions(arg1, arg2):
-    mock_dataset_version = [
-        {
-            'dataset_code': dataset_code
-        }
-    ]
-    return mock_dataset_version

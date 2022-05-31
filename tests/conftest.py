@@ -219,25 +219,14 @@ def mock_query__node_has_relation_with_admin(httpx_mock):
 
 @pytest.fixture(autouse=True)
 def mock_settings(monkeypatch, db_postgres):
-    monkeypatch.setattr(ConfigClass, 'NEO4J_SERVICE', 'http://neo4j_service')
-    monkeypatch.setattr(
-        ConfigClass, 'FILEINFO_HOST', 'http://fileinfo_service')
     monkeypatch.setattr(ConfigClass, 'KG_SERVICE', 'http://kg_service')
-    monkeypatch.setattr(ConfigClass, 'PROVENANCE_SERVICE',
-                        'http://provenance_service')
+    monkeypatch.setattr(ConfigClass, 'PROVENANCE_SERVICE', 'http://provenance_service')
     monkeypatch.setattr(ConfigClass, 'GREEN_ZONE_LABEL', 'gr')
     monkeypatch.setattr(ConfigClass, 'CORE_ZONE_LABEL', 'cr')
-    monkeypatch.setattr(ConfigClass, 'DATA_UPLOAD_SERVICE_CORE',
-                        'http://data_upload_cr')
-    monkeypatch.setattr(
-        ConfigClass, 'DATA_UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')
-    monkeypatch.setattr(
-        ConfigClass, 'HPC_SERVICE', 'http://service_hpc')
-    monkeypatch.setattr(
-        ConfigClass, 'AUTH_SERVICE', 'http://service_auth')
-    monkeypatch.setattr(
-        ConfigClass,
-        'RDS_DB_URI',
-        f'{db_postgres}?prepared_statement_cache_size=0')
-    monkeypatch.setattr(
-        ConfigClass, 'METADATA_SERVICE', 'http://metadata_service')
+    monkeypatch.setattr(ConfigClass, 'DATA_UPLOAD_SERVICE_CORE', 'http://data_upload_cr')
+    monkeypatch.setattr(ConfigClass, 'DATA_UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')
+    monkeypatch.setattr(ConfigClass, 'HPC_SERVICE', 'http://service_hpc')
+    monkeypatch.setattr(ConfigClass, 'AUTH_SERVICE', 'http://service_auth')
+    monkeypatch.setattr(ConfigClass, 'RDS_DB_URI', f'{db_postgres}?prepared_statement_cache_size=0')
+    monkeypatch.setattr(ConfigClass, 'METADATA_SERVICE', 'http://metadata_service')
+    monkeypatch.setattr(ConfigClass, 'DATASET_SERVICE', 'http://dataset_service')

@@ -20,7 +20,8 @@ from fastapi_utils.cbv import cbv
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.commons.data_providers.database import DBConnection
-from app.resources.helpers import get_node
+from app.resources.helpers import get_dataset
+from app.resources.helpers import list_datasets
 
 from ...models.base_models import EAPIResponseCode
 from ...models.dataset_models import DatasetDetailResponse
@@ -59,8 +60,7 @@ class APIDataset:
             return self.current_identity
         self._logger.info(
             f'User request with identity: {self.current_identity}')
-        payload = {'creator': username}
-        dataset_list = await get_node(payload, 'Dataset')
+        dataset_list = await list_datasets(username)
         self._logger.info(f'Getting user datasets: {dataset_list}')
         self._logger.info(f'Number of datasets: {len(dataset_list)}')
         api_response.result = dataset_list
@@ -84,28 +84,22 @@ class APIDataset:
             return self.current_identity
         self._logger.info(
             f'User request with identity: {self.current_identity}')
-        node = await get_node({'code': dataset_code}, 'Dataset')
+        node = await get_dataset(dataset_code)
         self._logger.info(f'Getting user dataset node: {node}')
         if not node:
             api_response.code = EAPIResponseCode.not_found
             api_response.error_msg = customized_error_template(
                 ECustomizedError.DATASET_NOT_FOUND)
             return api_response.json_response()
-        elif node[0].get('creator') != username:
+        elif node.get('creator') != username:
             api_response.code = EAPIResponseCode.forbidden
             api_response.error_msg = customized_error_template(
                 ECustomizedError.PERMISSION_DENIED)
             return api_response.json_response()
-        elif 'Dataset' not in node[0].get('labels'):
-            api_response.code = EAPIResponseCode.not_found
-            api_response.error_msg = customized_error_template(
-                ECustomizedError.DATASET_NOT_FOUND)
-            return api_response.json_response()
-        node_geid = node[0].get('global_entity_id')
+        node_geid = node.get('id')
         dataset_query_event = {'dataset_geid': node_geid}
         self._logger.info(f'Dataset query: {dataset_query_event}')
-        versions = await self.db.get_dataset_versions(
-            dataset_query_event, db_session)
+        versions = await self.db.get_dataset_versions(dataset_query_event, db_session)
         self._logger.info(f'Dataset versions: {versions}')
         dataset_detail = {
             'general_info': node,
