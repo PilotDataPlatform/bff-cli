@@ -422,3 +422,111 @@ async def test_get_folder_in_project_with_folder_not_found_should_return_404(
     res_json = res.json()
     assert res.status_code == 404
     assert res_json.get('error_msg') == 'Folder not exist'
+
+
+async def test_get_project_list_2nd_page_should_return_200(
+    test_async_client_auth, mocker
+):
+    test_project = [
+        {'name': 'project 1', 'code': 'project1', 'geid': 'fake-geid-1'},
+        {'name': 'project 2', 'code': 'project2', 'geid': 'fake-geid-2'},
+        {'name': 'project 3', 'code': 'project3', 'geid': 'fake-geid-3'},
+        {'name': 'project 4', 'code': 'project4', 'geid': 'fake-geid-4'},
+        {'name': 'project 5', 'code': 'project5', 'geid': 'fake-geid-5'},
+        {'name': 'project 6', 'code': 'project6', 'geid': 'fake-geid-6'},
+        {'name': 'project 7', 'code': 'project7', 'geid': 'fake-geid-7'},
+        {'name': 'project 8', 'code': 'project8', 'geid': 'fake-geid-8'},
+        {'name': 'project 9', 'code': 'project9', 'geid': 'fake-geid-9'},
+        {'name': 'project 10', 'code': 'project10', 'geid': 'fake-geid-10'},
+    ]
+    mocker.patch(
+        'app.routers.v1.api_project.get_user_projects',
+        return_value=test_project,
+    )
+    header = {'Authorization': 'fake token'}
+    params = {
+            'page': 0,
+            'page_size': 10,
+            'order': 'created_at',
+            'order_by': 'desc'
+        }
+    res = await test_async_client_auth.get(test_project_api, headers=header, query_string=params)
+    res_json = res.json()
+    projects = res_json.get('result')
+    assert res.status_code == 200
+    assert len(projects) == len(test_project)
+
+async def test_get_project_list_20_per_page_should_return_200(
+    test_async_client_auth, mocker
+):
+    test_project = [
+        {'name': 'project 1', 'code': 'project1', 'geid': 'fake-geid-1'},
+        {'name': 'project 2', 'code': 'project2', 'geid': 'fake-geid-2'},
+        {'name': 'project 3', 'code': 'project3', 'geid': 'fake-geid-3'},
+        {'name': 'project 4', 'code': 'project4', 'geid': 'fake-geid-4'},
+        {'name': 'project 5', 'code': 'project5', 'geid': 'fake-geid-5'},
+        {'name': 'project 6', 'code': 'project6', 'geid': 'fake-geid-6'},
+        {'name': 'project 7', 'code': 'project7', 'geid': 'fake-geid-7'},
+        {'name': 'project 8', 'code': 'project8', 'geid': 'fake-geid-8'},
+        {'name': 'project 9', 'code': 'project9', 'geid': 'fake-geid-9'},
+        {'name': 'project 10', 'code': 'project10', 'geid': 'fake-geid-10'},
+        {'name': 'project 11', 'code': 'project11', 'geid': 'fake-geid-11'},
+        {'name': 'project 12', 'code': 'project12', 'geid': 'fake-geid-12'},
+        {'name': 'project 13', 'code': 'project13', 'geid': 'fake-geid-13'},
+        {'name': 'project 14', 'code': 'project14', 'geid': 'fake-geid-14'},
+        {'name': 'project 15', 'code': 'project15', 'geid': 'fake-geid-15'},
+        {'name': 'project 16', 'code': 'project16', 'geid': 'fake-geid-16'},
+        {'name': 'project 17', 'code': 'project17', 'geid': 'fake-geid-17'},
+        {'name': 'project 18', 'code': 'project18', 'geid': 'fake-geid-18'},
+        {'name': 'project 19', 'code': 'project19', 'geid': 'fake-geid-19'},
+        {'name': 'project 20', 'code': 'project20', 'geid': 'fake-geid-20'},
+    ]
+    mocker.patch(
+        'app.routers.v1.api_project.get_user_projects',
+        return_value=test_project,
+    )
+    header = {'Authorization': 'fake token'}
+    params = {
+            'page': 0,
+            'page_size': 10,
+            'order': 'created_at',
+            'order_by': 'desc'
+        }
+    res = await test_async_client_auth.get(test_project_api, headers=header, query_string=params)
+    res_json = res.json()
+    projects = res_json.get('result')
+    assert res.status_code == 200
+    assert len(projects) == len(test_project)
+
+async def test_get_project_list_desc_order_by_code_should_return_200(
+    test_async_client_auth, mocker
+):
+    test_project = [
+        {'name': 'project1', 'code': 'zproject', 'geid': 'fake-geid1'},
+        {'name': 'project2', 'code': 'xproject', 'geid': 'fake-geid2'},
+        {'name': 'project3', 'code': 'wproject', 'geid': 'fake-geid3'},
+        {'name': 'project4', 'code': 'uproject', 'geid': 'fake-geid4'},
+        {'name': 'project5', 'code': 'kproject', 'geid': 'fake-geid5'},
+        {'name': 'project6', 'code': 'jproject', 'geid': 'fake-geid6'},
+        {'name': 'project7', 'code': 'gproject', 'geid': 'fake-geid7'},
+        {'name': 'project8', 'code': 'cproject', 'geid': 'fake-geid8'},
+        {'name': 'project9', 'code': 'bproject', 'geid': 'fake-geid9'},
+        {'name': 'project10', 'code': 'aproject', 'geid': 'fake-geid10'},
+    ]
+    mocker.patch(
+        'app.routers.v1.api_project.get_user_projects',
+        return_value=test_project,
+    )
+    header = {'Authorization': 'fake token'}
+    params = {
+            'page': 0,
+            'page_size': 10,
+            'order': 'created_at',
+            'order_by': 'desc'
+        }
+    res = await test_async_client_auth.get(test_project_api, headers=header, query_string=params)
+    res_json = res.json()
+    projects = res_json.get('result')
+    assert res.status_code == 200
+    assert len(projects) == len(test_project)
+    assert projects == test_project

@@ -56,7 +56,7 @@ class APIProject:
         summary='Get project list that user have access to',
     )
     @catch_internal(_API_NAMESPACE)
-    async def list_project(self):
+    async def list_project(self, page=0, page_size=10, order='created_at', order_by='desc'):
         """Get the project list that user have access to."""
         self._logger.info('API list_project'.center(80, '-'))
         api_response = ProjectListResponse()
@@ -67,7 +67,7 @@ class APIProject:
         self._logger.info(
             f'User request with identity: {self.current_identity}'
         )
-        project_list = await get_user_projects(self.current_identity)
+        project_list = await get_user_projects(self.current_identity, page, page_size, order, order_by)
         self._logger.info(f'Getting user projects: {project_list}')
         self._logger.info(f'Number of projects: {len(project_list)}')
         api_response.result = project_list

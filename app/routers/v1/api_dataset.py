@@ -50,7 +50,7 @@ class APIDataset:
                 response_model=DatasetListResponse,
                 summary='Get dataset list that user have access to')
     @catch_internal(_API_NAMESPACE)
-    async def list_datasets(self):
+    async def list_datasets(self, page=0, page_size=10):
         """Get the dataset list that user have access to."""
         self._logger.info('API list_datasets'.center(80, '-'))
         api_response = DatasetListResponse()
@@ -60,7 +60,7 @@ class APIDataset:
             return self.current_identity
         self._logger.info(
             f'User request with identity: {self.current_identity}')
-        dataset_list = await list_datasets(username)
+        dataset_list = await list_datasets(username, page, page_size)
         self._logger.info(f'Getting user datasets: {dataset_list}')
         self._logger.info(f'Number of datasets: {len(dataset_list)}')
         api_response.result = dataset_list

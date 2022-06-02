@@ -74,28 +74,31 @@ async def get_dataset(dataset_code):
         return None
 
 
-async def list_datasets(user):
+async def list_datasets(user, page, page_size):
     """List all datasets."""
+    _logger.info('list_datasets'.center(80, '-'))
     try:
         payload = {
-            'order_by': 'created_at',
-            'page': 0,
-            'page_size': 100,
+            'page': page,
+            'page_size': page_size,
             'filter': {},
-            'order_type': 'desc'
+            'order_type': 'desc',
+            'order_by': 'created_at'
         }
+        _logger.info(f'Listing dataset payload: {payload}')
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 ConfigClass.DATASET_SERVICE + f'/v1/users/{user}/datasets',
                 json=payload
             )
+        _logger.info(f'Listing dataset response: {response.text}')
         result = response.json().get('result')
         return result
     except Exception:
         return None
 
 
-async def get_user_projects(current_identity):
+async def get_user_projects(current_identity, page, page_size, order, order_by):
     _logger.info('get_user_projects'.center(80, '-'))
     projects_list = []
     project_client = ProjectClient(
@@ -107,7 +110,13 @@ async def get_user_projects(current_identity):
         project_codes = ','.join(project_codes)
     else:
         project_codes = ''
-    project_res = await project_client.search(code_any=project_codes)
+    project_res = await project_client.search(
+        code_any=project_codes,
+        page=page,
+        page_size=page_size,
+        order_type=order,
+        order_by=order_by
+    )
     _logger.info(f'project_res: {project_res}')
     projects = project_res.get('result')
     _logger.info(f'projects: {projects}')
