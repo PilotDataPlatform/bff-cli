@@ -18,7 +18,6 @@ from sqlalchemy.future import select
 
 from ..commons.data_providers.data_models import DataAttributeModel
 from ..commons.data_providers.data_models import DataManifestModel
-from ..commons.data_providers.data_models import DatasetVersionModel
 
 
 class RDConnection:
@@ -96,27 +95,3 @@ class RDConnection:
             ]
             self._logger.info(f"Each attributes payload is {m['attributes']}")
         return manifest_attributes
-
-    async def get_dataset_versions(self, event, db):
-        self._logger.info('get_dataset_versions'.center(80, '-'))
-        self._logger.info(f'Query event: {event}')
-        dataset_geid = event.get('dataset_geid')
-        dataset_versions = []
-        results = await db.execute(
-            select(DatasetVersionModel).filter_by(
-                dataset_geid=dataset_geid))
-        versions = results.scalars().all()
-        self._logger.info(f'Query result: {versions}')
-        if not versions:
-            return []
-        for attr in versions:
-            result = {'dataset_code': attr.dataset_code,
-                      'dataset_geid': attr.dataset_geid,
-                      'version': attr.version,
-                      'created_by': attr.created_by,
-                      'created_at': str(attr.created_at),
-                      'location': attr.location,
-                      'notes': attr.notes
-                      }
-            dataset_versions.append(result)
-        return dataset_versions

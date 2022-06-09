@@ -26,15 +26,17 @@ async def test_create_lineage_should_return_200(
 ):
     payload = {
         'project_code': 'test_project',
-        'input_geid': 'fake_input_geid',
-        'output_geid': 'fake_output_geid',
+        'input_id': 'fake_input_geid',
+        'output_id': 'fake_output_geid',
+        'input_name': 'fake_input_name',
+        'output_name': 'fake_output_name',
         'pipeline_name': 'pipeline_name',
         'description': 'Test lineage'
     }
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://provenance_service/v1/lineage',
+        url='http://provenance_service/v1/lineage/',
         json={
             'mutatedEntities': {
                 'UPDATE': [
@@ -71,15 +73,17 @@ async def test_create_lineage_with_internal_error_should_return_500(
 ):
     payload = {
         'project_code': 'test_project',
-        'input_geid': 'fake_input_geid',
-        'output_geid': 'fake_output_geid',
+        'input_id': 'fake_input_geid',
+        'output_id': 'fake_output_geid',
+        'input_name': 'fake_input_name',
+        'output_name': 'fake_output_name',
         'pipeline_name': 'pipeline_name',
         'description': 'Test lineage'
     }
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://provenance_service/v1/lineage',
+        url='http://provenance_service/v1/lineage/',
         json={},
         status_code=500,
     )

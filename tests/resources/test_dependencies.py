@@ -20,7 +20,6 @@ import pytest
 from fastapi import Request
 
 from app.models.project_models import POSTProjectFile
-from app.resources.dependencies import check_file_exist
 from app.resources.dependencies import jwt_required
 from app.resources.dependencies import transfer_to_pre
 from app.resources.dependencies import validate_upload_event
@@ -94,48 +93,6 @@ async def test_jwt_required_without_username_return_not_found(httpx_mock):
     )
     test_result = await jwt_required(mock_request)
     response = test_result.__dict__
-    assert response['status_code'] == 403
-
-
-async def test_check_file_in_zone_should_return_bad_request(httpx_mock):
-    zone = 'gr'
-    mock_file = {
-        'resumable_relative_path': 'relative_path',
-        'resumable_filename': 'file_name'
-    }
-    httpx_mock.add_response(
-        method='GET',
-        url=(
-            'http://metadata_service/v1/items/search/'
-            '?container_code=test_project'
-            '&container_type=project'
-            '&parent_path=relative_path'
-            '&recursive=false'
-            '&zone=0'
-            '&archived=false'
-            '&type=file'
-            '&name=file_name'
-        ),
-        json={
-            'code': 200,
-            'error_msg': '',
-            'result': []},
-        status_code=200,
-    )
-    result = await check_file_exist(zone, mock_file, project_code)
-    assert result['code'] == 200
-
-
-async def test_check_file_with_external_error_should_return_forbidden():
-    mock_post_model = POSTProjectFile
-    mock_post_model.type = 'type'
-    mock_post_model.zone = 'gr'
-    mock_file = {
-        'resumable_relative_path': 'relative_path',
-        'resumable_filename': 'file_name'
-    }
-    result = await check_file_exist(mock_post_model, mock_file, project_code)
-    response = result.__dict__
     assert response['status_code'] == 403
 
 

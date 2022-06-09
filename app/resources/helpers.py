@@ -163,6 +163,46 @@ async def query_file_folder(params):
         _logger.error(f'Error file/folder: {e}')
 
 
+async def get_dataset_versions(event):
+    _logger.info('get_dataset_versions'.center(80, '-'))
+    _logger.info(f'Query event: {event}')
+    try:
+        dataset_geid = event.get('dataset_geid')
+        page = event.get('page')
+        page_size = event.get('page_size')
+        dataset_versions = []
+        url = ConfigClass.DATASET_SERVICE + f'/v1/dataset/{dataset_geid}/versions'
+        _logger.info(f'url: {url}')
+        params = {
+            'dataset_geid': dataset_geid,
+            'page': page,
+            'page_size': page_size,
+            'order': 'desc',
+            'sorting': 'created_at'
+        }
+        async with httpx.AsyncClient() as client:
+            res = await client.get(url, params=params)
+        res_json = res.json()
+        result = res_json.get('result')
+        _logger.info(f'Query result: {res.text}')
+        if not result:
+            return []
+        for attr in result:
+            result = {
+                'dataset_code': attr['dataset_code'],
+                'dataset_geid': attr['dataset_geid'],
+                'version': attr['version'],
+                'created_by': attr['created_by'],
+                'created_at': str(attr['created_at']),
+                'location': attr['location'],
+                'notes': attr['notes']
+            }
+            dataset_versions.append(result)
+        return dataset_versions
+    except Exception as e:
+        _logger.error(f'Error getting dataset version: {e}')
+
+
 def separate_rel_path(folder_path):
     folder_layers = folder_path.strip('/').split('/')
     if len(folder_layers) > 1:
