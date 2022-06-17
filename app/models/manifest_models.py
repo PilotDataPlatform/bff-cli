@@ -62,15 +62,20 @@ class ManifestListResponse(APIResponse):
 
 class ManifestAttachPost(BaseModel):
     """Attach Manifest post model."""
-    manifest_json: dict = Field({}, example={
-        'manifest_json': {
-            'manifest_name': 'Manifest1',
-            'project_code': 'sampleproject',
-            'attributes': {'attr1': 'a1', 'attr2': 'asdf', 'attr3': 't1'},
-            'file_name': 'file1'
-        }
-    }
-    )
+    manifest_name: str
+    project_code: str
+    attributes: dict
+    file_name: str
+    zone: str
+    # manifest_json: dict = Field({}, example={
+    #     'manifest_json': {
+    #         'manifest_name': 'Manifest1',
+    #         'project_code': 'sampleproject',
+    #         'attributes': {'attr1': 'a1', 'attr2': 'asdf', 'attr3': 't1'},
+    #         'file_name': 'file1'
+    #     }
+    # }
+    # )
 
 
 class ManifestAttachResponse(APIResponse):
@@ -111,7 +116,7 @@ class ManifestAttachResponse(APIResponse):
 
 class ManifestExportParam(BaseModel):
     project_code: str
-    manifest_name: str
+    name: str
 
 
 class ManifestExportResponse(APIResponse):

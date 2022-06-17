@@ -17,17 +17,13 @@ from common import LoggerFactory
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi_utils.cbv import cbv
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.commons.data_providers.database import DBConnection
 from app.resources.helpers import get_dataset
 from app.resources.helpers import get_dataset_versions
 from app.resources.helpers import list_datasets
-
 from ...models.base_models import EAPIResponseCode
 from ...models.dataset_models import DatasetDetailResponse
 from ...models.dataset_models import DatasetListResponse
-from ...resources.database_service import RDConnection
 from ...resources.dependencies import jwt_required
 from ...resources.error_handler import ECustomizedError
 from ...resources.error_handler import catch_internal
@@ -41,11 +37,9 @@ _API_NAMESPACE = 'api_dataset'
 @cbv(router)
 class APIDataset:
     current_identity: dict = Depends(jwt_required)
-    db_connection = DBConnection
 
     def __init__(self):
         self._logger = LoggerFactory(_API_NAMESPACE).get_logger()
-        self.db = RDConnection()
 
     @router.get('/datasets', tags=[_API_TAG],
                 response_model=DatasetListResponse,
@@ -72,10 +66,7 @@ class APIDataset:
                 response_model=DatasetDetailResponse,
                 summary='Get dataset detail based on the dataset code')
     @catch_internal(_API_NAMESPACE)
-    async def get_dataset(
-        self, dataset_code, page=0, page_size=10,
-        db_session: AsyncSession = Depends(db_connection.get_db)
-    ):
+    async def get_dataset(self, dataset_code, page=0, page_size=10):
         """Get the dataset detail by dataset code."""
         self._logger.info('API get_dataset'.center(80, '-'))
         api_response = DatasetDetailResponse()

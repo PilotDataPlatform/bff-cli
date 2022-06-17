@@ -18,21 +18,51 @@ import pytest
 from app.models.error_model import InvalidEncryptionError
 
 pytestmark = pytest.mark.asyncio
-test_validate_id_api = '/v1/validate/gid'
 test_validate_manifest_api = '/v1/validate/manifest'
 test_validate_env_api = '/v1/validate/env'
 
 
-async def test_validate_attribute_should_return_200(
-    test_async_client_auth,
-    create_db_manifest
-):
+async def test_validate_attribute_should_return_200(test_async_client_auth, httpx_mock):
+    httpx_mock.add_response(
+        method='GET',
+        url='http://metadata_service/v1/template/?project_code=test_project&name=fake_manifest',
+        json={
+            "code": 200,
+            "error_msg": "",
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1,
+            "result": [
+                {
+                    "id": "fake-id",
+                    "name": "fake_manifest",
+                    "project_code": "test_project",
+                    "attributes": [
+                        {
+                            "name": "attr1",
+                            "optional": False,
+                            "type": "multiple_choice",
+                            "options": ["a1", "a2", "a3"]
+                        },
+                        {
+                            "name": "attr2",
+                            "optional": True,
+                            "type": "text",
+                            "options": None
+                        }
+                    ]
+                }
+            ]
+        },
+        status_code=200,
+    )
     payload = {
         'manifest_json': {
             'manifest_name': 'fake_manifest',
-            'project_code': 'cli',
+            'project_code': 'test_project',
             'attributes': {
-                'fake_attribute': '1'
+                'attr1': 'a1',
+                'attr2': 'test text manifest'
             }
         }
     }
@@ -40,21 +70,30 @@ async def test_validate_attribute_should_return_200(
         test_validate_manifest_api, json=payload)
     res_json = res.json()
     assert res_json.get('code') == 200
-    assert res_json.get('result') == 'Valid'
+    assert res_json.get('result') == 'valid'
 
 
-async def test_validate_attribute_with_manifest_not_found_return_404(
-    test_async_client_auth,
-    create_db_manifest
-):
+async def test_validate_attribute_with_manifest_not_found_return_404(test_async_client_auth, httpx_mock):
+    httpx_mock.add_response(
+        method='GET',
+        url='http://metadata_service/v1/template/?project_code=test_project&name=fake_manifest',
+        json={
+            "code": 200,
+            "error_msg": "",
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1,
+            "result": []
+        },
+        status_code=200,
+    )
     payload = {
         'manifest_json': {
-            'manifest_name': 'Manifest1',
-            'project_code': 'cli',
+            'manifest_name': 'fake_manifest',
+            'project_code': 'test_project',
             'attributes': {
                 'attr1': 'a1',
-                'attr2': 'Test manifest text value',
-                'attr3': 't1'
+                'attr2': 'Test manifest text value'
             }
         }
     }
@@ -63,17 +102,48 @@ async def test_validate_attribute_with_manifest_not_found_return_404(
         json=payload)
     res_json = res.json()
     assert res_json.get('code') == 404
-    assert res_json.get('result') == 'Manifest Not Exist Manifest1'
+    assert res_json.get('error_msg') == 'Manifest Not Exist fake_manifest'
+    assert res_json.get('result') == 'invalid'
 
 
-async def test_invalidate_attribute_should_return_400(
-    test_async_client_auth,
-    create_db_manifest
-):
+async def test_invalidate_attribute_should_return_400(test_async_client_auth, httpx_mock):
+    httpx_mock.add_response(
+        method='GET',
+        url='http://metadata_service/v1/template/?project_code=test_project&name=fake_manifest',
+        json={
+            "code": 200,
+            "error_msg": "",
+            "page": 0,
+            "total": 1,
+            "num_of_pages": 1,
+            "result": [
+                {
+                    "id": "fake-id",
+                    "name": "fake_manifest",
+                    "project_code": "test_project",
+                    "attributes": [
+                        {
+                            "name": "attr1",
+                            "optional": False,
+                            "type": "multiple_choice",
+                            "options": ["a1", "a2", "a3"]
+                        },
+                        {
+                            "name": "attr2",
+                            "optional": True,
+                            "type": "text",
+                            "options": None
+                        }
+                    ]
+                }
+            ]
+        },
+        status_code=200,
+    )
     payload = {
         'manifest_json': {
             'manifest_name': 'fake_manifest',
-            'project_code': 'cli',
+            'project_code': 'test_project',
             'attributes': {
                 'attr1': 'a1',
                 'attr2': 'Test manifest text value',
@@ -86,7 +156,8 @@ async def test_invalidate_attribute_should_return_400(
         json=payload)
     res_json = res.json()
     assert res_json.get('code') == 400
-    assert res_json.get('result') == 'Invalid Attribute attr1'
+    assert res_json.get('error_msg') == 'invalid attribute attr3'
+    assert res_json.get('result') == 'invalid'
 
 
 @pytest.mark.parametrize(

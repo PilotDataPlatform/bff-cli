@@ -21,8 +21,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from .database_service import RDConnection
 from ..models.error_model import InvalidEncryptionError
+from ..models.error_model import ValidationError
 from ..resources.error_handler import ECustomizedError
 from ..resources.error_handler import customized_error_template
 
@@ -55,76 +55,56 @@ def decryption(encrypted_message, secret):
             'Invalid encryption, could not decrypt message'
         )
 
-
 class ManifestValidator:
 
-    def __init__(self):
-        self.db = RDConnection()
+    def __init__(self, current_attribute, target_attribute):
+        self.current_attribute = current_attribute
+        self.target_attribute = target_attribute
 
-    @staticmethod
-    def validate_non_optional_attribute_field(input_attributes, compare_attr):
-        optional = compare_attr.get('optional')
-        name = compare_attr.get('name')
-        if not optional and name not in input_attributes:
-            return customized_error_template(
-                ECustomizedError.MISSING_REQUIRED_ATTRIBUTES)
+    def validate_attributes_name(self):
+        _logger.info('validate_attributes_name'.center(80, '-'))
+        allowed_attributes = [attr.get('name') for attr in self.target_attribute]
+        for attr in self.current_attribute.keys():
+            if attr not in allowed_attributes:
+                error = f'invalid attribute {attr}'
+                _logger.error(f'Error attribute field: {error}')
+                raise ValidationError(error)
 
-    @staticmethod
-    def validate_attribute_field_by_value(input_attributes, compare_attr):
-        attr_name = compare_attr.get('name')
-        value = input_attributes.get(attr_name)
-        if value and compare_attr.get('type') == 'text':
-            if len(value) > 100:
-                return customized_error_template(
-                    ECustomizedError.TEXT_TOO_LONG) % attr_name
-        elif value and compare_attr.get('type') == 'multiple_choice':
-            if value not in compare_attr.get('value').split(','):
-                return customized_error_template(
-                    ECustomizedError.INVALID_CHOICE) % attr_name
-        else:
-            if not compare_attr.get('optional'):
-                return customized_error_template(
-                    ECustomizedError.FIELD_REQUIRED) % attr_name
+    def validate_non_optional_attribute_field(self, attr):
+        _logger.info('validate_non_optional_attribute_field'.center(80, '-'))
+        required_attr = attr.get('name')
+        if not attr.get('optional') and required_attr not in self.current_attribute.keys():
+            error = customized_error_template(ECustomizedError.FIELD_REQUIRED) % required_attr
+            _logger.error(f'Error attribute field: {error}')
+            raise ValidationError(error)
 
-    @staticmethod
-    def validate_attribute_name(input_attributes, exist_attributes):
-        _logger.info('validate attribute name')
-        valid_attributes = [attr.get('name') for attr in exist_attributes]
-        for key, _ in input_attributes.items():
-            if key not in valid_attributes:
-                return customized_error_template(
-                    ECustomizedError.INVALID_ATTRIBUTE) % key
+    def validate_attribute_value(self, attr):
+        _logger.info('validate_attribute_value'.center(80, '-'))
+        attr_name = attr.get('name')
+        current_attr = self.current_attribute.get(attr_name)
+        if not current_attr:
+            error = f'Invalid attr: {attr}'
+            _logger.error(f'Error attribute field: {error}')
+            raise ValidationError(error)
+        attr_name = attr.get('name')
+        exceed_length = len(current_attr) > 100
+        valid_choice = attr.get('options')
+        if attr.get('type') == 'text' and exceed_length:
+            error = customized_error_template(ECustomizedError.TEXT_TOO_LONG) % attr_name
+            _logger.error(f'Error attribute field: {error}')
+            raise ValidationError(error)
+        elif attr.get('type') == 'multiple_choice' and current_attr not in valid_choice:
+            error = customized_error_template(ECustomizedError.INVALID_CHOICE) % attr_name
+            _logger.error(f'Error attribute field: {error}')
+            raise ValidationError(error)
 
-    async def has_valid_attributes(self, event, db_session):
-        _logger.info(f'received event: {event}')
-        attributes = event.get('attributes')
-        manifest = event.get('manifest')
-        exist_manifest = await self.db.get_attributes_in_manifest_db(
-            manifest,
-            db_session
-        )
-        _logger.info(f'existing manifest: {exist_manifest}')
-        exist_attributes = exist_manifest[0].get('attributes')
-        _name_error = self.validate_attribute_name(
-            attributes, exist_attributes)
-        _logger.info(f'validation name error: {_name_error}')
-        if _name_error:
-            return _name_error
-        for attr in exist_attributes:
-            required_attr = attr.get('name')
-            if not attr.get('optional') and required_attr not in attributes:
-                return customized_error_template(
-                    ECustomizedError.MISSING_REQUIRED_ATTRIBUTES
-                ) % required_attr
-            elif attr not in exist_attributes:
-                return customized_error_template(
-                    ECustomizedError.INVALID_ATTRIBUTE) % attr
-            else:
-                _optional_error = self.validate_non_optional_attribute_field(
-                    attributes, attr)
-                if _optional_error:
-                    return _optional_error
-                _value_error = self.validate_attribute_field_by_value(
-                    attributes, attr)
-                if _value_error:
-                    return _value_error
+    async def has_valid_attributes(self):
+        _logger.info('has_valid_attributes'.center(80, '-'))
+        try:
+            self.validate_attributes_name()
+            for attr in self.target_attribute:
+                self.validate_non_optional_attribute_field(attr)
+                self.validate_attribute_value(attr)
+        except ValidationError as e:
+            _logger.error(e.error_msg)
+            return e.error_msg

@@ -13,16 +13,18 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class Error(Exception):
-    pass
+class ValidationError(Exception):
+    def __init__(self, message='Validation Failed'):
+        super().__init__(message)
+        self.error_msg = message
 
 
-class InvalidEncryptionError(Error):
+class InvalidEncryptionError(Exception):
     def __init__(self, message='Invalid encryption'):
         super().__init__(message)
 
 
-class HPCError(Error):
+class HPCError(Exception):
     def __init__(self, code, message='HPC error'):
         self.code = code
         self.error_msg = message

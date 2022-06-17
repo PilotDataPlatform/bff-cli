@@ -76,41 +76,6 @@ class GetProjectFileListResponse(APIResponse):
     )
 
 
-class POSTDownloadFile(BaseModel):
-    files: list
-    operator: str
-    project_code: str
-    session_id: str
-    zone: str
-
-
-class POSTDownloadFileResponse(APIResponse):
-    result: dict = Field({}, example={
-        'code': 200,
-        'error_msg': '',
-        'result': {
-            'session_id': 'downloadtest',
-            'job_id': 'data-download-1621521355',
-            'geid': '6c890078-1596-44a5-b695-1a9a1b1d974a-1621347776',
-            'source': '/data/core-storage/sampleproject/...',
-            'action': 'data_download',
-            'status': 'READY_FOR_DOWNLOADING',
-            'project_code': 'sampleproject',
-            'operator': 'admin',
-            'progress': 0,
-            'payload': {
-                'hash_code': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...',
-                'files': [
-                    '/data/core-storage/sampleproject/raw/contributor_file_a'
-                ],
-                'zone': 'Greenroom',
-                'frontend_zone': 'Green Room'
-            },
-            'update_timestamp': '1621521356'
-        }
-    })
-
-
 class QueryDataInfo(BaseModel):
     geid: list
 
