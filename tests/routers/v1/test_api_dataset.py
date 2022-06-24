@@ -18,6 +18,7 @@ from pytest_httpx import HTTPXMock
 
 test_dataset_api = '/v1/datasets'
 dataset_code = 'testdataset'
+dataset_geid = 'test-dataset-geid'
 test_dataset_detailed_api = '/v1/dataset/testdataset'
 pytestmark = pytest.mark.asyncio
 
@@ -107,9 +108,7 @@ async def test_get_dataset_detail_without_token(test_async_client):
 
 async def test_get_dataset_detail_should_successed(
     test_async_client_auth,
-    httpx_mock,
-    mocker,
-    create_db_dataset_metrics
+    httpx_mock
 ):
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
@@ -122,7 +121,7 @@ async def test_get_dataset_detail_should_successed(
             'total': 1,
             'num_of_pages': 1,
             'result': {
-                'id': 'fake_geid',
+                'id': dataset_geid,
                 'source': '',
                 'authors': ['user1', 'user2'],
                 'code': dataset_code,
@@ -143,6 +142,53 @@ async def test_get_dataset_detail_should_successed(
         },
         status_code=200,
     )
+    httpx_mock.add_response(
+        method='GET',
+        url=(
+            f'http://dataset_service/v1/dataset/{dataset_geid}/versions'
+            '?dataset_geid=test-dataset-geid&page=0&page_size=10&order=desc&sorting=created_at'
+        ),
+        json={
+            "code": 200,
+            "error_msg": "",
+            "page": 0,
+            "total": 3,
+            "num_of_pages": 1,
+            "result": [
+                {
+                    "id": "1",
+                    "dataset_code": dataset_code,
+                    "dataset_geid": dataset_geid,
+                    "version": "2.0",
+                    "created_by": "testuser",
+                    "created_at": "2022-06-07T22:10:29",
+                    "location": "fake-minio-zip-path2",
+                    "notes": "test release version 2"
+                },
+                {
+                    "id": "2",
+                    "dataset_code": dataset_code,
+                    "dataset_geid": dataset_geid,
+                    "version": "1.1",
+                    "created_by": "testuser",
+                    "created_at": "2022-03-17T13:53:27",
+                    "location": "fakie-minio-zip-path1-1",
+                    "notes": "test release version 1.1"
+                },
+                {
+                    "id": "82",
+                    "dataset_code": dataset_code,
+                    "dataset_geid": dataset_geid,
+                    "version": "1.0",
+                    "created_by": "testuser",
+                    "created_at": "2022-03-10T18:37:41",
+                    "location": "fake-minio-zip-path-1",
+                    "notes": "test release version 1.0"
+                }
+            ]
+        },
+        status_code=200,
+    )
     res = await test_async_client_auth.get(
         test_dataset_detailed_api, headers=header)
     res_json = res.json()
@@ -153,7 +199,7 @@ async def test_get_dataset_detail_should_successed(
     _version_info = result.get('version_detail')
     assert _version_info[0]['dataset_code'] == dataset_code
     _version_no = result.get('version_no')
-    assert _version_no == 1
+    assert _version_no == 3
 
 
 async def test_get_dataset_detail_no_access(

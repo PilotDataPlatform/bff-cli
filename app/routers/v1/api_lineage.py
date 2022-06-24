@@ -47,14 +47,14 @@ class APILineage:
     ):
         self._logger.info('API Lineage'.center(80, '-'))
         proxy_payload = request_payload.__dict__
-        url = ConfigClass.PROVENANCE_SERVICE + '/v1/lineage'
+        url = ConfigClass.PROVENANCE_SERVICE + '/v1/lineage/'
         self._logger.info(f'url: {url}')
         self._logger.info(f'payload: {proxy_payload}')
         async with httpx.AsyncClient() as client:
             fw_response = await client.post(
                 url,
                 json=proxy_payload,
-                timeout=100,
+                timeout=300,
                 follow_redirects=True)
         return JSONResponse(
             content=fw_response.json(),

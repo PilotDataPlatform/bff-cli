@@ -21,8 +21,10 @@ from .base_models import APIResponse
 
 class LineageCreatePost(BaseModel):
     project_code: str
-    input_geid: str
-    output_geid: str
+    input_id: str
+    output_id: str
+    input_name: str
+    output_name: str
     pipeline_name: str
     description: str
 

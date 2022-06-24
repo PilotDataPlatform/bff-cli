@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.commons.data_providers.database import DBConnection
 from app.resources.helpers import get_dataset
+from app.resources.helpers import get_dataset_versions
 from app.resources.helpers import list_datasets
 
 from ...models.base_models import EAPIResponseCode
@@ -50,7 +51,7 @@ class APIDataset:
                 response_model=DatasetListResponse,
                 summary='Get dataset list that user have access to')
     @catch_internal(_API_NAMESPACE)
-    async def list_datasets(self):
+    async def list_datasets(self, page=0, page_size=10):
         """Get the dataset list that user have access to."""
         self._logger.info('API list_datasets'.center(80, '-'))
         api_response = DatasetListResponse()
@@ -60,7 +61,7 @@ class APIDataset:
             return self.current_identity
         self._logger.info(
             f'User request with identity: {self.current_identity}')
-        dataset_list = await list_datasets(username)
+        dataset_list = await list_datasets(username, page, page_size)
         self._logger.info(f'Getting user datasets: {dataset_list}')
         self._logger.info(f'Number of datasets: {len(dataset_list)}')
         api_response.result = dataset_list
@@ -72,7 +73,7 @@ class APIDataset:
                 summary='Get dataset detail based on the dataset code')
     @catch_internal(_API_NAMESPACE)
     async def get_dataset(
-        self, dataset_code,
+        self, dataset_code, page=0, page_size=10,
         db_session: AsyncSession = Depends(db_connection.get_db)
     ):
         """Get the dataset detail by dataset code."""
@@ -97,9 +98,13 @@ class APIDataset:
                 ECustomizedError.PERMISSION_DENIED)
             return api_response.json_response()
         node_geid = node.get('id')
-        dataset_query_event = {'dataset_geid': node_geid}
+        dataset_query_event = {
+            'dataset_geid': node_geid,
+            'page': page,
+            'page_size': page_size
+        }
         self._logger.info(f'Dataset query: {dataset_query_event}')
-        versions = await self.db.get_dataset_versions(dataset_query_event, db_session)
+        versions = await get_dataset_versions(dataset_query_event)
         self._logger.info(f'Dataset versions: {versions}')
         dataset_detail = {
             'general_info': node,

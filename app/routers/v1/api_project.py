@@ -24,7 +24,6 @@ from ...models.project_models import GetProjectFolderResponse
 from ...models.project_models import POSTProjectFile
 from ...models.project_models import POSTProjectFileResponse
 from ...models.project_models import ProjectListResponse
-from ...resources.dependencies import check_file_exist
 from ...resources.dependencies import get_project_role
 from ...resources.dependencies import has_permission
 from ...resources.dependencies import jwt_required
@@ -56,7 +55,7 @@ class APIProject:
         summary='Get project list that user have access to',
     )
     @catch_internal(_API_NAMESPACE)
-    async def list_project(self):
+    async def list_project(self, page=0, page_size=10, order='created_at', order_by='desc'):
         """Get the project list that user have access to."""
         self._logger.info('API list_project'.center(80, '-'))
         api_response = ProjectListResponse()
@@ -67,7 +66,7 @@ class APIProject:
         self._logger.info(
             f'User request with identity: {self.current_identity}'
         )
-        project_list = await get_user_projects(self.current_identity)
+        project_list = await get_user_projects(self.current_identity, page, page_size, order, order_by)
         self._logger.info(f'Getting user projects: {project_list}')
         self._logger.info(f'Number of projects: {len(project_list)}')
         api_response.result = project_list
@@ -110,42 +109,57 @@ class APIProject:
             api_response.code = code
             api_response.result = val_result
             return api_response.json_response()
-        for file in data.data:
-            file_result = await check_file_exist(data.zone, file, project_code)
-            # Stop upload if file exist
-            if file_result.get('code') == 200 and file_result.get('result'):
-                api_response.error_msg = 'File with that name already exists'
+        try:
+            for file in data.data:
+                query_type = 'file' if data.job_type == 'AS_FILE' else 'folder'
+                query = {
+                    'container_code': project_code,
+                    'container_type': 'project',
+                    'parent_path': file.get('resumable_relative_path'),
+                    'recursive': False,
+                    'zone': get_zone(data.zone),
+                    'archived': False,
+                    'type': query_type,
+                    'name': file.get('resumable_filename'),
+                }
+                response = await query_file_folder(query)
+                file_result = response.json()
+                if file_result.get('code') == 200 and file_result.get('result'):
+                    api_response.error_msg = 'File with that name already exists'
+                    api_response.code = EAPIResponseCode.conflict
+                    api_response.result = data
+                    return api_response.json_response()
+            session_id = request.headers.get('Session-ID')
+            result = await transfer_to_pre(data, project_code, session_id)
+            if result.status_code == 409:
+                api_response.error_msg = result.json()['error_msg']
                 api_response.code = EAPIResponseCode.conflict
-                api_response.result = data
                 return api_response.json_response()
-        session_id = request.headers.get('Session-ID')
-        result = await transfer_to_pre(data, project_code, session_id)
-        if result.status_code == 409:
-            api_response.error_msg = result.json()['error_msg']
-            api_response.code = EAPIResponseCode.conflict
+            elif result.status_code != 200:
+                api_response.error_msg = (
+                    'Upload Error: ' + result.json()['error_msg']
+                )
+                api_response.code = EAPIResponseCode.internal_error
+                return api_response.json_response()
+            else:
+                api_response.result = result.json()['result']
             return api_response.json_response()
-        elif result.status_code != 200:
-            api_response.error_msg = (
-                'Upload Error: ' + result.json()['error_msg']
-            )
-            api_response.code = EAPIResponseCode.internal_error
-            return api_response.json_response()
-        else:
-            api_response.result = result.json()['result']
-        return api_response.json_response()
+        except Exception as e:
+            self._logger.error(f'Preupload error: {e}')
+            raise e
 
     @router.get(
-        '/project/{project_code}/folder',
+        '/project/{project_code}/search',
         tags=[_API_TAG],
         response_model=GetProjectFolderResponse,
-        summary='Get folder in the project',
+        summary='Get item in the project',
     )
     @catch_internal(_API_NAMESPACE)
-    async def get_project_folder(self, project_code, zone, folder):
-        """Get folder in project."""
+    async def get_project_item(self, project_code, zone, path, item_type, container_type):
+        """Get item in project."""
         api_response = GetProjectFolderResponse()
         username = self.current_identity['username']
-        self._logger.info('API get_project_folder'.center(80, '-'))
+        self._logger.info('API get_project_item'.center(80, '-'))
         self._logger.info(f'User request identity: {self.current_identity}')
         zone_type = get_zone(zone.lower())
         error_msg = ''
@@ -159,7 +173,7 @@ class APIProject:
             api_response.code = EAPIResponseCode.forbidden
             return api_response.json_response()
         project_role = get_project_role(self.current_identity, project_code)
-        name_folder = folder.split('/')[0]
+        name_folder = path.split('/')[0]
         # verify the name folder access permission
         if zone_type == 0 and project_role not in ['admin', 'platform-admin']:
             if username != name_folder:
@@ -168,21 +182,23 @@ class APIProject:
                 )
                 api_response.code = EAPIResponseCode.forbidden
                 return api_response.json_response()
-        folder_path = folder.strip('/').split('/')
-        parent_path = '/'.join(folder_path[0:-1])
+        folder_path = path.strip('/').split('/')
+        parent_path = '.'.join(folder_path[0:-1])
         folder_name = folder_path[-1]
 
         folder_check_event = {
             'container_code': project_code,
-            'container_type': 'project',
+            'container_type': container_type,
             'parent_path': parent_path,
             'recursive': False,
             'zone': get_zone(zone),
             'archived': False,
             'name': folder_name,
         }
-        folder_response = await query_file_folder(folder_check_event)
+        if item_type:
+            folder_check_event['type'] = item_type
         self._logger.info(f'Folder check event: {folder_check_event}')
+        folder_response = await query_file_folder(folder_check_event)
         self._logger.info(f'Folder check response: {folder_response.text}')
         response = folder_response.json()
         if response.get('code') != 200:

@@ -24,8 +24,6 @@ from app.resources.error_handler import APIException
 from app.resources.error_handler import ECustomizedError
 from app.resources.error_handler import customized_error_template
 
-from .helpers import get_zone
-from .helpers import query_file_folder
 from ..config import ConfigClass
 from ..models.base_models import APIResponse
 from ..models.base_models import EAPIResponseCode
@@ -151,27 +149,6 @@ async def has_permission(identity, project_code, resource, zone, operation):
         )
 
 
-async def check_file_exist(zone, file, project_code):
-    try:
-        query = {
-            'container_code': project_code,
-            'container_type': 'project',
-            'parent_path': file.get('resumable_relative_path'),
-            'recursive': False,
-            'zone': get_zone(zone),
-            'archived': False,
-            'type': 'file',
-            'name': file.get('resumable_filename'),
-        }
-        response = await query_file_folder(query)
-        result = response.json()
-        return result
-    except Exception as e:
-        api_response.error_msg = f'Getting file error: {e}'
-        api_response.code = EAPIResponseCode.forbidden
-        return api_response.json_response()
-
-
 def select_url_by_zone(zone):
     if zone == ConfigClass.CORE_ZONE_LABEL.lower():
         url = ConfigClass.DATA_UPLOAD_SERVICE_CORE + '/v1/files/jobs'
@@ -181,6 +158,7 @@ def select_url_by_zone(zone):
 
 
 def validate_upload_event(zone, current_identity, project_code):
+    _logger.info('validate_upload_event'.center(80, '-'))
     zones = [
         ConfigClass.CORE_ZONE_LABEL.lower(),
         ConfigClass.GREEN_ZONE_LABEL.lower(),
@@ -190,8 +168,10 @@ def validate_upload_event(zone, current_identity, project_code):
         result = ''
         return result, error_msg
     role = current_identity['role']
+    _logger.info(f'role {role}')
     if role != 'admin':
         project_role = get_project_role(current_identity, project_code)
+        _logger.info(f'project_role: {project_role}')
         restrict_zone = ConfigClass.CORE_ZONE_LABEL.lower()
         if zone == restrict_zone and project_role == 'contributor':
             error_msg = customized_error_template(
@@ -203,6 +183,13 @@ def validate_upload_event(zone, current_identity, project_code):
                 ECustomizedError.PERMISSION_DENIED
             )
             result = 'User not in the project'
+        else:
+            error_msg = ''
+            result = project_role
+    else:
+        result = 'admin'
+        error_msg = ''
+    _logger.info(f'result {result}')
     return result, error_msg
 
 

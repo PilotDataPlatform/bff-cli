@@ -18,7 +18,6 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi_utils.cbv import cbv
 
-from ...config import ConfigClass
 from ...models.file_models import GetProjectFileListResponse
 from ...models.file_models import QueryDataInfo
 from ...models.file_models import QueryDataInfoResponse
@@ -74,14 +73,6 @@ class APIFile:
                 )
                 result = []
                 self._logger.info(f'status: {status}')
-            elif 'File' not in query_result[global_entity_id].get(
-                'labels'
-            ) and 'Folder' not in query_result[global_entity_id].get('labels'):
-                status = customized_error_template(
-                    ECustomizedError.FILE_FOLDER_ONLY
-                )
-                result = []
-                self._logger.info(f'status: {status}')
             elif query_result[global_entity_id].get('archived'):
                 status = customized_error_template(
                     ECustomizedError.FILE_FOLDER_ONLY
@@ -89,45 +80,28 @@ class APIFile:
                 result = []
                 self._logger.info(f'status: {status}')
             else:
-                self._logger.info(
-                    f'Query result: {query_result[global_entity_id]}'
-                )
-                project_code = query_result[global_entity_id].get(
-                    'project_code'
-                )
-                labels = query_result[global_entity_id].get('labels')
-                display_path = (
-                    query_result[global_entity_id]
-                    .get('display_path')
-                    .lstrip('/')
-                )
-                name_folder = display_path.split('/')[0]
-                zone = (
-                    ConfigClass.CORE_ZONE_LABEL
-                    if ConfigClass.CORE_ZONE_LABEL in labels
-                    else ConfigClass.GREEN_ZONE_LABEL
-                )
-                self._logger.info(f'File zone: {zone}')
+                self._logger.info(f'Query result: {query_result[global_entity_id]}')
+                project_code = query_result[global_entity_id].get('container_code')
+                zone = query_result[global_entity_id].get('zone')
+                parent_path = query_result[global_entity_id].get('parent_path')
+                name_folder = parent_path.split('/')[0]
                 permission = await has_permission(
                     self.current_identity,
                     project_code,
                     'file',
-                    zone.lower(),
+                    zone,
                     'view',
                 )
                 if not permission:
-                    file_response.error_msg = 'Permission denied'
-                    file_response.code = EAPIResponseCode.forbidden
-                    return file_response.json_response()
-                if user_name and user_name != name_folder:
-                    status = customized_error_template(
-                        ECustomizedError.PERMISSION_DENIED
-                    )
+                    status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
+                    result = []
+                project_role = get_project_role(self.current_identity, project_code)
+                if user_name != name_folder and project_role not in ['platform-admin', 'admin']:
+                    status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
                     result = []
                 else:
                     status = 'success'
                     result = [query_result[global_entity_id]]
-                self._logger.info(f'file result: {result}')
             response_list.append(
                 {'status': status, 'result': result, 'geid': global_entity_id}
             )
@@ -151,26 +125,6 @@ class APIFile:
         zone = get_zone(zone)
         project_role = get_project_role(self.current_identity, project_code)
         rel_path, folder_name = separate_rel_path(folder)
-        self._logger.info(f'Getting relative_path: {rel_path}')
-        self._logger.info(f'Getting folder_name: {folder_name}')
-        self._logger.info(
-            f"Getting rel_path.split('/')[0]: \
-            {rel_path.split('/')[0]}"
-        )
-        self._logger.info(f'Getting username: {username}')
-        self._logger.info(f'Getting zone: {zone}')
-        self._logger.info(f'Getting zone: {type(zone)}')
-        self._logger.info(
-            f"Getting role: \
-            {not project_role in ['admin', 'platform-admin']}"
-        )
-        self._logger.info(f'Getting zone: {zone == 0}')
-        self._logger.info(f'Getting project_role: {project_role}')
-        self._logger.info(
-            f"Getting username and rel_path \
-            and rel_path.split('/')[0] != username: \
-            {username and rel_path and rel_path.split('/')[0] != username}"
-        )
         self._logger.info(
             f'project_role in ["admin", "platform-admin"]: \
                 {project_role in ["admin", "platform-admin"]}'

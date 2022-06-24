@@ -51,7 +51,6 @@ class POSTProjectFile(BaseModel):
     operator: str
     job_type: str
     upload_message: str
-    type: str
     zone: str
     filename: str
     current_folder_node: str
