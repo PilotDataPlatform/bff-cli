@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     AUTH_SERVICE: str
     DATA_UPLOAD_SERVICE_GREENROOM: str
     DATA_UPLOAD_SERVICE_CORE: str
-    FILEINFO_HOST: str
+    DATASET_SERVICE: str
     HPC_SERVICE: str
     KG_SERVICE: str
     PROVENANCE_SERVICE: str
@@ -73,7 +73,6 @@ class Settings(BaseSettings):
     RDS_USER: str
     RDS_PWD: str
     RDS_SCHEMA_DEFAULT: str
-    NEO4J_SERVICE: str
     RDS_DB_URI: str
     METADATA_SERVICE: str
     PROJECT_SERVICE: str

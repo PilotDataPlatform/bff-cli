@@ -59,15 +59,38 @@ async def batch_query_node_by_geid(geid_list):
     return located_geid, query_result
 
 
-async def get_node(post_data, label):
+async def get_dataset(dataset_code):
     """get dataset node information."""
+    _logger.info('get_dataset'.center(80, '-'))
     try:
+        url = ConfigClass.DATASET_SERVICE + f'/v1/dataset-peek/{dataset_code}'
+        _logger.info(f'Getting dataset url: {url}')
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
+        _logger.info(f'Getting dataset response: {response.text}')
+        result = response.json().get('result')
+        return result
+    except Exception:
+        return None
+
+
+async def list_datasets(user):
+    """List all datasets."""
+    try:
+        payload = {
+            'order_by': 'created_at',
+            'page': 0,
+            'page_size': 100,
+            'filter': {},
+            'order_type': 'desc'
+        }
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                ConfigClass.NEO4J_SERVICE + f'/v1/neo4j/nodes/{label}/query',
-                json=post_data,
+                ConfigClass.DATASET_SERVICE + f'/v1/users/{user}/datasets',
+                json=payload
             )
-        return response.json()
+        result = response.json().get('result')
+        return result
     except Exception:
         return None
 
