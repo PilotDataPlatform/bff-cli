@@ -117,18 +117,30 @@ class APIFile:
         summary='Get files and folders in the project/folder',
     )
     @catch_internal(_API_NAMESPACE)
-    async def get_file_folders(self, project_code, zone, folder, source_type):
+    async def get_file_folders(self, project_code, zone, folder, source_type, page, page_size):
         """List files and folders in project."""
         self._logger.info('API file_list_query'.center(80, '-'))
         file_response = GetProjectFileListResponse()
         username = self.current_identity['username']
+        permission = await has_permission(
+                self.current_identity,
+                project_code,
+                'file',
+                zone,
+                'view',
+            )
+        self._logger.info(f'User permission: {permission}')
+        if not permission:
+            file_response.error_msg = 'Project permission denied'
+            file_response.code = EAPIResponseCode.forbidden
+            return file_response.json_response()
         zone = get_zone(zone)
         project_role = get_project_role(self.current_identity, project_code)
-        rel_path, folder_name = separate_rel_path(folder)
         self._logger.info(
             f'project_role in ["admin", "platform-admin"]: \
                 {project_role in ["admin", "platform-admin"]}'
         )
+        rel_path, folder_name = separate_rel_path(folder)
         if zone == 0 and project_role not in ['admin', 'platform-admin']:
             if username and not rel_path and folder_name != username:
                 file_response.error_msg = customized_error_template(
@@ -165,9 +177,12 @@ class APIFile:
             'recursive': False,
             'zone': zone,
             'archived': False,
+            'page': page,
+            'page_size': page_size,
+            'order': 'desc'
         }
         if folder:
-            params['parent_path'] = folder
+            params['parent_path'] = folder.replace('/', '.')
         self._logger.info(f'Query node payload: {params}')
         folder_info = await query_file_folder(params)
         self._logger.info(f'folder_info: {folder_info}')
@@ -183,14 +198,14 @@ class APIFile:
             return file_response.json_response()
         else:
             result = response.get('result')
-            if result:
-                result = result
-                code = EAPIResponseCode.success
-                error_msg = response.get('error_msg')
-            else:
-                result = []
-                code = EAPIResponseCode.forbidden
-                error_msg = 'Folder not exist'
+            # if result:
+            # result = result
+            code = EAPIResponseCode.success
+            error_msg = response.get('error_msg')
+            # else:
+            #     result = []
+            #     code = EAPIResponseCode.forbidden
+            #     error_msg = 'Folder not exist'
             file_response.result = result
             file_response.code = code
             file_response.error_msg = error_msg

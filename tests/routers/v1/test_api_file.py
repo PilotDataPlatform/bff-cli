@@ -32,11 +32,12 @@ async def test_get_name_folders_in_project_should_return_200(
         'project_code': project_code,
         'zone': '0',
         'folder': '',
-        'source_type': 'Project'
+        'source_type': 'Project',
+        'page': 0,
+        'page_size': 10
     }
     header = {'Authorization': 'fake token'}
-    mocker.patch('app.routers.v1.api_file.has_permission',
-                 return_value=True)
+    mocker.patch('app.routers.v1.api_file.has_permission', return_value=True)
     httpx_mock.add_response(
         method='GET',
         url=(
@@ -45,7 +46,11 @@ async def test_get_name_folders_in_project_should_return_200(
             '&container_type=project'
             '&parent_path='
             '&recursive=false'
-            '&zone=0&archived=false'
+            '&zone=0'
+            '&archived=false'
+            '&page=0'
+            '&page_size=10'
+            '&order=desc'
         ),
         json={
             'code': 200,
@@ -134,7 +139,9 @@ async def test_get_files_in_folder_should_return_200(
         'project_code': project_code,
         'zone': '0',
         'folder': 'testuser/fake_folder',
-        'source_type': 'Project'
+        'source_type': 'Project',
+        'page': 0,
+        'page_size': 10
     }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_file.has_permission',
@@ -142,14 +149,16 @@ async def test_get_files_in_folder_should_return_200(
     httpx_mock.add_response(
         method='GET',
         url=(
-            'http://metadata_service/v1/items/search/'
-            '?container_code=test_project'
+            'http://metadata_service/v1/items/search/?'
+            'container_code=test_project'
             '&container_type=project'
-            '&parent_path=testuser'
-            '%2Ffake_folder'
             '&recursive=false'
-            '&zone=0&'
-            'archived=false'),
+            '&zone=0'
+            '&archived=false'
+            '&page=0'
+            '&page_size=10'
+            '&order=desc'
+            '&parent_path=testuser.fake_folder'),
         json={
             'code': 200,
             'result': [
@@ -234,15 +243,17 @@ async def test_get_folder_without_token(test_async_client):
         'project_code': project_code,
         'zone': 'zone',
         'folder': '',
-        'source_type': 'Container'
+        'source_type': 'Container',
+        'page': 0,
+        'page_size': 10
     }
     res = await test_async_client.get(test_get_file_api, query_string=param)
     res_json = res.json()
     assert res_json.get('code') == 401
     assert res_json.get('error_msg') == 'Token required'
 
-
-async def test_get_files_when_folder_does_not_exist_should_return_403(
+# case changed to 200 since metadata cannot distinguish empty folder and non-exist folder
+async def test_get_files_when_folder_does_not_exist_should_return_200(
     test_async_client_auth,
     mocker,
     httpx_mock
@@ -250,7 +261,10 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(
     param = {'project_code': project_code,
              'zone': '0',
              'folder': 'fake_user/fake_folder',
-             'source_type': 'Project'}
+             'source_type': 'Project',
+             'page': 0,
+             'page_size': 10
+        }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_file.has_permission',
                  return_value={'code': 200,
@@ -259,11 +273,16 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(
     httpx_mock.add_response(
         method='GET',
         url=(
-            'http://metadata_service/v1/items/search/'
-            f'?container_code={project_code}'
+            'http://metadata_service/v1/items/search/?'
+            'container_code=test_project'
             '&container_type=project'
-            '&parent_path=fake_user%2Ffake_folder'
-            '&recursive=false&zone=0&archived=false'
+            '&recursive=false'
+            '&zone=0'
+            '&archived=false'
+            '&page=0'
+            '&page_size=10'
+            '&order=desc'
+            '&parent_path=fake_user.fake_folder'
         ),
         json={'code': 200, 'result': []},
         status_code=200,
@@ -274,8 +293,8 @@ async def test_get_files_when_folder_does_not_exist_should_return_403(
         query_string=param
     )
     res_json = res.json()
-    assert res.status_code == 403
-    assert res_json.get('error_msg') == 'Folder not exist'
+    assert res.status_code == 200
+    # assert res_json.get('error_msg') == 'Folder not exist'
 
 
 async def test_get_files_when_folder_not_belong_to_user_should_return_403(
@@ -285,7 +304,10 @@ async def test_get_files_when_folder_not_belong_to_user_should_return_403(
     param = {'project_code': project_code,
              'zone': 0,
              'folder': 'fake_admin/fake_folder',
-             'source_type': 'Folder'}
+             'source_type': 'Folder',
+             'page': 0,
+             'page_size': 10
+            }
     header = {'Authorization': 'fake token'}
     mocker.patch(
         'app.routers.v1.api_file.has_permission',

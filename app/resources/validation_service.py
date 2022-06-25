@@ -77,6 +77,10 @@ class ManifestValidator:
             error = customized_error_template(ECustomizedError.FIELD_REQUIRED) % required_attr
             _logger.error(f'Error attribute field: {error}')
             raise ValidationError(error)
+        elif not self.current_attribute.get(required_attr):
+            error = customized_error_template(ECustomizedError.MISSING_REQUIRED_ATTRIBUTES) % required_attr
+            _logger.error(f'Error attribute field: {error}')
+            raise ValidationError(error)
 
     def validate_attribute_value(self, attr):
         _logger.info('validate_attribute_value'.center(80, '-'))

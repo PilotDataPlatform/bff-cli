@@ -16,7 +16,7 @@
 from common import LoggerFactory
 from fastapi import APIRouter
 from fastapi_utils.cbv import cbv
-
+from fastapi import Depends
 from app.config import ConfigClass
 from app.models.error_model import InvalidEncryptionError
 from app.resources.helpers import get_attribute_templates
@@ -30,7 +30,8 @@ from ...resources.error_handler import catch_internal
 from ...resources.error_handler import customized_error_template
 from ...resources.validation_service import ManifestValidator
 from ...resources.validation_service import decryption
-
+from ...resources.dependencies import jwt_required
+from ...resources.dependencies import has_permission
 router = APIRouter()
 
 
@@ -49,7 +50,11 @@ class APIValidation:
         summary='Validate manifest for project',
     )
     @catch_internal(_API_NAMESPACE)
-    async def validate_manifest(self, request_payload: ManifestValidatePost):
+    async def validate_manifest(
+        self,
+        request_payload: ManifestValidatePost,
+        current_identity: dict = Depends(jwt_required)
+    ):
         """Validate the manifest based on the project."""
         self._logger.info('API validate_manifest'.center(80, '-'))
         api_response = ManifestValidateResponse()
@@ -58,6 +63,18 @@ class APIValidation:
             manifest_name = manifests['manifest_name']
             project_code = manifests['project_code']
             attributes = manifests.get('attributes', {})
+            permission = await has_permission(
+                current_identity,
+                project_code,
+                'file_attribute_template',
+                ConfigClass.GREEN_ZONE_LABEL.lower(),
+                'view',
+            )
+            self._logger.info(f'User permission: {permission}')
+            if not permission:
+                api_response.error_msg = 'Permission denied'
+                api_response.code = EAPIResponseCode.forbidden
+                return api_response.json_response()
             response = await get_attribute_templates(project_code, manifest_name)
             manifest_list = response.get('result')
             self._logger.info(f'manifest_info: {manifest_list}')
