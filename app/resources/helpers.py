@@ -124,12 +124,11 @@ async def get_user_projects(current_identity, page, page_size, order, order_by):
     _logger.info(f'Number of projects found: {len(projects_list)}')
     return projects_list
 
+
 async def get_attribute_templates(project_code, manifest_name=None):
     _logger.info('get_attribute_templates'.center(80, '-'))
     url = ConfigClass.METADATA_SERVICE + '/v1/template/'
-    params = {
-        'project_code': project_code
-        }
+    params = {'project_code': project_code}
     _logger.info(f'Getting: {url}')
     _logger.info(f'PARAMS: {params}')
     if manifest_name:
@@ -208,6 +207,7 @@ def separate_rel_path(folder_path):
         rel_path = ''
         folder_name = folder_path
     return rel_path, folder_name
+
 
 class Annotations:
 

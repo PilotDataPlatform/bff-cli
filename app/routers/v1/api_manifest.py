@@ -17,13 +17,13 @@ from common import LoggerFactory
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi_utils.cbv import cbv
+
 from app.config import ConfigClass
 
 from ...models.manifest_models import ManifestAttachPost
 from ...models.manifest_models import ManifestAttachResponse
 from ...models.manifest_models import ManifestExportResponse
 from ...models.manifest_models import ManifestListResponse
-from ...resources.validation_service import ManifestValidator
 from ...resources.dependencies import has_permission
 from ...resources.dependencies import jwt_required
 from ...resources.error_handler import EAPIResponseCode
@@ -31,10 +31,11 @@ from ...resources.error_handler import ECustomizedError
 from ...resources.error_handler import catch_internal
 from ...resources.error_handler import customized_error_template
 from ...resources.helpers import Annotations
+from ...resources.helpers import get_attribute_templates
 from ...resources.helpers import get_zone
 from ...resources.helpers import query_file_folder
-from ...resources.helpers import get_attribute_templates
 from ...resources.helpers import separate_rel_path
+from ...resources.validation_service import ManifestValidator
 
 router = APIRouter()
 

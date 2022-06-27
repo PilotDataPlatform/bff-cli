@@ -122,13 +122,7 @@ class APIFile:
         self._logger.info('API file_list_query'.center(80, '-'))
         file_response = GetProjectFileListResponse()
         username = self.current_identity['username']
-        permission = await has_permission(
-                self.current_identity,
-                project_code,
-                'file',
-                zone,
-                'view',
-            )
+        permission = await has_permission(self.current_identity, project_code, 'file', zone, 'view')
         self._logger.info(f'User permission: {permission}')
         if not permission:
             file_response.error_msg = 'Project permission denied'
@@ -189,24 +183,12 @@ class APIFile:
         response = folder_info.json()
         self._logger.info(f'folder_response: {response}')
         if response.get('code') != 200:
-            error_msg = 'Error Getting Folder: ' + response.get('error_msg')
-            response_code = EAPIResponseCode.internal_error
-            result = []
-            file_response.result = result
-            file_response.code = response_code
-            file_response.error_msg = error_msg
+            file_response.result = response.get('result')
+            file_response.code = EAPIResponseCode.internal_error
+            file_response.error_msg = 'Error Getting Folder: ' + response.get('error_msg')
             return file_response.json_response()
         else:
-            result = response.get('result')
-            # if result:
-            # result = result
-            code = EAPIResponseCode.success
-            error_msg = response.get('error_msg')
-            # else:
-            #     result = []
-            #     code = EAPIResponseCode.forbidden
-            #     error_msg = 'Folder not exist'
-            file_response.result = result
-            file_response.code = code
-            file_response.error_msg = error_msg
+            file_response.result = response.get('result')
+            file_response.code = EAPIResponseCode.success
+            file_response.error_msg = response.get('error_msg')
             return file_response.json_response()

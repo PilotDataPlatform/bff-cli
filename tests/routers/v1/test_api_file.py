@@ -252,19 +252,21 @@ async def test_get_folder_without_token(test_async_client):
     assert res_json.get('code') == 401
     assert res_json.get('error_msg') == 'Token required'
 
+
 # case changed to 200 since metadata cannot distinguish empty folder and non-exist folder
 async def test_get_files_when_folder_does_not_exist_should_return_200(
     test_async_client_auth,
     mocker,
     httpx_mock
 ):
-    param = {'project_code': project_code,
-             'zone': '0',
-             'folder': 'fake_user/fake_folder',
-             'source_type': 'Project',
-             'page': 0,
-             'page_size': 10
-        }
+    param = {
+        'project_code': project_code,
+        'zone': '0',
+        'folder': 'fake_user/fake_folder',
+        'source_type': 'Project',
+        'page': 0,
+        'page_size': 10
+    }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_file.has_permission',
                  return_value={'code': 200,
@@ -293,21 +295,23 @@ async def test_get_files_when_folder_does_not_exist_should_return_200(
         query_string=param
     )
     res_json = res.json()
-    assert res.status_code == 200
-    # assert res_json.get('error_msg') == 'Folder not exist'
+    assert res_json.get('code') == 200
+    assert res_json.get('error_msg') is None
+    assert res_json.get('result') == []
 
 
 async def test_get_files_when_folder_not_belong_to_user_should_return_403(
     test_async_client_project_member_auth,
     mocker
 ):
-    param = {'project_code': project_code,
-             'zone': 0,
-             'folder': 'fake_admin/fake_folder',
-             'source_type': 'Folder',
-             'page': 0,
-             'page_size': 10
-            }
+    param = {
+        'project_code': project_code,
+        'zone': 0,
+        'folder': 'fake_admin/fake_folder',
+        'source_type': 'Folder',
+        'page': 0,
+        'page_size': 10
+    }
     header = {'Authorization': 'fake token'}
     mocker.patch(
         'app.routers.v1.api_file.has_permission',

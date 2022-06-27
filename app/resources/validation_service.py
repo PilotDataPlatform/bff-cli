@@ -55,6 +55,7 @@ def decryption(encrypted_message, secret):
             'Invalid encryption, could not decrypt message'
         )
 
+
 class ManifestValidator:
 
     def __init__(self, current_attribute, target_attribute):

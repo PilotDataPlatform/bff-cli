@@ -67,15 +67,6 @@ class ManifestAttachPost(BaseModel):
     attributes: dict
     file_name: str
     zone: str
-    # manifest_json: dict = Field({}, example={
-    #     'manifest_json': {
-    #         'manifest_name': 'Manifest1',
-    #         'project_code': 'sampleproject',
-    #         'attributes': {'attr1': 'a1', 'attr2': 'asdf', 'attr3': 't1'},
-    #         'file_name': 'file1'
-    #     }
-    # }
-    # )
 
 
 class ManifestAttachResponse(APIResponse):

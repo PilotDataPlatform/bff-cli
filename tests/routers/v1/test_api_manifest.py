@@ -271,12 +271,12 @@ async def test_attach_attributes_without_token_should_return_401(test_async_clie
 
 async def test_attach_attributes_should_return_200(test_async_client_auth, mocker, httpx_mock):
     payload = {
-                'manifest_name': 'fake_manifest',
-                'project_code': project_code,
-                'attributes': {'attr1': 'a1', 'attr2': 'test text attribute'},
-                'file_name': 'test_file',
-                'zone': '0'
-            }
+        'manifest_name': 'fake_manifest',
+        'project_code': project_code,
+        'attributes': {'attr1': 'a1', 'attr2': 'test text attribute'},
+        'file_name': 'test_file',
+        'zone': '0'
+    }
     header = {'Authorization': 'fake token'}
     mocker.patch('app.routers.v1.api_manifest.has_permission', return_value=True)
     # check file exist
@@ -386,7 +386,7 @@ async def test_attach_attributes_should_return_200(test_async_client_auth, mocke
                 "type": "file",
                 "zone": 0,
                 "name": "test_file",
-                "size":1048576,
+                "size": 1048576,
                 "owner": "admin",
                 "container_code": "test_project",
                 "container_type": "project",

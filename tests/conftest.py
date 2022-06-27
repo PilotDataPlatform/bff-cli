@@ -15,11 +15,13 @@
 
 
 import os
+
 import pytest
 import pytest_asyncio
 from async_asgi_testclient import TestClient as TestAsyncClient
 from fastapi import Request
 from pydantic import BaseModel
+
 from app.config import ConfigClass
 from app.main import create_app
 from app.resources.dependencies import jwt_required
