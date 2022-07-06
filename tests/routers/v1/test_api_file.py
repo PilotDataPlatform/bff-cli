@@ -464,7 +464,7 @@ async def test_query_file_by_geid_when_file_not_found(
     result = res_json.get('result')
     for entity in result:
         assert entity['status'] == 'File Not Exist'
-        assert entity['result'] == []
+        assert entity['result'] == {}
 
 
 async def test_query_file_by_geid_when_file_is_archived(
@@ -529,4 +529,4 @@ async def test_query_file_by_geid_when_file_is_archived(
     res_json = res.json()
     result = res_json.get('result')
     for entity in result:
-        assert entity['result'] == []
+        assert entity['result'] == {}
