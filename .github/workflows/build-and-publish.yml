@@ -1,0 +1,49 @@
+name: Build and Publish
+
+on:
+  workflow_run:
+    workflows: ["Run Tests"]
+    branches: [ develop ]
+    types:
+      - completed
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-push-docker-image:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Build Docker image and push to repositories
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Github Packages
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: indoc-devops
+          password: ${{ secrets.GHCR_PAT }}
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ghcr.io/pilotdataplatform/bff-cli
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=sha,enable=true,prefix=,suffix=,format=short
+      - name: Image digest
+        run: echo ${{ steps.meta.outputs.tags }}
+      - name: Build image and push to GitHub Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: .
+          # Note: tags has to be all lower-case
+          tags: ${{ steps.meta.outputs.tags }}
+          # build on feature branches, push only on main branch
+          push: ${{ github.event_name != 'pull_request' }}
