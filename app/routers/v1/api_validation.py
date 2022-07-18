@@ -17,17 +17,17 @@ from common import LoggerFactory
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi_utils.cbv import cbv
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import ConfigClass
 from app.models.error_model import InvalidEncryptionError
+from app.resources.helpers import get_attribute_templates
 
-from ...commons.data_providers.database import DBConnection
 from ...models.validation_models import EnvValidatePost
 from ...models.validation_models import EnvValidateResponse
 from ...models.validation_models import ManifestValidatePost
 from ...models.validation_models import ManifestValidateResponse
-from ...resources.database_service import RDConnection
+from ...resources.dependencies import has_permission
+from ...resources.dependencies import jwt_required
 from ...resources.error_handler import EAPIResponseCode
 from ...resources.error_handler import ECustomizedError
 from ...resources.error_handler import catch_internal
@@ -42,11 +42,9 @@ router = APIRouter()
 class APIValidation:
     _API_TAG = 'V1 Validate'
     _API_NAMESPACE = 'api_validation'
-    db_connection = DBConnection
 
     def __init__(self):
         self._logger = LoggerFactory(self._API_NAMESPACE).get_logger()
-        self.db = RDConnection()
 
     @router.post(
         '/validate/manifest',
@@ -56,34 +54,55 @@ class APIValidation:
     )
     @catch_internal(_API_NAMESPACE)
     async def validate_manifest(
-        self, request_payload: ManifestValidatePost, db_session: AsyncSession = Depends(db_connection.get_db)
+        self,
+        request_payload: ManifestValidatePost,
+        current_identity: dict = Depends(jwt_required)
     ):
         """Validate the manifest based on the project."""
         self._logger.info('API validate_manifest'.center(80, '-'))
-        self._logger.info(f'DB URI: {ConfigClass.RDS_DB_URI}')
         api_response = ManifestValidateResponse()
-        manifests = request_payload.manifest_json
-        manifest_name = manifests['manifest_name']
-        project_code = manifests['project_code']
-        attributes = manifests.get('attributes', {})
-        validation_event = {'project_code': project_code, 'manifest_name': manifest_name, 'attributes': attributes}
-        self._logger.info(f'Validation event: {validation_event}')
-        manifest_info = await self.db.get_manifest_name_from_project_db(validation_event, db_session)
-        self._logger.info(f'manifest_info: {manifest_info}')
-        if not manifest_info:
-            api_response.result = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
-            api_response.code = EAPIResponseCode.not_found
+        try:
+            manifests = request_payload.manifest_json
+            manifest_name = manifests['manifest_name']
+            project_code = manifests['project_code']
+            attributes = manifests.get('attributes', {})
+            permission = await has_permission(
+                current_identity,
+                project_code,
+                'file_attribute_template',
+                ConfigClass.GREEN_ZONE_LABEL.lower(),
+                'view',
+            )
+            self._logger.info(f'User permission: {permission}')
+            if not permission:
+                api_response.error_msg = 'Permission denied'
+                api_response.code = EAPIResponseCode.forbidden
+                return api_response.json_response()
+            response = await get_attribute_templates(project_code, manifest_name)
+            manifest_list = response.get('result')
+            self._logger.info(f'manifest_info: {manifest_list}')
+            if not manifest_list:
+                api_response.error_msg = customized_error_template(ECustomizedError.MANIFEST_NOT_FOUND) % manifest_name
+                api_response.result = 'invalid'
+                api_response.code = EAPIResponseCode.not_found
+                return api_response.json_response()
+            target_attribute = manifest_list[0].get('attributes')
+            self._logger.info(f'attributes: {attributes}')
+            self._logger.info(f'target_attribute: {target_attribute}')
+            validator = ManifestValidator(attributes, target_attribute)
+            attribute_validation_error_msg = await validator.has_valid_attributes()
+            if attribute_validation_error_msg:
+                self._logger.error(f'attribute_validation_error_msg: {attribute_validation_error_msg}')
+                api_response.error_msg = attribute_validation_error_msg
+                api_response.result = 'invalid'
+                api_response.code = EAPIResponseCode.bad_request
+                return api_response.json_response()
+            api_response.code = EAPIResponseCode.success
+            api_response.result = 'valid'
             return api_response.json_response()
-        validation_event['manifest'] = manifest_info
-        validator = ManifestValidator()
-        attribute_validation_error_msg = await validator.has_valid_attributes(validation_event, db_session)
-        if attribute_validation_error_msg:
-            api_response.result = attribute_validation_error_msg
-            api_response.code = EAPIResponseCode.bad_request
-            return api_response.json_response()
-        api_response.code = EAPIResponseCode.success
-        api_response.result = 'Valid'
-        return api_response.json_response()
+        except Exception as e:
+            self._logger.error(f'Error validate_manifest: {e}')
+            raise e
 
     @router.post(
         '/validate/env', tags=[_API_TAG], response_model=EnvValidateResponse, summary='Validate env for CLI commands'

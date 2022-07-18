@@ -129,8 +129,9 @@ class APIProject:
                     api_response.code = EAPIResponseCode.conflict
                     api_response.result = data
                     return api_response.json_response()
-            session_id = request.headers.get('Session-ID')
-            result = await transfer_to_pre(data, project_code, session_id)
+            self._logger.info('Tansfering to pre upload')
+            result = await transfer_to_pre(data, project_code, request.headers)
+            self._logger.info(result.text)
             if result.status_code == 409:
                 api_response.error_msg = result.json()['error_msg']
                 api_response.code = EAPIResponseCode.conflict

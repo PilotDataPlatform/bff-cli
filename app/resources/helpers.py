@@ -101,9 +101,7 @@ async def list_datasets(user, page, page_size):
 async def get_user_projects(current_identity, page, page_size, order, order_by):
     _logger.info('get_user_projects'.center(80, '-'))
     projects_list = []
-    project_client = ProjectClient(
-        ConfigClass.PROJECT_SERVICE, ConfigClass.REDIS_DB_URI
-    )
+    project_client = ProjectClient(ConfigClass.PROJECT_SERVICE, ConfigClass.REDIS_DB_URI)
     if current_identity['role'] != 'admin':
         roles = current_identity['realm_roles']
         project_codes = [i.split('-')[0] for i in roles]
@@ -127,19 +125,16 @@ async def get_user_projects(current_identity, page, page_size, order, order_by):
     return projects_list
 
 
-async def attach_manifest_to_file(event):
-    global_entity_id = event.get('global_entity_id')
-    manifest_id = event.get('manifest_id')
-    attributes = event.get('attributes')
-    _logger.info('attach_manifest_to_file'.center(80, '-'))
-    url = ConfigClass.METADATA_SERVICE + '/v1/items/batch/bequeath/'
-    params = {'ids': global_entity_id}
-    payload = {'attribute_template_id': manifest_id, 'attributes': attributes}
-    _logger.info(f'POSTING: {url}')
-    _logger.info(f'PAYLOAD: {payload}')
+async def get_attribute_templates(project_code, manifest_name=None):
+    _logger.info('get_attribute_templates'.center(80, '-'))
+    url = ConfigClass.METADATA_SERVICE + '/v1/template/'
+    params = {'project_code': project_code}
+    _logger.info(f'Getting: {url}')
     _logger.info(f'PARAMS: {params}')
+    if manifest_name:
+        params['name'] = manifest_name
     async with httpx.AsyncClient() as client:
-        response = await client.put(url=url, params=params, json=payload)
+        response = await client.get(url=url, params=params)
     _logger.info(f'RESPONSE: {response.text}')
     if not response.json():
         return None
@@ -212,3 +207,43 @@ def separate_rel_path(folder_path):
         rel_path = ''
         folder_name = folder_path
     return rel_path, folder_name
+
+
+class Annotations:
+
+    @staticmethod
+    async def attach_manifest_to_file(event):
+        _logger.info('attach_manifest_to_file'.center(80, '-'))
+        url = ConfigClass.METADATA_SERVICE + '/v1/item/'
+        params = {'id': event.get('global_entity_id')}
+        payload = {
+            'type': 'file',
+            'attribute_template_id': event.get('manifest_id'),
+            'attributes': event.get('attributes')
+        }
+        _logger.info(f'PUT: {url}')
+        _logger.info(f'PAYLOAD: {payload}')
+        _logger.info(f'PARAMS: {params}')
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url=url, params=params, json=payload)
+        _logger.info(f'RESPONSE: {response.text}')
+        result = response.json().get('result')
+        return result
+
+    @staticmethod
+    async def attach_manifest_to_folder(event):
+        _logger.info('attach_manifest_to_folder'.center(80, '-'))
+        url = ConfigClass.METADATA_SERVICE + '/v1/items/batch/bequeath/'
+        params = {'id': event.get('global_entity_id')}
+        payload = {
+            'attribute_template_id': event.get('manifest_id'),
+            'attributes': event.get('attributes')
+        }
+        _logger.info(f'PUT: {url}')
+        _logger.info(f'PAYLOAD: {payload}')
+        _logger.info(f'PARAMS: {params}')
+        async with httpx.AsyncClient() as client:
+            response = await client.put(url=url, params=params, json=payload)
+        _logger.info(f'RESPONSE: {response.text}')
+        result = response.json().get('result')
+        return result

@@ -193,7 +193,7 @@ def validate_upload_event(zone, current_identity, project_code):
     return result, error_msg
 
 
-async def transfer_to_pre(data, project_code, session_id):
+async def transfer_to_pre(data, project_code, header):
     try:
         _logger.info('transfer_to_pre'.center(80, '-'))
         payload = {
@@ -204,12 +204,16 @@ async def transfer_to_pre(data, project_code, session_id):
             'data': data.data,
             'job_type': data.job_type,
         }
-        headers = {'Session-ID': session_id}
+        headers = {
+            'Session-ID': header.get('Session-ID'),
+            'authorization': header.get('authorization')
+        }
         url = select_url_by_zone(data.zone)
         async with httpx.AsyncClient() as client:
             result = await client.post(url, headers=headers, json=payload)
+            _logger.info(f'pre response: {result.text}')
         return result
     except Exception as e:
-        api_response.error_msg = f'Upload service  error: {e}'
+        api_response.error_msg = f'Upload service error: {e}'
         api_response.code = EAPIResponseCode.forbidden
         return api_response.json_response()

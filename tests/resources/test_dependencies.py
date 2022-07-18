@@ -117,7 +117,11 @@ async def test_transfer_to_pre_success(httpx_mock):
         json={},
         status_code=200,
     )
-    result = await transfer_to_pre(mock_post_model, project_code, 'session_id')
+    headers = {
+        'Session-ID': 'session_id',
+        'authorization': 'fake-token'
+    }
+    result = await transfer_to_pre(mock_post_model, project_code, headers)
     assert result.json() == {}
 
 

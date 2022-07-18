@@ -21,13 +21,14 @@ from opentelemetry import trace
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
-from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+
+# from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from app.commons.data_providers.database import engine
+# from app.commons.data_providers.database import engine
 from app.config import ConfigClass
 from app.namespace import namespace
 from app.resources.error_handler import APIException
@@ -50,9 +51,6 @@ def instrument_app(app) -> None:
 
     tracer_provider.add_span_processor(BatchSpanProcessor(jaeger_exporter))
     FastAPIInstrumentor.instrument_app(app)
-    SQLAlchemyInstrumentor().instrument(
-        engine=engine.sync_engine,
-        service=namespace)
     HTTPXClientInstrumentor().instrument()
 
 
