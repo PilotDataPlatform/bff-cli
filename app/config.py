@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     DATASET_SERVICE: str
     HPC_SERVICE: str
     KG_SERVICE: str
-    PROVENANCE_SERVICE: str
+    AUDIT_TRAIL_SERVICE: str
     RDS_HOST: str
     RDS_DBNAME: str
     RDS_USER: str

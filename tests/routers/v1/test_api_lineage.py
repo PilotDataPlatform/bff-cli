@@ -36,7 +36,7 @@ async def test_create_lineage_should_return_200(
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://provenance_service/v1/lineage/',
+        url='http://audit_trail_service/v1/lineage/',
         json={
             'mutatedEntities': {
                 'UPDATE': [
@@ -83,7 +83,7 @@ async def test_create_lineage_with_internal_error_should_return_500(
     header = {'Authorization': 'fake token'}
     httpx_mock.add_response(
         method='POST',
-        url='http://provenance_service/v1/lineage/',
+        url='http://audit_trail_service/v1/lineage/',
         json={},
         status_code=500,
     )
