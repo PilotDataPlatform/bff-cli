@@ -67,17 +67,12 @@ class APIFile:
         located_geid, query_result = await batch_query_node_by_geid(geid_list)
         for global_entity_id in geid_list:
             self._logger.info(f'Query geid: {global_entity_id}')
+            result = {}
             if global_entity_id not in located_geid:
-                status = customized_error_template(
-                    ECustomizedError.FILE_NOT_FOUND
-                )
-                result = []
+                status = customized_error_template(ECustomizedError.FILE_NOT_FOUND)
                 self._logger.info(f'status: {status}')
             elif query_result[global_entity_id].get('archived'):
-                status = customized_error_template(
-                    ECustomizedError.FILE_FOLDER_ONLY
-                )
-                result = []
+                status = customized_error_template(ECustomizedError.FILE_FOLDER_ONLY)
                 self._logger.info(f'status: {status}')
             else:
                 self._logger.info(f'Query result: {query_result[global_entity_id]}')
@@ -94,17 +89,13 @@ class APIFile:
                 )
                 if not permission:
                     status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                    result = []
                 project_role = get_project_role(self.current_identity, project_code)
                 if user_name != name_folder and project_role not in ['platform-admin', 'admin']:
                     status = customized_error_template(ECustomizedError.PERMISSION_DENIED)
-                    result = []
                 else:
                     status = 'success'
-                    result = [query_result[global_entity_id]]
-            response_list.append(
-                {'status': status, 'result': result, 'geid': global_entity_id}
-            )
+                    result = query_result[global_entity_id]
+            response_list.append({'status': status, 'result': result, 'geid': global_entity_id})
         self._logger.info(f'Query file/folder result: {response_list}')
         file_response.result = response_list
         file_response.code = EAPIResponseCode.success
