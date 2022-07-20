@@ -13,9 +13,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-import os
-
 import pytest
 import pytest_asyncio
 from async_asgi_testclient import TestClient as TestAsyncClient
@@ -26,9 +23,6 @@ from app.config import ConfigClass
 from app.main import create_app
 from app.resources.dependencies import jwt_required
 from app.routers.v1.api_kg import APIProject
-
-os.environ['RDS_DB_URI'] = 'test_container_uri'
-RDS_SCHEMA_DEFAULT = os.environ['RDS_SCHEMA_DEFAULT']
 
 
 @pytest_asyncio.fixture
@@ -103,8 +97,8 @@ def mock_settings(monkeypatch):
     monkeypatch.setattr(ConfigClass, 'PROVENANCE_SERVICE', 'http://provenance_service')
     monkeypatch.setattr(ConfigClass, 'GREEN_ZONE_LABEL', 'gr')
     monkeypatch.setattr(ConfigClass, 'CORE_ZONE_LABEL', 'cr')
-    monkeypatch.setattr(ConfigClass, 'DATA_UPLOAD_SERVICE_CORE', 'http://data_upload_cr')
-    monkeypatch.setattr(ConfigClass, 'DATA_UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')
+    monkeypatch.setattr(ConfigClass, 'UPLOAD_SERVICE_CORE', 'http://data_upload_cr')
+    monkeypatch.setattr(ConfigClass, 'UPLOAD_SERVICE_GREENROOM', 'http://data_upload_gr')
     monkeypatch.setattr(ConfigClass, 'HPC_SERVICE', 'http://service_hpc')
     monkeypatch.setattr(ConfigClass, 'AUTH_SERVICE', 'http://service_auth')
     monkeypatch.setattr(ConfigClass, 'METADATA_SERVICE', 'http://metadata_service')

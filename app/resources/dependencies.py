@@ -151,9 +151,9 @@ async def has_permission(identity, project_code, resource, zone, operation):
 
 def select_url_by_zone(zone):
     if zone == ConfigClass.CORE_ZONE_LABEL.lower():
-        url = ConfigClass.DATA_UPLOAD_SERVICE_CORE + '/v1/files/jobs'
+        url = ConfigClass.UPLOAD_SERVICE_CORE + '/v1/files/jobs'
     else:
-        url = ConfigClass.DATA_UPLOAD_SERVICE_GREENROOM + '/v1/files/jobs'
+        url = ConfigClass.UPLOAD_SERVICE_GREENROOM + '/v1/files/jobs'
     return url
 
 
