@@ -47,7 +47,7 @@ class APILineage:
     ):
         self._logger.info('API Lineage'.center(80, '-'))
         proxy_payload = request_payload.__dict__
-        url = ConfigClass.PROVENANCE_SERVICE + '/v1/lineage/'
+        url = ConfigClass.AUDIT_TRAIL_SERVICE + '/v1/lineage/'
         self._logger.info(f'url: {url}')
         self._logger.info(f'payload: {proxy_payload}')
         async with httpx.AsyncClient() as client:
