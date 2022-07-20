@@ -16,6 +16,8 @@
 from fastapi import FastAPI
 from fastapi_health import health
 
+from app.resources.health_check import redis_check
+
 from .routers import api_root
 from .routers.v1 import api_dataset
 from .routers.v1 import api_file
@@ -25,7 +27,6 @@ from .routers.v1 import api_lineage
 from .routers.v1 import api_manifest
 from .routers.v1 import api_project
 from .routers.v1 import api_validation
-from app.resources.health_check import redis_check
 
 
 def api_registry(app: FastAPI):

@@ -1,7 +1,7 @@
-from common import LoggerFactory
-from ..config import ConfigClass
 from aioredis import StrictRedis
+from common import LoggerFactory
 
+from ..config import ConfigClass
 
 logger = LoggerFactory('api_health').get_logger()
 
