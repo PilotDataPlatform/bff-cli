@@ -4,7 +4,7 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/PilotDataPlatform/bff-cli/CI/develop?style=for-the-badge)](https://github.com/PilotDataPlatform/bff-cli/actions/workflows/main.yml)
 
 [![codecov](https://img.shields.io/codecov/c/github/PilotDataPlatform/bff-cli?style=for-the-badge)](https://codecov.io/gh/PilotDataPlatform/bff-cli)
-## About
+## Getting Started
 The backend for the command line interface.
 ### Built With
 - Python
@@ -12,34 +12,59 @@ The backend for the command line interface.
 ## Getting Started
 
 ### Prerequisites
-- [Poetry](https://python-poetry.org/) dependency manager.
-- Vault connection credentials or custom-set environment variables.
+This project is using [Poetry](https://python-poetry.org/docs/#installation) to handle the dependencies.
 
-### Installation
-#### Using Docker
-1. Add environment variables into `.env`.
-2. Run Docker compose with environment variables.
+    curl -sSL https://install.python-poetry.org | python3 -
 
-       docker-compose up
+### Installation & Quick Start
 
-2. Find service locally at `http://localhost:5080/`.
+1. Clone the project.
 
-#### Without Docker
-1. Install [Poetry](https://python-poetry.org/docs/#installation).
-2. Configure access to internal package registry.
+       git clone https://github.com/PilotDataPlatform/sandbox.git
 
-       poetry config virtualenvs.create false
+2. Install dependencies.
 
-3. Install dependencies.
+       poetry install
 
-       poetry install --no-dev --no-root --no-interaction
+3. Install any OS level dependencies.
 
-4. Add environment variables into `.env`.
-5. Run application.
+       apt install <foo>
+       brew install <bar>
+
+5. Add environment variables into `.env` in case it's needed. Use `.env.schema` as a reference.
+
+
+6. Run any initial scripts, migrations or database seeders.
+
+       poetry run alembic upgrade head
+
+7. Run application.
 
        poetry run python run.py
 
-6. Find service locally at `http://localhost:5080/`.
+### Startup using Docker
 
-## Usage
-Swagger API documentation can be found locally at `http://localhost:5080/v1/api-doc`.
+This project can also be started using [Docker](https://www.docker.com/get-started/).
+
+1. To build and start the service within the Docker container run.
+
+       docker compose up
+
+2. Migrations should run automatically on previous step. They can also be manually triggered:
+
+       docker compose run --rm alembic upgrade head
+
+## Resources
+
+* [Pilot Platform API Documentation](https://pilotdataplatform.github.io/api-docs/)
+* [Pilot Platform Helm Charts](https://github.com/PilotDataPlatform/helm-charts/)
+
+## Contribution
+
+You can contribute the project in following ways:
+
+* Report a bug
+* Suggest a feature
+* Open a pull request for fixing issues or adding functionality. Please consider
+  using [pre-commit](https://pre-commit.com) in this case.
+* For general guidelines how to contribute to the project, please take a look at the [contribution guides](CONTRIBUTING.md).

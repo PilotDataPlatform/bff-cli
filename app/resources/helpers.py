@@ -101,7 +101,7 @@ async def list_datasets(user, page, page_size):
 async def get_user_projects(current_identity, page, page_size, order, order_by):
     _logger.info('get_user_projects'.center(80, '-'))
     projects_list = []
-    project_client = ProjectClient(ConfigClass.PROJECT_SERVICE, ConfigClass.REDIS_DB_URI)
+    project_client = ProjectClient(ConfigClass.PROJECT_SERVICE, ConfigClass.REDIS_URI)
     if current_identity['role'] != 'admin':
         roles = current_identity['realm_roles']
         project_codes = [i.split('-')[0] for i in roles]

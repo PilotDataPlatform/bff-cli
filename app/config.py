@@ -62,33 +62,22 @@ class Settings(BaseSettings):
     CORE_ZONE_LABEL: str = ''
     GREEN_ZONE_LABEL: str = ''
     AUTH_SERVICE: str
-    DATA_UPLOAD_SERVICE_GREENROOM: str
-    DATA_UPLOAD_SERVICE_CORE: str
+    UPLOAD_SERVICE_GREENROOM: str
+    UPLOAD_SERVICE_CORE: str
     DATASET_SERVICE: str
     HPC_SERVICE: str
     KG_SERVICE: str
     AUDIT_TRAIL_SERVICE: str
-    RDS_HOST: str
-    RDS_DBNAME: str
-    RDS_USER: str
-    RDS_PWD: str
-    RDS_SCHEMA_DEFAULT: str
-    RDS_DB_URI: str
     METADATA_SERVICE: str
     PROJECT_SERVICE: str
-    REDIS_DB: str
     REDIS_HOST: str
     REDIS_PASSWORD: str
+    REDIS_DB: str
     REDIS_PORT: str
 
-    def __init__(self):
-        super().__init__()
-        self.RDS_DB_URI = self.RDS_DB_URI.replace(
-            'postgresql', 'postgresql+asyncpg'
-        )
-        self.REDIS_DB_URI = (
-            f'redis://:{self.REDIS_PASSWORD}@'
-            f'{self.REDIS_HOST}:{self.REDIS_PORT}')
+    def modify_values(self, settings):
+        settings.REDIS_URI = f'redis://:{settings.REDIS_PASSWORD}@{settings.REDIS_HOST}:{settings.REDIS_PORT}'
+        return settings
 
     class Config:
         env_file = '.env'
@@ -113,6 +102,7 @@ class Settings(BaseSettings):
 @lru_cache(1)
 def get_settings():
     settings = Settings()
+    settings = settings.modify_values(settings)
     return settings
 
 
