@@ -25,6 +25,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
 from app.config import ConfigClass
 from app.namespace import namespace
 from app.resources.error_handler import APIException
