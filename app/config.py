@@ -68,7 +68,6 @@ class Settings(BaseSettings):
     HPC_SERVICE: str
     KG_SERVICE: str
     AUDIT_TRAIL_SERVICE: str
-
     METADATA_SERVICE: str
     PROJECT_SERVICE: str
     REDIS_HOST: str
