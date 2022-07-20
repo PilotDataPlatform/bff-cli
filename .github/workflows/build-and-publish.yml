@@ -32,7 +32,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/pilotdataplatform/bff-cli
+            ghcr.io/pilotdataplatform/bff_cli
           # generate Docker tags based on the following events/attributes
           tags: |
             type=sha,enable=true,prefix=,suffix=,format=short
