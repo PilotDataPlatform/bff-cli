@@ -1,4 +1,4 @@
-name: Build and Publish
+name: CI/CD
 
 on:
   workflow_run:
@@ -6,8 +6,8 @@ on:
     branches: [ develop ]
     types:
       - completed
-  pull_request:
-    branches: [ main, develop ]
+  # pull_request:
+  #   branches: [ main, develop ]
 
 jobs:
   build-and-push-docker-image:
@@ -47,3 +47,42 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           # build on feature branches, push only on main branch
           push: ${{ github.event_name != 'pull_request' }}
+  Trigger-jenkins:
+    needs: [build-and-push-docker-image]
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: Trigger jenkins job
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo commit sha
+        run:  full_commit_SHA="${{ github.event.workflow_run.head_sha }}" && short_commit_SHA=$(echo "${full_commit_SHA:0:7}") && echo "SHA=$short_commit_SHA" >> $GITHUB_ENV
+        # getting commit_SHA for when this job has been trigger by push (not workflow_run)
+        # run:  full_commit_SHA="${{ github.sha }}" && short_commit_SHA=$(echo "${full_commit_SHA:0:7}") && echo "SHA=$short_commit_SHA" >> $GITHUB_ENV
+      - name: trigger the jenkins pipeline with curl
+        run: |
+          target_release=bff-cli
+          env=dev
+          curl --silent -i -X POST -m 60 -L -o output.txt --user jenkins:${{ secrets.JENKINS_API_TOKEN }} https://ci.dev.pilot.indocresearch.org/job/Infra/job/UpdateAppVersion/buildWithParameters --data TF_TARGET_ENV=$env --data TARGET_RELEASE=$target_release --data NEW_APP_VERSION="${{ env.SHA }}"
+          location=$(cat output.txt | grep location | cut -d " " -f2 | sed 's/\r//')
+          link=${location}api/json && echo $link && echo -n "location_link=$link" >> $GITHUB_ENV
+      - name: getting the json
+        run: |
+          sleep 10
+          curl --silent -o output.json --user jenkins:${{ secrets.JENKINS_API_TOKEN }} -X GET "${{ env.location_link }}"
+      - name: getting the build number
+        uses: sergeysova/jq-action@v2
+        id: build_number
+        with:
+          cmd: |
+            cd /github/workspace
+            build_num=$(jq .executable.number output.json -r)
+            echo $build_num && echo "build_number=$build_num" >> $GITHUB_ENV
+
+      - name: getting the result of the pipeline
+        run: |
+         timer=0;
+         timeout=300;
+         step=5;
+         echo "https://ci.dev.pilot.indocresearch.org/job/Infra/job/UpdateAppVersion/${{ env.build_number }}/api/json"
+         result=$(curl --silent --user jenkins:${{ secrets.JENKINS_API_TOKEN }} -X GET "https://ci.dev.pilot.indocresearch.org/job/Infra/job/UpdateAppVersion/${{ env.build_number }}/api/json" | grep -Eo '"result"[^,]*' | grep -Eo '[^:]*$' |  tr -d '"')
+         while [[ "$result" != "SUCCESS" && "$result" != "FAILURE" && $timer -lt $timeout ]]; do result=$(curl --silent --user jenkins:${{ secrets.JENKINS_API_TOKEN }} -X GET "https://ci.dev.pilot.indocresearch.org/job/Infra/job/UpdateAppVersion/${{ env.build_number }}/api/json" | grep -Eo '"result"[^,]*' | grep -Eo '[^:]*$' |  tr -d '"') && sleep $step && ((timer=timer+step)) && echo "result=$result in $timer seconds"; done
+         if [ "$result" != "SUCCESS" ]; then exit 1; fi
