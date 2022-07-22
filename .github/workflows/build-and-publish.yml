@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-and-push-docker-image:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build Docker image and push to repositories
     runs-on: ubuntu-latest
     steps:
